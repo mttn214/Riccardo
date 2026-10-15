@@ -18,17 +18,21 @@ import {
   Copy,
   FileText,
   AlertCircle,
-  Sparkles
+  Sparkles,
+  Printer,
+  Download
 } from 'lucide-react';
 import confetti from 'canvas-confetti';
 import { sendFormNotification } from '../services/formService';
 import { ApplePayLogo, GooglePayLogo, RevolutIcon, CreditCardBrandIcons } from './PaymentIcons';
 import {
+  getStripe,
   processStripeCardPayment,
   createStripePaymentRequest,
   createStripeCheckoutSession,
   STRIPE_TEST_CARD
 } from '../services/stripeService';
+
 
 interface ReservationModalProps {
   isOpen: boolean;
@@ -107,6 +111,8 @@ export const ReservationModal: React.FC<ReservationModalProps> = ({
   const [stripeError, setStripeError] = useState<string>('');
   const [isTestModeCardNotice, setIsTestModeCardNotice] = useState<boolean>(false);
   const [copiedIban, setCopiedIban] = useState<boolean>(false);
+  const [copiedTicketCode, setCopiedTicketCode] = useState<boolean>(false);
+
 
   // Reset or initialize on modal open
   useEffect(() => {
@@ -225,8 +231,8 @@ export const ReservationModal: React.FC<ReservationModalProps> = ({
       title: selectedSeminar.title,
       onPaymentSuccess: async ({ paymentMethodId, paymentIntentId, payerName, payerEmail }) => {
         await completeReservation({
-          methodTitle: paymentMethod === 'apple_pay' ? 'Apple Pay (Stripe overené)' : 'Google Pay (Stripe overené)',
-          paymentStatus: 'Autorizované cez Stripe',
+          methodTitle: 'Apple Pay (Priama autorizácia)',
+          paymentStatus: 'Autorizované / Uhradené cez Apple Pay',
           stripeTokenId: paymentMethodId,
           stripePaymentIntentId: paymentIntentId,
         });
@@ -235,17 +241,45 @@ export const ReservationModal: React.FC<ReservationModalProps> = ({
         setIsProcessingPayment(false);
         setStripeError(err);
       }
-    }).then((res) => {
+    }).then(async (res) => {
       if (!isMounted) return;
       setStripePaymentRequest(res.paymentRequest);
       setCanApplePay(res.canPayWithApplePay);
       setCanGooglePay(res.canPayWithGooglePay);
+
+      // Mount native Stripe Elements PaymentRequestButton if supported
+      if (res.paymentRequest && (res.canPayWithApplePay || res.canPayWithGooglePay)) {
+        try {
+          const stripe = await getStripe();
+          if (stripe && isMounted) {
+            const elements = stripe.elements();
+            const prBtn = elements.create('paymentRequestButton', {
+              paymentRequest: res.paymentRequest,
+              style: {
+                paymentRequestButton: {
+                  theme: 'dark',
+                  height: '56px',
+                  type: 'buy',
+                },
+              },
+            });
+            const mountEl = document.getElementById('native-apple-pay-element');
+            if (mountEl) {
+              mountEl.innerHTML = '';
+              prBtn.mount('#native-apple-pay-element');
+            }
+          }
+        } catch (mountErr) {
+          console.warn('Native PaymentRequestButton mount:', mountErr);
+        }
+      }
     });
 
     return () => {
       isMounted = false;
     };
   }, [isOpen, step, amountToPayNow, selectedSeminar]);
+
 
   // Format Card Number (adds space every 4 digits)
   const handleCardNumberChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -377,131 +411,49 @@ export const ReservationModal: React.FC<ReservationModalProps> = ({
   };
 
   // Dedicated Apple Pay transaction handler
-  const handleApplePayPayment = async () => {
-    setIsProcessingPayment(true);
-    setPaymentStatusText('Otváram Apple Pay transakciu...');
-    setStripeError('');
-
-    const randomTicketId = `RIC-${selectedSeminar.city.slice(0, 3).toUpperCase()}-${Math.floor(1000 + Math.random() * 9000)}`;
-
-    // A. Native Apple Pay sheet in Safari if available
-    if (stripePaymentRequest && canApplePay) {
+  const handleApplePayPayment = () => {
+    // 1. MUST be synchronous in Safari to preserve user gesture activation!
+    if (stripePaymentRequest) {
       try {
         stripePaymentRequest.show();
-        setIsProcessingPayment(false);
         return;
       } catch (nativeErr) {
-        console.warn('Native Apple Pay show error, falling back to Stripe Checkout:', nativeErr);
+        console.warn('Native Apple Pay show error, falling back:', nativeErr);
       }
     }
 
-    // B. Direct Stripe Checkout Session with Apple Pay
-    try {
-      setPaymentStatusText('Presmerovávam na bezpečnú Apple Pay platobnú bránu Stripe...');
-      const pendingBooking = {
-        seminar: selectedSeminar,
-        tier: currentTier,
-        formData,
-        amountToPayNow,
-        totalPackagePriceEUR,
-        paymentOption,
-        addOnBrush,
-        addOnAudit,
-        randomTicketId,
-        currency
-      };
-      localStorage.setItem('riccardo_pending_booking', JSON.stringify(pendingBooking));
-
-      const checkoutRes = await createStripeCheckoutSession({
-        amountEUR: amountToPayNow,
-        seminarTitle: selectedSeminar.title,
-        customerName: formData.fullName || 'Vážený zákazník',
-        customerEmail: formData.email,
-        customerPhone: formData.phone,
-        ticketId: randomTicketId,
-        tierName: currentTier.name,
-        paymentMethod: 'apple_pay'
-      });
-
-      if (checkoutRes.success && checkoutRes.url) {
-        window.location.href = checkoutRes.url;
-      } else {
-        setIsProcessingPayment(false);
-        setStripeError(checkoutRes.error || 'Nepodarilo sa spustiť Apple Pay transakciu.');
-      }
-    } catch (err: any) {
-      setIsProcessingPayment(false);
-      setStripeError(err.message || 'Chyba pri inicializácii Apple Pay.');
-    }
+    // 2. Fallback to Stripe Checkout session
+    executeCheckoutFallback('apple_pay');
   };
 
   // Dedicated Google Pay transaction handler
-  const handleGooglePayPayment = async () => {
-    setIsProcessingPayment(true);
-    setPaymentStatusText('Otváram Google Pay...');
-    setStripeError('');
-
-    const randomTicketId = `RIC-${selectedSeminar.city.slice(0, 3).toUpperCase()}-${Math.floor(1000 + Math.random() * 9000)}`;
-
-    if (stripePaymentRequest && canGooglePay) {
+  const handleGooglePayPayment = () => {
+    if (stripePaymentRequest) {
       try {
         stripePaymentRequest.show();
-        setIsProcessingPayment(false);
         return;
       } catch (nativeErr) {
-        console.warn('Native Google Pay show error, falling back to Stripe Checkout:', nativeErr);
+        console.warn('Native Google Pay show error, falling back:', nativeErr);
       }
     }
 
-    try {
-      setPaymentStatusText('Presmerovávam na Google Pay bránu...');
-      const pendingBooking = {
-        seminar: selectedSeminar,
-        tier: currentTier,
-        formData,
-        amountToPayNow,
-        totalPackagePriceEUR,
-        paymentOption,
-        addOnBrush,
-        addOnAudit,
-        randomTicketId,
-        currency
-      };
-      localStorage.setItem('riccardo_pending_booking', JSON.stringify(pendingBooking));
-
-      const checkoutRes = await createStripeCheckoutSession({
-        amountEUR: amountToPayNow,
-        seminarTitle: selectedSeminar.title,
-        customerName: formData.fullName || 'Vážený zákazník',
-        customerEmail: formData.email,
-        customerPhone: formData.phone,
-        ticketId: randomTicketId,
-        tierName: currentTier.name,
-        paymentMethod: 'google_pay'
-      });
-
-      if (checkoutRes.success && checkoutRes.url) {
-        window.location.href = checkoutRes.url;
-      } else {
-        setIsProcessingPayment(false);
-        setStripeError(checkoutRes.error || 'Nepodarilo sa spustiť Google Pay transakciu.');
-      }
-    } catch (err: any) {
-      setIsProcessingPayment(false);
-      setStripeError(err.message || 'Chyba pri inicializácii Google Pay.');
-    }
+    executeCheckoutFallback('google_pay');
   };
 
   // Dedicated Revolut Pay transaction handler
-  const handleRevolutPayPayment = async () => {
+  const handleRevolutPayPayment = () => {
+    executeCheckoutFallback('revolut_pay');
+  };
+
+  // Checkout fallback helper
+  const executeCheckoutFallback = async (method: 'apple_pay' | 'google_pay' | 'revolut_pay') => {
     setIsProcessingPayment(true);
-    setPaymentStatusText('Otváram Revolut Pay...');
+    setPaymentStatusText(`Pripravujem ${method === 'apple_pay' ? 'Apple Pay' : method === 'google_pay' ? 'Google Pay' : 'Revolut Pay'}...`);
     setStripeError('');
 
     const randomTicketId = `RIC-${selectedSeminar.city.slice(0, 3).toUpperCase()}-${Math.floor(1000 + Math.random() * 9000)}`;
 
     try {
-      setPaymentStatusText('Presmerovávam na Revolut Pay...');
       const pendingBooking = {
         seminar: selectedSeminar,
         tier: currentTier,
@@ -524,20 +476,69 @@ export const ReservationModal: React.FC<ReservationModalProps> = ({
         customerPhone: formData.phone,
         ticketId: randomTicketId,
         tierName: currentTier.name,
-        paymentMethod: 'revolut_pay'
+        paymentMethod: method
       });
 
       if (checkoutRes.success && checkoutRes.url) {
         window.location.href = checkoutRes.url;
       } else {
         setIsProcessingPayment(false);
-        setStripeError(checkoutRes.error || 'Nepodarilo sa spustiť Revolut Pay transakciu.');
+        setStripeError(checkoutRes.error || 'Nepodarilo sa spustiť platobnú reláciu.');
       }
     } catch (err: any) {
       setIsProcessingPayment(false);
-      setStripeError(err.message || 'Chyba pri inicializácii Revolut Pay.');
+      setStripeError(err.message || 'Chyba pri inicializácii platby.');
     }
   };
+
+  // Copy Ticket Code helper
+  const handleCopyTicketCode = () => {
+    navigator.clipboard.writeText(confirmationCode);
+    setCopiedTicketCode(true);
+    setTimeout(() => setCopiedTicketCode(false), 2500);
+  };
+
+  // Print / PDF Ticket
+  const handlePrintTicket = () => {
+    window.print();
+  };
+
+  // Download Ticket text file
+  const handleDownloadTicketFile = () => {
+    const textContent = `=====================================================
+HAIR SALON RICCARDO — OFICIÁLNA VSTUPENKA
+Prevádzkovateľ: zeterem s.r.o.
+=====================================================
+
+KÓD VSTUPENKY: ${confirmationCode}
+STAV: POTVRDENÉ & GARANTOVANÉ
+
+SEMINÁR: ${selectedSeminar.title}
+DÁTUM: ${selectedSeminar.dates}
+MIESTO: ${selectedSeminar.venue}, ${selectedSeminar.city} (Atelier)
+LEKTOR: Richard Čonka
+
+ÚČASTNÍK: ${formData.fullName}
+SALÓN / MESTO: ${formData.salonName || formData.city || 'Neuvedené'}
+BALÍČEK: ${currentTier.name} (${totalPackagePriceEUR} €)
+SPÔSOB PLATBY: ${paymentMethod.toUpperCase()}
+UHRADENÁ SUMA: ${amountToPayNow} €
+
+INŠTRUKCIE:
+Túto vstupenku alebo kód predložte pri príchode na recepcii.
+Kontakt: +421 908 261 740 | hair.riccardo@gmail.com
+Adresa salónu: Novohradská 3, 984 01 Lučenec
+=====================================================`;
+    const blob = new Blob([textContent], { type: 'text/plain;charset=utf-8' });
+    const url = window.URL.createObjectURL(blob);
+    const link = document.createElement('a');
+    link.href = url;
+    link.setAttribute('download', `Vstupenka-${confirmationCode}.txt`);
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+  };
+
 
 
   const handleDownloadCalendar = () => {
@@ -1305,7 +1306,10 @@ export const ReservationModal: React.FC<ReservationModalProps> = ({
                     </span>
                   </div>
 
-                  {/* JEDINÉ APPLE PAY TLAČIDLO */}
+                  {/* Native Stripe Elements Mount Point (renders Apple's native WebKit button in Safari) */}
+                  <div id="native-apple-pay-element" className="w-full empty:hidden" />
+
+                  {/* Fallback Direct Apple Pay Button */}
                   <button
                     type="button"
                     onClick={handleApplePayPayment}
@@ -1327,10 +1331,11 @@ export const ReservationModal: React.FC<ReservationModalProps> = ({
                   </button>
 
                   <p className="text-[11px] text-zinc-500 text-center">
-                    Platba cez Apple Wallet (Touch ID / Face ID) • Zabezpečené cez Stripe • Prevádzkovateľ: zeterem s.r.o.
+                    Platba prebehne priamo cez Apple Wallet (Touch ID / Face ID) bez opustenia stránky • Prevádzkovateľ: zeterem s.r.o.
                   </p>
                 </div>
               )}
+
 
               {/* 3. Google Pay Tab */}
               {paymentMethod === 'google_pay' && (
@@ -1492,32 +1497,55 @@ export const ReservationModal: React.FC<ReservationModalProps> = ({
                   Tešíme sa na vás, {formData.fullName}.
                 </h3>
                 <p className="text-xs sm:text-sm text-zinc-400 max-w-md mx-auto leading-relaxed">
-                  Vaša rezervácia bola úspešne spracovaná. Potvrdenie a daňový doklad vystavený prevádzkovateľom <strong>zeterem s.r.o.</strong> boli odoslané na <strong>{formData.email}</strong>.
+                  Vaša rezervácia a platba boli úspešne spracované. Potvrdenie s kódom vstupenky a daňový doklad vystavený prevádzkovateľom <strong>zeterem s.r.o.</strong> boli odoslané na <strong>{formData.email}</strong>.
                 </p>
               </div>
 
-              {/* Minimal Monochrome Ticket Card */}
-              <div className="max-w-md mx-auto p-6 rounded-3xl bg-zinc-900 border border-zinc-800 text-left space-y-4 shadow-2xl relative overflow-hidden">
-                <div className="absolute top-0 right-0 p-4 opacity-10">
-                  <QrCode className="w-32 h-32 text-white" />
+              {/* Prominent High-Contrast Reservation Code Box */}
+              <div className="max-w-md mx-auto p-4 sm:p-5 rounded-2xl bg-zinc-950 border-2 border-emerald-500/50 space-y-2 text-center shadow-2xl">
+                <span className="text-[10px] sm:text-xs uppercase font-extrabold tracking-widest text-emerald-400 block">
+                  Váš oficiálny kód vstupenky
+                </span>
+                <div className="flex items-center justify-center gap-3">
+                  <span className="text-2xl sm:text-3xl font-mono font-black text-white tracking-widest select-all">
+                    {confirmationCode}
+                  </span>
+                  <button
+                    type="button"
+                    onClick={handleCopyTicketCode}
+                    className="px-3 py-1.5 rounded-xl bg-zinc-800 hover:bg-zinc-700 text-zinc-200 hover:text-white text-xs font-semibold flex items-center gap-1.5 transition-all shadow"
+                    title="Kopírovať kód"
+                  >
+                    {copiedTicketCode ? <Check className="w-4 h-4 text-emerald-400" /> : <Copy className="w-4 h-4" />}
+                    <span>{copiedTicketCode ? 'Skopírované!' : 'Kopírovať'}</span>
+                  </button>
                 </div>
+                <p className="text-[11px] text-zinc-400">
+                  Tento kód je vašou záväznou vstupenkou na seminár. Predložte ho na recepcii.
+                </p>
+              </div>
 
+              {/* Minimal Luxury Ticket Card (Printable) */}
+              <div
+                id="printable-ticket"
+                className="max-w-md mx-auto p-6 rounded-3xl bg-zinc-900 border border-zinc-800 text-left space-y-4 shadow-2xl relative overflow-hidden"
+              >
                 <div className="flex justify-between items-baseline border-b border-zinc-800 pb-3">
                   <div>
-                    <span className="text-xs font-semibold tracking-wider text-white uppercase block">
-                      RICCARDO ACADEMY
+                    <span className="text-xs font-bold tracking-wider text-white uppercase block">
+                      RICCARDO ACADEMY • VIP VSTUPENKA
                     </span>
-                    <span className="text-[11px] text-zinc-500">Predajca: zeterem s.r.o.</span>
+                    <span className="text-[11px] text-zinc-500">Prevádzkovateľ: zeterem s.r.o.</span>
                   </div>
-                  <span className="font-mono text-xs text-white bg-zinc-800 px-2 py-0.5 rounded font-semibold">
+                  <span className="font-mono text-xs text-emerald-400 bg-emerald-950/80 border border-emerald-500/40 px-2.5 py-1 rounded-lg font-bold">
                     {confirmationCode}
                   </span>
                 </div>
 
-                <div className="space-y-2 text-xs relative z-10">
+                <div className="space-y-3 text-xs relative z-10">
                   <div>
-                    <span className="text-[10px] uppercase text-zinc-500 block">Seminár</span>
-                    <strong className="text-sm text-white font-medium block">
+                    <span className="text-[10px] uppercase text-zinc-500 block font-semibold">Seminár</span>
+                    <strong className="text-sm sm:text-base text-white font-semibold block leading-tight">
                       {selectedSeminar.title}
                     </strong>
                   </div>
@@ -1529,43 +1557,73 @@ export const ReservationModal: React.FC<ReservationModalProps> = ({
                     </div>
                     <div>
                       <span className="text-[10px] uppercase text-zinc-500 block">Miesto</span>
-                      <span className="font-medium text-white">{selectedSeminar.city} (Atelier)</span>
+                      <span className="font-medium text-white">{selectedSeminar.city} (Atelier Riccardo)</span>
                     </div>
                   </div>
 
                   <div className="pt-2 border-t border-zinc-800/80 grid grid-cols-2 gap-3">
                     <div>
                       <span className="text-[10px] uppercase text-zinc-500 block">Účastník</span>
-                      <span className="font-medium text-white">{formData.fullName}</span>
+                      <span className="font-medium text-white text-sm">{formData.fullName}</span>
                       <span className="text-[10px] text-zinc-500 block">{formData.salonName || formData.city}</span>
                     </div>
                     <div>
                       <span className="text-[10px] uppercase text-zinc-500 block">Spôsob platby</span>
-                      <span className="text-emerald-400 font-medium">
+                      <span className="text-emerald-400 font-medium block">
                         {paymentMethod === 'apple_pay' && 'Apple Pay (Uhradené)'}
                         {paymentMethod === 'google_pay' && 'Google Pay (Uhradené)'}
                         {paymentMethod === 'revolut_pay' && 'Revolut Pay (Uhradené)'}
                         {paymentMethod === 'card' && 'Platobná karta (Uhradené)'}
                         {paymentMethod === 'transfer' && 'Faktúra / Účet (Rezervované)'}
                       </span>
-                      <span className="text-[10px] text-zinc-500 block">Suma: {amountToPayNow} €</span>
+                      <span className="text-[10px] text-zinc-400 block font-mono">Uhradená suma: {amountToPayNow} €</span>
                     </div>
+                  </div>
+
+                  {/* Scannable Crisp QR Code */}
+                  <div className="pt-3 border-t border-zinc-800 flex flex-col items-center justify-center gap-2">
+                    <div className="p-2.5 bg-white rounded-2xl shadow-md">
+                      <img
+                        src={`https://api.qrserver.com/v1/create-qr-code/?size=160x160&data=${encodeURIComponent(confirmationCode || 'RIC-VIP')}&color=000000&bgcolor=ffffff`}
+                        alt={`QR Vstupenka ${confirmationCode}`}
+                        className="w-28 h-28 object-contain"
+                      />
+                    </div>
+                    <span className="text-[10px] font-mono tracking-wider text-zinc-400 text-center">
+                      Predložte tento QR kód alebo kód {confirmationCode} pri vstupe
+                    </span>
                   </div>
                 </div>
 
-                <div className="pt-3 border-t border-zinc-800 flex items-center justify-between text-xs">
-                  <div className="flex items-center gap-2">
-                    <QrCode className="w-7 h-7 text-white" />
-                    <span className="text-[10px] text-zinc-400">Platná elektronická vstupenka</span>
-                  </div>
-                  <span className="text-xs font-semibold text-zinc-300">
-                    Spolu balíček: {totalPackagePriceEUR} €
-                  </span>
+                <div className="pt-3 border-t border-zinc-800 flex items-center justify-between text-xs text-zinc-400">
+                  <span>Platná elektronická vstupenka</span>
+                  <span className="font-semibold text-white">Balíček: {currentTier.name} ({totalPackagePriceEUR} €)</span>
                 </div>
               </div>
 
+              {/* Download and Print Ticket Actions */}
+              <div className="max-w-md mx-auto grid grid-cols-1 sm:grid-cols-2 gap-2.5 pt-1">
+                <button
+                  type="button"
+                  onClick={handlePrintTicket}
+                  className="py-3 px-4 rounded-xl bg-white text-black font-semibold text-xs hover:bg-zinc-200 transition-all flex items-center justify-center gap-2 shadow-lg active:scale-95"
+                >
+                  <Printer className="w-4 h-4" />
+                  <span>Vytlačiť / Uložiť (PDF)</span>
+                </button>
+
+                <button
+                  type="button"
+                  onClick={handleDownloadTicketFile}
+                  className="py-3 px-4 rounded-xl bg-zinc-850 hover:bg-zinc-800 border border-zinc-700 text-white font-medium text-xs transition-all flex items-center justify-center gap-2 active:scale-95 shadow"
+                >
+                  <Download className="w-4 h-4 text-emerald-400" />
+                  <span>Stiahnuť potvrdenie (.txt)</span>
+                </button>
+              </div>
+
               {/* Add to Calendar Action Buttons */}
-              <div className="space-y-3">
+              <div className="space-y-2 pt-2">
                 <span className="text-xs text-zinc-400 block font-medium">
                   Pridajte si termín do svojho kalendára:
                 </span>
@@ -1591,6 +1649,7 @@ export const ReservationModal: React.FC<ReservationModalProps> = ({
 
             </div>
           )}
+
 
         </div>
 

@@ -16,6 +16,22 @@ export interface FormSubmissionData {
 
 export async function sendFormNotification(data: FormSubmissionData): Promise<{ success: boolean; message?: string }> {
   try {
+    // 1. Try serverless endpoint first for reliable double-delivery (customer + salon)
+    const apiRes = await fetch('/api/send-email', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(data)
+    });
+
+    if (apiRes.ok) {
+      return { success: true };
+    }
+  } catch (apiErr) {
+    console.warn('/api/send-email fallback to direct formsubmit:', apiErr);
+  }
+
+  // 2. Direct fallback to FormSubmit with _cc and _autoresponse for customer
+  try {
     const response = await fetch(`https://formsubmit.co/ajax/${FORM_NOTIFICATION_EMAIL}`, {
       method: 'POST',
       headers: {
@@ -23,9 +39,12 @@ export async function sendFormNotification(data: FormSubmissionData): Promise<{ 
         'Accept': 'application/json'
       },
       body: JSON.stringify({
-        _subject: `[Riccardo Salon] ${data.formType}: ${data.name}`,
+        _subject: `[Riccardo Salon] ${data.formType}: ${data.name} (${data['Kód vstupenky'] || 'RIC'})`,
         _template: 'table',
         _captcha: 'false',
+        _cc: data.email,
+        _replyto: data.email,
+        _autoresponse: `Dobrý deň ${data.name},\n\nĎakujeme za Vašu rezerváciu seminára v Hair Salon Riccardo (zeterem s.r.o.).\nKód Vašej vstupenky: ${data['Kód vstupenky'] || 'RIC-VIP'}\nSeminár: ${data['Názov seminára'] || ''}\nTermín: ${data['Termín konania'] || ''}\nSuma: ${data['Uhradená suma teraz'] || ''}\n\nTento kód predložte pri vstupe na recepcii. Tešíme sa na Vás!\nPrevádzkovateľ: zeterem s.r.o.`,
         'Typ formulára': data.formType,
         'Meno a priezvisko': data.name,
         'Email odosielateľa': data.email,
@@ -42,7 +61,7 @@ export async function sendFormNotification(data: FormSubmissionData): Promise<{ 
     return { success: false, message: result.message };
   } catch (error) {
     console.error('Chyba pri odosielaní formulára:', error);
-    // Return true on network failure fallback so the user experience isn't blocked on the frontend
     return { success: true };
   }
 }
+
