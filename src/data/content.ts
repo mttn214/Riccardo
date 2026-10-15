@@ -78,7 +78,7 @@ export const STYLIST_PROFILE = {
   tagline: "Vzdelávacie semináre, precízna tvorba & majstrovstvo účesov",
   address: "J. Kármána 1727/30, 984 01 Lučenec, Slovensko",
   phone: "+421 915 869 758",
-  email: "info@hairsalonriccardo.sk",
+  email: "hair.riccardo@gmail.com",
   instagramHandle: "@hair_riccardo",
   instagramUrl: "https://www.instagram.com/hair_riccardo/",
   facebookUrl: "https://www.facebook.com/hairsalonriccardo",
