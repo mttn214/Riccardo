@@ -261,3 +261,53 @@ export async function createStripePaymentRequest({
     return { paymentRequest: null, canPayWithApplePay: false, canPayWithGooglePay: false };
   }
 }
+
+export interface CreateCheckoutSessionParams {
+  amountEUR: number;
+  seminarTitle: string;
+  customerName: string;
+  customerEmail: string;
+  customerPhone: string;
+  ticketId?: string;
+  tierName?: string;
+  paymentMethod?: 'apple_pay' | 'google_pay' | 'revolut_pay' | 'card';
+}
+
+export async function createStripeCheckoutSession(params: CreateCheckoutSessionParams): Promise<{
+  success: boolean;
+  url?: string;
+  sessionId?: string;
+  error?: string;
+}> {
+  try {
+    const res = await fetch('/api/checkout', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(params)
+    });
+    const data = await res.json();
+    return data;
+  } catch (err: any) {
+    return { success: false, error: err.message || 'Nepodarilo sa spojiť so Stripe Checkout.' };
+  }
+}
+
+export async function verifyStripeSession(sessionId: string): Promise<{
+  success: boolean;
+  paid?: boolean;
+  status?: string;
+  paymentIntentId?: string;
+  customerEmail?: string;
+  customerName?: string;
+  metadata?: any;
+  error?: string;
+}> {
+  try {
+    const res = await fetch(`/api/verify-session?sessionId=${encodeURIComponent(sessionId)}`);
+    const data = await res.json();
+    return data;
+  } catch (err: any) {
+    return { success: false, error: err.message || 'Nepodarilo sa overiť stav platby.' };
+  }
+}
+

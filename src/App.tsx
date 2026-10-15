@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Routes, Route, Navigate } from 'react-router-dom';
 import { Seminar, PortfolioItem, SEMINARS_DATA, STYLIST_PROFILE } from './data/content';
 import { Navbar } from './components/Navbar';
@@ -14,6 +14,8 @@ import { AwardsPage } from './pages/AwardsPage';
 import { TestimonialsPage } from './pages/TestimonialsPage';
 import { ContactPage } from './pages/ContactPage';
 import { Phone, Calendar } from 'lucide-react';
+import { verifyStripeSession } from './services/stripeService';
+import { sendFormNotification } from './services/formService';
 
 export function App() {
   // Modals
@@ -22,12 +24,83 @@ export function App() {
   const [isBookingOpen, setIsBookingOpen] = useState(false);
   const [bookingSeminar, setBookingSeminar] = useState<Seminar | null>(null);
   const [bookingTierId, setBookingTierId] = useState<string | undefined>(undefined);
+  const [initialBookingStep, setInitialBookingStep] = useState<1 | 2 | 3 | 4>(1);
+  const [initialConfirmationCode, setInitialConfirmationCode] = useState<string>('');
+  const [initialFormData, setInitialFormData] = useState<any>(null);
+
+  // Detect return from Stripe Checkout (Apple Pay / Express Checkout)
+  useEffect(() => {
+    const urlParams = new URLSearchParams(window.location.search);
+    const paymentStatus = urlParams.get('payment');
+    const sessionId = urlParams.get('session_id');
+
+    if (paymentStatus === 'success' && sessionId) {
+      window.history.replaceState({}, document.title, window.location.pathname);
+
+      verifyStripeSession(sessionId).then(async (res) => {
+        if (res.success && res.paid) {
+          const saved = localStorage.getItem('riccardo_pending_booking');
+          let bookingData: any = null;
+          if (saved) {
+            try {
+              bookingData = JSON.parse(saved);
+            } catch (e) {
+              console.error(e);
+            }
+          }
+
+          const seminar = bookingData?.seminar || SEMINARS_DATA[0];
+          const tier = bookingData?.tier || seminar.tiers[0];
+          const savedForm = bookingData?.formData || {};
+          const customerName = savedForm.fullName || res.customerName || 'Vážený zákazník';
+          const customerEmail = savedForm.email || res.customerEmail || '';
+          const customerPhone = savedForm.phone || '';
+          const ticketCode = bookingData?.randomTicketId || `RIC-${seminar.city.slice(0, 3).toUpperCase()}-${Math.floor(1000 + Math.random() * 9000)}`;
+
+          await sendFormNotification({
+            formType: 'Rezervácia seminára',
+            name: customerName,
+            email: customerEmail,
+            phone: customerPhone,
+            'Názov seminára': seminar.title,
+            'Termín konania': seminar.dates,
+            'Miesto konania': `${seminar.venue}, ${seminar.city}`,
+            'Zvolený balíček': `${tier.name} (${tier.priceEUR} €)`,
+            'Spôsob platby': 'Apple Pay (Stripe Checkout)',
+            'Stav platby': 'Uhradené cez Apple Pay (Stripe)',
+            'Stripe Payment Intent ID': (typeof res.paymentIntentId === 'string' ? res.paymentIntentId : res.paymentIntentId?.id) || sessionId,
+            'Platobný režim': 'Celá suma vopred',
+            'Uhradená suma teraz': `${res.amountTotal || tier.priceEUR} €`,
+            'Kód vstupenky': ticketCode,
+            'Prevádzkovateľ eshopu': 'zeterem s.r.o.'
+          });
+
+          localStorage.removeItem('riccardo_pending_booking');
+
+          setBookingSeminar(seminar);
+          setBookingTierId(tier.id);
+          setInitialBookingStep(4);
+          setInitialConfirmationCode(ticketCode);
+          setInitialFormData({
+            ...savedForm,
+            fullName: customerName,
+            email: customerEmail,
+            phone: customerPhone
+          });
+          setIsBookingOpen(true);
+        }
+      });
+    }
+  }, []);
 
   const handleOpenBooking = (seminar?: Seminar, tierId?: string) => {
     setBookingSeminar(seminar || SEMINARS_DATA[0]);
     setBookingTierId(tierId);
+    setInitialBookingStep(1);
+    setInitialConfirmationCode('');
     setIsBookingOpen(true);
   };
+
 
   const handleSelectTierFromDetail = (seminar: Seminar, tierId: string) => {
     setDetailSeminar(null);
@@ -110,10 +183,17 @@ export function App() {
 
       <ReservationModal
         isOpen={isBookingOpen}
-        onClose={() => setIsBookingOpen(false)}
+        onClose={() => {
+          setIsBookingOpen(false);
+          setInitialBookingStep(1);
+          setInitialConfirmationCode('');
+        }}
         currency="EUR"
         initialSeminar={bookingSeminar}
         initialTierId={bookingTierId}
+        initialStep={initialBookingStep}
+        initialConfirmationCode={initialConfirmationCode}
+        initialFormData={initialFormData}
       />
 
       <PortfolioModal

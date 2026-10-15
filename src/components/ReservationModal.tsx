@@ -26,6 +26,7 @@ import { ApplePayLogo, GooglePayLogo, RevolutIcon, CreditCardBrandIcons } from '
 import {
   processStripeCardPayment,
   createStripePaymentRequest,
+  createStripeCheckoutSession,
   STRIPE_TEST_CARD
 } from '../services/stripeService';
 
@@ -35,6 +36,9 @@ interface ReservationModalProps {
   currency: Currency;
   initialSeminar?: Seminar | null;
   initialTierId?: string;
+  initialStep?: 1 | 2 | 3 | 4;
+  initialConfirmationCode?: string;
+  initialFormData?: any;
 }
 
 export const ReservationModal: React.FC<ReservationModalProps> = ({
@@ -43,7 +47,11 @@ export const ReservationModal: React.FC<ReservationModalProps> = ({
   currency,
   initialSeminar,
   initialTierId,
+  initialStep,
+  initialConfirmationCode,
+  initialFormData,
 }) => {
+
   const [selectedSeminar, setSelectedSeminar] = useState<Seminar>(
     initialSeminar || SEMINARS_DATA[0]
   );
@@ -103,7 +111,13 @@ export const ReservationModal: React.FC<ReservationModalProps> = ({
   // Reset or initialize on modal open
   useEffect(() => {
     if (isOpen) {
-      setStep(1);
+      setStep(initialStep || 1);
+      if (initialConfirmationCode) {
+        setConfirmationCode(initialConfirmationCode);
+      }
+      if (initialFormData) {
+        setFormData((prev) => ({ ...prev, ...initialFormData }));
+      }
       setStripeError('');
       setIsTestModeCardNotice(false);
       setIsProcessingPayment(false);
@@ -115,7 +129,8 @@ export const ReservationModal: React.FC<ReservationModalProps> = ({
         );
       }
     }
-  }, [isOpen, initialSeminar, initialTierId]);
+  }, [isOpen, initialSeminar, initialTierId, initialStep, initialConfirmationCode, initialFormData]);
+
 
   useEffect(() => {
     if (step === 4) {
@@ -335,42 +350,19 @@ export const ReservationModal: React.FC<ReservationModalProps> = ({
 
     // 2. Apple Pay
     if (paymentMethod === 'apple_pay') {
-      if (stripePaymentRequest && canApplePay) {
-        setIsProcessingPayment(true);
-        setPaymentStatusText('Otváram Apple Pay na vašom zariadení...');
-        stripePaymentRequest.show();
-        setIsProcessingPayment(false);
-        return;
-      } else {
-        setStripeError('Apple Pay na webe vyžaduje prehliadač Safari na zariadení Apple s pridanou kartou v Peňaženke a overenú doménu v Stripe. Pre otestovanie zvoľte záložku „Platobná karta“ alebo „Faktúra / Prevod“.');
-        return;
-      }
+      await handleApplePayPayment();
+      return;
     }
 
     // 3. Google Pay
     if (paymentMethod === 'google_pay') {
-      if (stripePaymentRequest && canGooglePay) {
-        setIsProcessingPayment(true);
-        setPaymentStatusText('Otváram Google Pay...');
-        stripePaymentRequest.show();
-        setIsProcessingPayment(false);
-        return;
-      } else {
-        setStripeError('Google Pay peňaženka nie je v tomto prehliadači pripravená. Zvoľte prosím záložku „Platobná karta“ alebo „Faktúra / Prevod“.');
-        return;
-      }
+      await handleGooglePayPayment();
+      return;
     }
 
     // 4. Revolut Pay
     if (paymentMethod === 'revolut_pay') {
-      setIsProcessingPayment(true);
-      setPaymentStatusText('Spracovávam rezerváciu cez Revolut Pay...');
-      await new Promise((r) => setTimeout(r, 800));
-
-      await completeReservation({
-        methodTitle: 'Revolut Pay (zeterem s.r.o.)',
-        paymentStatus: 'Autorizované cez Revolut Pay',
-      });
+      await handleRevolutPayPayment();
       return;
     }
 
@@ -383,6 +375,170 @@ export const ReservationModal: React.FC<ReservationModalProps> = ({
       return;
     }
   };
+
+  // Dedicated Apple Pay transaction handler
+  const handleApplePayPayment = async () => {
+    setIsProcessingPayment(true);
+    setPaymentStatusText('Otváram Apple Pay transakciu...');
+    setStripeError('');
+
+    const randomTicketId = `RIC-${selectedSeminar.city.slice(0, 3).toUpperCase()}-${Math.floor(1000 + Math.random() * 9000)}`;
+
+    // A. Native Apple Pay sheet in Safari if available
+    if (stripePaymentRequest && canApplePay) {
+      try {
+        stripePaymentRequest.show();
+        setIsProcessingPayment(false);
+        return;
+      } catch (nativeErr) {
+        console.warn('Native Apple Pay show error, falling back to Stripe Checkout:', nativeErr);
+      }
+    }
+
+    // B. Direct Stripe Checkout Session with Apple Pay
+    try {
+      setPaymentStatusText('Presmerovávam na bezpečnú Apple Pay platobnú bránu Stripe...');
+      const pendingBooking = {
+        seminar: selectedSeminar,
+        tier: currentTier,
+        formData,
+        amountToPayNow,
+        totalPackagePriceEUR,
+        paymentOption,
+        addOnBrush,
+        addOnAudit,
+        randomTicketId,
+        currency
+      };
+      localStorage.setItem('riccardo_pending_booking', JSON.stringify(pendingBooking));
+
+      const checkoutRes = await createStripeCheckoutSession({
+        amountEUR: amountToPayNow,
+        seminarTitle: selectedSeminar.title,
+        customerName: formData.fullName || 'Vážený zákazník',
+        customerEmail: formData.email,
+        customerPhone: formData.phone,
+        ticketId: randomTicketId,
+        tierName: currentTier.name,
+        paymentMethod: 'apple_pay'
+      });
+
+      if (checkoutRes.success && checkoutRes.url) {
+        window.location.href = checkoutRes.url;
+      } else {
+        setIsProcessingPayment(false);
+        setStripeError(checkoutRes.error || 'Nepodarilo sa spustiť Apple Pay transakciu.');
+      }
+    } catch (err: any) {
+      setIsProcessingPayment(false);
+      setStripeError(err.message || 'Chyba pri inicializácii Apple Pay.');
+    }
+  };
+
+  // Dedicated Google Pay transaction handler
+  const handleGooglePayPayment = async () => {
+    setIsProcessingPayment(true);
+    setPaymentStatusText('Otváram Google Pay...');
+    setStripeError('');
+
+    const randomTicketId = `RIC-${selectedSeminar.city.slice(0, 3).toUpperCase()}-${Math.floor(1000 + Math.random() * 9000)}`;
+
+    if (stripePaymentRequest && canGooglePay) {
+      try {
+        stripePaymentRequest.show();
+        setIsProcessingPayment(false);
+        return;
+      } catch (nativeErr) {
+        console.warn('Native Google Pay show error, falling back to Stripe Checkout:', nativeErr);
+      }
+    }
+
+    try {
+      setPaymentStatusText('Presmerovávam na Google Pay bránu...');
+      const pendingBooking = {
+        seminar: selectedSeminar,
+        tier: currentTier,
+        formData,
+        amountToPayNow,
+        totalPackagePriceEUR,
+        paymentOption,
+        addOnBrush,
+        addOnAudit,
+        randomTicketId,
+        currency
+      };
+      localStorage.setItem('riccardo_pending_booking', JSON.stringify(pendingBooking));
+
+      const checkoutRes = await createStripeCheckoutSession({
+        amountEUR: amountToPayNow,
+        seminarTitle: selectedSeminar.title,
+        customerName: formData.fullName || 'Vážený zákazník',
+        customerEmail: formData.email,
+        customerPhone: formData.phone,
+        ticketId: randomTicketId,
+        tierName: currentTier.name,
+        paymentMethod: 'google_pay'
+      });
+
+      if (checkoutRes.success && checkoutRes.url) {
+        window.location.href = checkoutRes.url;
+      } else {
+        setIsProcessingPayment(false);
+        setStripeError(checkoutRes.error || 'Nepodarilo sa spustiť Google Pay transakciu.');
+      }
+    } catch (err: any) {
+      setIsProcessingPayment(false);
+      setStripeError(err.message || 'Chyba pri inicializácii Google Pay.');
+    }
+  };
+
+  // Dedicated Revolut Pay transaction handler
+  const handleRevolutPayPayment = async () => {
+    setIsProcessingPayment(true);
+    setPaymentStatusText('Otváram Revolut Pay...');
+    setStripeError('');
+
+    const randomTicketId = `RIC-${selectedSeminar.city.slice(0, 3).toUpperCase()}-${Math.floor(1000 + Math.random() * 9000)}`;
+
+    try {
+      setPaymentStatusText('Presmerovávam na Revolut Pay...');
+      const pendingBooking = {
+        seminar: selectedSeminar,
+        tier: currentTier,
+        formData,
+        amountToPayNow,
+        totalPackagePriceEUR,
+        paymentOption,
+        addOnBrush,
+        addOnAudit,
+        randomTicketId,
+        currency
+      };
+      localStorage.setItem('riccardo_pending_booking', JSON.stringify(pendingBooking));
+
+      const checkoutRes = await createStripeCheckoutSession({
+        amountEUR: amountToPayNow,
+        seminarTitle: selectedSeminar.title,
+        customerName: formData.fullName || 'Vážený zákazník',
+        customerEmail: formData.email,
+        customerPhone: formData.phone,
+        ticketId: randomTicketId,
+        tierName: currentTier.name,
+        paymentMethod: 'revolut_pay'
+      });
+
+      if (checkoutRes.success && checkoutRes.url) {
+        window.location.href = checkoutRes.url;
+      } else {
+        setIsProcessingPayment(false);
+        setStripeError(checkoutRes.error || 'Nepodarilo sa spustiť Revolut Pay transakciu.');
+      }
+    } catch (err: any) {
+      setIsProcessingPayment(false);
+      setStripeError(err.message || 'Chyba pri inicializácii Revolut Pay.');
+    }
+  };
+
 
   const handleDownloadCalendar = () => {
     const icsContent = `BEGIN:VCALENDAR\r\nVERSION:2.0\r\nPRODID:-//Hair Salon Riccardo//Masterclass Reservations//SK\r\nBEGIN:VEVENT\r\nSUMMARY:${selectedSeminar.title} — Hair Salon Riccardo\r\nDESCRIPTION:Masterclass s Richardom Čonkom. Kód rezervácie: ${confirmationCode}. Prevádzkovateľ: zeterem s.r.o.\r\nLOCATION:${selectedSeminar.venue}, ${selectedSeminar.city}\r\nSTATUS:CONFIRMED\r\nEND:VEVENT\r\nEND:VCALENDAR`;
@@ -1140,99 +1296,72 @@ export const ReservationModal: React.FC<ReservationModalProps> = ({
 
               {/* 2. Apple Pay Tab */}
               {paymentMethod === 'apple_pay' && (
-                <div className="p-5 rounded-2xl bg-zinc-900/60 border border-zinc-850 space-y-4 animate-fadeIn">
+                <div className="p-6 rounded-2xl bg-zinc-900/60 border border-zinc-850 space-y-4 animate-fadeIn">
                   <div className="flex items-center justify-between text-xs text-zinc-400">
                     <span>Expresná autorizácia cez Apple Pay</span>
-                    <span className="text-white font-medium">Touch ID / Face ID</span>
+                    <span className="text-white font-medium flex items-center gap-1.5">
+                      <span className="w-2 h-2 rounded-full bg-emerald-400 animate-pulse"></span>
+                      Touch ID / Face ID
+                    </span>
                   </div>
 
-                  {canApplePay ? (
-                    <button
-                      type="button"
-                      onClick={handleProcessPayment}
-                      disabled={isProcessingPayment}
-                      className="w-full py-4 px-6 rounded-2xl bg-white text-black font-semibold text-sm hover:bg-zinc-100 transition-all flex items-center justify-center gap-2.5 active:scale-95 shadow-xl"
-                    >
-                      <ApplePayLogo className="h-6 w-auto" fill="#000000" />
-                      <span className="font-semibold text-base">Zaplatiť {amountToPayNow} €</span>
-                    </button>
-                  ) : (
-                    <div className="p-4 rounded-xl bg-zinc-950 border border-zinc-800 space-y-3">
-                      <p className="text-xs text-zinc-300 leading-relaxed">
-                        Apple Pay na webe vyžaduje Safari na zariadení Apple (iPhone, iPad, Mac) s aktívnou kartou v Peňaženke a zaregistrovanú doménu v Stripe.
-                      </p>
-                      <div className="flex flex-wrap gap-2 pt-1">
-                        <button
-                          type="button"
-                          onClick={() => setPaymentMethod('card')}
-                          className="px-4 py-2 rounded-xl bg-white text-black text-xs font-semibold hover:bg-zinc-200 transition-all"
-                        >
-                          Zaplatiť kartou
-                        </button>
-                        <button
-                          type="button"
-                          onClick={() => completeReservation({
-                            methodTitle: 'Rezervácia (Apple Pay alternatíva - Na účet)',
-                            paymentStatus: 'Rezervované — vystavenie faktúry zeterem s.r.o.'
-                          })}
-                          className="px-4 py-2 rounded-xl bg-zinc-850 hover:bg-zinc-800 border border-zinc-700 text-zinc-200 text-xs font-medium transition-all"
-                        >
-                          Dokončiť rezerváciu na faktúru
-                        </button>
+                  {/* JEDINÉ APPLE PAY TLAČIDLO */}
+                  <button
+                    type="button"
+                    onClick={handleApplePayPayment}
+                    disabled={isProcessingPayment}
+                    className="w-full py-4 px-6 rounded-2xl bg-black hover:bg-zinc-900 active:scale-[0.98] border border-zinc-700/80 text-white font-semibold text-base transition-all flex items-center justify-center gap-3 shadow-2xl cursor-pointer"
+                  >
+                    {isProcessingPayment ? (
+                      <div className="flex items-center gap-2 text-zinc-300 text-sm">
+                        <Loader2 className="w-5 h-5 animate-spin text-white" />
+                        <span>{paymentStatusText || 'Inicializujem Apple Pay...'}</span>
                       </div>
-                    </div>
-                  )}
+                    ) : (
+                      <div className="flex items-center justify-center gap-2.5">
+                        <ApplePayLogo className="h-6 w-auto fill-white text-white" />
+                        <span className="text-zinc-500 font-light text-lg">|</span>
+                        <span className="tracking-tight text-white font-semibold">Zaplatiť {amountToPayNow} €</span>
+                      </div>
+                    )}
+                  </button>
 
                   <p className="text-[11px] text-zinc-500 text-center">
-                    Platba prebehne priamo cez Apple Pay peňaženku • Prevádzkovateľ: zeterem s.r.o.
+                    Platba cez Apple Wallet (Touch ID / Face ID) • Zabezpečené cez Stripe • Prevádzkovateľ: zeterem s.r.o.
                   </p>
                 </div>
               )}
 
               {/* 3. Google Pay Tab */}
               {paymentMethod === 'google_pay' && (
-                <div className="p-5 rounded-2xl bg-zinc-900/60 border border-zinc-850 space-y-4 animate-fadeIn">
+                <div className="p-6 rounded-2xl bg-zinc-900/60 border border-zinc-850 space-y-4 animate-fadeIn">
                   <div className="flex items-center justify-between text-xs text-zinc-400">
                     <span>Expresná platba cez Google Pay</span>
-                    <span className="text-white font-medium">Google Peňaženka</span>
+                    <span className="text-white font-medium flex items-center gap-1.5">
+                      <span className="w-2 h-2 rounded-full bg-emerald-400 animate-pulse"></span>
+                      Google Peňaženka
+                    </span>
                   </div>
 
-                  {canGooglePay ? (
-                    <button
-                      type="button"
-                      onClick={handleProcessPayment}
-                      disabled={isProcessingPayment}
-                      className="w-full py-4 px-6 rounded-2xl bg-black hover:bg-zinc-900 border border-zinc-700 text-white font-semibold text-sm transition-all flex items-center justify-center gap-2.5 active:scale-95 shadow-xl"
-                    >
-                      <GooglePayLogo className="h-5 w-auto" lightText={true} />
-                      <span className="font-semibold text-base">Zaplatiť {amountToPayNow} €</span>
-                    </button>
-                  ) : (
-                    <div className="p-4 rounded-xl bg-zinc-950 border border-zinc-800 space-y-3">
-                      <p className="text-xs text-zinc-300 leading-relaxed">
-                        Google Pay peňaženka nie je v tomto prehliadači pripravená. Môžete okamžite zaplatiť platobnou kartou alebo dokončiť rezerváciu na faktúru.
-                      </p>
-                      <div className="flex flex-wrap gap-2 pt-1">
-                        <button
-                          type="button"
-                          onClick={() => setPaymentMethod('card')}
-                          className="px-4 py-2 rounded-xl bg-white text-black text-xs font-semibold hover:bg-zinc-200 transition-all"
-                        >
-                          Zaplatiť kartou
-                        </button>
-                        <button
-                          type="button"
-                          onClick={() => completeReservation({
-                            methodTitle: 'Rezervácia (Google Pay alternatíva - Na účet)',
-                            paymentStatus: 'Rezervované — vystavenie faktúry zeterem s.r.o.'
-                          })}
-                          className="px-4 py-2 rounded-xl bg-zinc-850 hover:bg-zinc-800 border border-zinc-700 text-zinc-200 text-xs font-medium transition-all"
-                        >
-                          Dokončiť rezerváciu na faktúru
-                        </button>
+                  <button
+                    type="button"
+                    onClick={handleGooglePayPayment}
+                    disabled={isProcessingPayment}
+                    className="w-full py-4 px-6 rounded-2xl bg-black hover:bg-zinc-900 active:scale-[0.98] border border-zinc-700/80 text-white font-semibold text-base transition-all flex items-center justify-center gap-3 shadow-2xl cursor-pointer"
+                  >
+                    {isProcessingPayment ? (
+                      <div className="flex items-center gap-2 text-zinc-300 text-sm">
+                        <Loader2 className="w-5 h-5 animate-spin text-white" />
+                        <span>{paymentStatusText || 'Inicializujem Google Pay...'}</span>
                       </div>
-                    </div>
-                  )}
+                    ) : (
+                      <div className="flex items-center justify-center gap-2.5">
+                        <GooglePayLogo className="h-5 w-auto" lightText={true} />
+                        <span className="text-zinc-500 font-light text-lg">|</span>
+                        <span className="tracking-tight text-white font-semibold">Zaplatiť {amountToPayNow} €</span>
+                      </div>
+                    )}
+                  </button>
 
                   <p className="text-[11px] text-zinc-500 text-center">
                     Bezpečné spracovanie platby cez účet Google • Prevádzkovateľ: zeterem s.r.o.
@@ -1242,25 +1371,42 @@ export const ReservationModal: React.FC<ReservationModalProps> = ({
 
               {/* 4. Revolut Pay Tab */}
               {paymentMethod === 'revolut_pay' && (
-                <div className="p-5 rounded-2xl bg-zinc-900/60 border border-zinc-850 space-y-4 animate-fadeIn">
+                <div className="p-6 rounded-2xl bg-zinc-900/60 border border-zinc-850 space-y-4 animate-fadeIn">
                   <div className="flex items-center justify-between text-xs text-zinc-400">
                     <span>Okamžitá platba cez Revolut</span>
-                    <span className="text-white font-medium">Revolut App</span>
+                    <span className="text-white font-medium flex items-center gap-1.5">
+                      <span className="w-2 h-2 rounded-full bg-emerald-400 animate-pulse"></span>
+                      Revolut App
+                    </span>
                   </div>
+
                   <button
                     type="button"
-                    onClick={handleProcessPayment}
+                    onClick={handleRevolutPayPayment}
                     disabled={isProcessingPayment}
-                    className="w-full py-4 px-6 rounded-2xl bg-white hover:bg-zinc-100 text-black font-semibold text-sm transition-all flex items-center justify-center gap-2.5 active:scale-95 shadow-xl"
+                    className="w-full py-4 px-6 rounded-2xl bg-black hover:bg-zinc-900 active:scale-[0.98] border border-zinc-700/80 text-white font-semibold text-base transition-all flex items-center justify-center gap-3 shadow-2xl cursor-pointer"
                   >
-                    <RevolutIcon className="h-5 w-5" fill="#000000" />
-                    <span className="font-semibold text-base">Zaplatiť cez Revolut Pay ({amountToPayNow} €)</span>
+                    {isProcessingPayment ? (
+                      <div className="flex items-center gap-2 text-zinc-300 text-sm">
+                        <Loader2 className="w-5 h-5 animate-spin text-white" />
+                        <span>{paymentStatusText || 'Inicializujem Revolut Pay...'}</span>
+                      </div>
+                    ) : (
+                      <div className="flex items-center justify-center gap-2.5">
+                        <RevolutIcon className="h-5 w-5 text-white" />
+                        <span className="font-bold text-white text-base tracking-tight">Pay</span>
+                        <span className="text-zinc-500 font-light text-lg">|</span>
+                        <span className="tracking-tight text-white font-semibold">Zaplatiť {amountToPayNow} €</span>
+                      </div>
+                    )}
                   </button>
+
                   <p className="text-[11px] text-zinc-500 text-center">
                     Budete presmerovaný do aplikácie Revolut na 1-klikové potvrdenie • Prevádzkovateľ: zeterem s.r.o.
                   </p>
                 </div>
               )}
+
 
               {/* 5. Prevod / Faktúra na účet (zeterem s.r.o.) */}
               {paymentMethod === 'transfer' && (
