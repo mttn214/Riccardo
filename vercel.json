@@ -2,15 +2,7 @@
   "framework": "vite",
   "rewrites": [
     {
-      "source": "/api/(.*)",
-      "destination": "/api/$1"
-    },
-    {
-      "source": "/.well-known/(.*)",
-      "destination": "/.well-known/$1"
-    },
-    {
-      "source": "/((?!api/|.well-known/).*)",
+      "source": "/((?!api/|api$|.well-known/).*)",
       "destination": "/index.html"
     }
   ]
