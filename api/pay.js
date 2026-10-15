@@ -1,12 +1,5 @@
 import Stripe from 'stripe';
 
-// Read secret key securely from environment variables (configured in Vercel & .env.local)
-const STRIPE_SECRET = process.env.STRIPE_SECRET_KEY;
-
-const stripe = new Stripe(STRIPE_SECRET || '', {
-  apiVersion: '2024-12-18.acacia'
-});
-
 export default async function handler(req, res) {
   // CORS Configuration
   res.setHeader('Access-Control-Allow-Credentials', 'true');
@@ -21,16 +14,28 @@ export default async function handler(req, res) {
     return res.status(200).end();
   }
 
+  if (req.method === 'GET') {
+    return res.status(200).json({
+      status: 'active',
+      service: 'Stripe Payment Gateway for Hair Salon Riccardo / zeterem s.r.o.',
+      hasSecretKey: Boolean(process.env.STRIPE_SECRET_KEY)
+    });
+  }
+
   if (req.method !== 'POST') {
     return res.status(405).json({ success: false, error: 'Metóda nepovolená' });
   }
 
+  const STRIPE_SECRET = process.env.STRIPE_SECRET_KEY;
   if (!STRIPE_SECRET) {
-    return res.status(500).json({
+    return res.status(200).json({
       success: false,
-      error: 'STRIPE_SECRET_KEY nie je nakonfigurovaný v prostredí.'
+      needsConfig: true,
+      error: 'STRIPE_SECRET_KEY zatiaľ nie je nastavený vo Vercel Environment Variables.'
     });
   }
+
+  const stripe = new Stripe(STRIPE_SECRET);
 
   try {
     const {
@@ -43,7 +48,7 @@ export default async function handler(req, res) {
       seminarTitle,
       ticketId,
       paymentType
-    } = req.body;
+    } = req.body || {};
 
     if (!amountEUR || amountEUR <= 0) {
       return res.status(400).json({ success: false, error: 'Neplatná suma platby.' });
