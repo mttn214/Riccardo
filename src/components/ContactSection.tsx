@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { STYLIST_PROFILE } from '../data/content';
 import { ChevronDown, ArrowUpRight, Check } from 'lucide-react';
 import { InstagramIcon, FacebookIcon } from './SocialIcons';
+import { sendFormNotification } from '../services/formService';
 
 export const ContactSection: React.FC = () => {
   const [formSent, setFormSent] = useState(false);
@@ -34,13 +35,25 @@ export const ContactSection: React.FC = () => {
     }
   ];
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const [isSubmitting, setIsSubmitting] = useState(false);
+
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+    setIsSubmitting(true);
+    await sendFormNotification({
+      formType: 'Kontaktná správa',
+      name: formData.name,
+      email: formData.email,
+      phone: formData.phone,
+      'Predmet správy': formData.subject,
+      'Text správy': formData.message
+    });
+    setIsSubmitting(false);
     setFormSent(true);
     setTimeout(() => {
       setFormData({ name: '', email: '', phone: '', subject: 'Otázka k seminárom', message: '' });
       setFormSent(false);
-    }, 4000);
+    }, 5000);
   };
 
   return (

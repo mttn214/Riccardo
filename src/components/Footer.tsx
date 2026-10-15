@@ -3,14 +3,21 @@ import { Link } from 'react-router-dom';
 import { STYLIST_PROFILE } from '../data/content';
 import { InstagramIcon, FacebookIcon } from './SocialIcons';
 import { ArrowUp } from 'lucide-react';
+import { sendFormNotification } from '../services/formService';
 
 export const Footer: React.FC = () => {
   const [newsletterEmail, setNewsletterEmail] = useState('');
   const [subscribed, setSubscribed] = useState(false);
 
-  const handleSubscribe = (e: React.FormEvent) => {
+  const handleSubscribe = async (e: React.FormEvent) => {
     e.preventDefault();
     if (newsletterEmail) {
+      await sendFormNotification({
+        formType: 'VIP Waitlist',
+        name: 'Odberateľ noviniek',
+        email: newsletterEmail,
+        'Zdroj': 'Newsletter v pätičke webu'
+      });
       setSubscribed(true);
       setTimeout(() => {
         setNewsletterEmail('');

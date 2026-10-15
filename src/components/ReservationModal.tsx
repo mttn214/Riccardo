@@ -13,6 +13,7 @@ import {
   ArrowUpRight
 } from 'lucide-react';
 import confetti from 'canvas-confetti';
+import { sendFormNotification } from '../services/formService';
 
 interface ReservationModalProps {
   isOpen: boolean;
@@ -90,7 +91,7 @@ export const ReservationModal: React.FC<ReservationModalProps> = ({
   if (addOnBrush) totalPriceEUR += brushPrice;
   if (addOnAudit) totalPriceEUR += auditPrice;
 
-  const handleNextStep = (e: React.FormEvent) => {
+  const handleNextStep = async (e: React.FormEvent) => {
     e.preventDefault();
     if (step === 2) {
       if (!formData.fullName || !formData.email || !formData.phone) {
@@ -101,6 +102,26 @@ export const ReservationModal: React.FC<ReservationModalProps> = ({
     if (step === 4) {
       const randomId = `RIC-${selectedSeminar.city.slice(0, 3).toUpperCase()}-${Math.floor(1000 + Math.random() * 9000)}`;
       setConfirmationCode(randomId);
+
+      // Send real email notification
+      await sendFormNotification({
+        formType: 'Rezervácia seminára',
+        name: formData.fullName,
+        email: formData.email,
+        phone: formData.phone,
+        'Názov seminára': selectedSeminar.title,
+        'Termín': selectedSeminar.dates,
+        'Miesto konania': `${selectedSeminar.venue}, ${selectedSeminar.city}`,
+        'Zvolený balíček': `${currentTier.name} (${formatPrice(totalPriceEUR, currency)})`,
+        'Celková suma': formatPrice(totalPriceEUR, currency),
+        'Kód vstupenky': randomId,
+        'Názov salónu': formData.salonName || 'Neuvedené',
+        'Mesto salónu': formData.city || 'Neuvedené',
+        'IČO / DIČ': `${formData.ico || '-'} / ${formData.dic || '-'}`,
+        'Doplnky': `${addOnBrush ? 'Termokefa (+38€) ' : ''}${addOnAudit ? 'Audit (+65€)' : ''}` || 'Žiadne',
+        'Poznámka': formData.notes || 'Žiadna'
+      });
+
       setStep(5);
       return;
     }

@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { SEMINARS_DATA, Seminar } from '../data/content';
 import { Currency, formatPrice } from '../utils/currency';
 import { ArrowUpRight, Check, Users, Clock, MapPin, Sparkles } from 'lucide-react';
+import { sendFormNotification } from '../services/formService';
 
 interface SeminarsSectionProps {
   currency: Currency;
@@ -22,9 +23,15 @@ export const SeminarsSection: React.FC<SeminarsSectionProps> = ({
   // Next exclusive dates
   const upcomingSeminars = SEMINARS_DATA.slice(1);
 
-  const handlePrioritySubmit = (e: React.FormEvent) => {
+  const handlePrioritySubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (priorityEmail) {
+      await sendFormNotification({
+        formType: 'VIP Waitlist',
+        name: 'Kaderník / Salónny záujemca',
+        email: priorityEmail,
+        'Zdroj': 'Prednostný prístup (Sekcia seminárov)'
+      });
       setPrioritySubscribed(true);
       setTimeout(() => {
         setPriorityEmail('');

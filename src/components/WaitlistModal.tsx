@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { X, Sparkles, CheckCircle2, Shield, Bell, ArrowRight } from 'lucide-react';
 import confetti from 'canvas-confetti';
+import { sendFormNotification } from '../services/formService';
 
 interface WaitlistModalProps {
   isOpen: boolean;
@@ -24,20 +25,28 @@ export const WaitlistModal: React.FC<WaitlistModalProps> = ({
 
   if (!isOpen) return null;
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setLoading(true);
 
-    setTimeout(() => {
-      setLoading(false);
-      setIsSubmitted(true);
-      confetti({
-        particleCount: 50,
-        spread: 60,
-        origin: { y: 0.7 },
-        colors: ['#ffffff', '#e4e4e7', '#a1a1aa']
-      });
-    }, 600);
+    await sendFormNotification({
+      formType: 'VIP Waitlist',
+      name,
+      email,
+      phone,
+      'Mesto / Salón': salonCity || 'Neuvedené',
+      'Instagram profil': instagram || 'Neuvedené',
+      'Preferovaná téma masterclassu': topic
+    });
+
+    setLoading(false);
+    setIsSubmitted(true);
+    confetti({
+      particleCount: 50,
+      spread: 60,
+      origin: { y: 0.7 },
+      colors: ['#ffffff', '#e4e4e7', '#a1a1aa']
+    });
   };
 
   const handleResetAndClose = () => {
