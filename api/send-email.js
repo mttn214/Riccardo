@@ -59,14 +59,13 @@ Prevádzkovateľ eshopu: zeterem s.r.o.`;
         'User-Agent': 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36'
       },
       body: JSON.stringify({
-        _subject: `[Riccardo Salon] ${data.formType || 'Rezervácia'}: ${customerName} (${ticketCode})`,
+        _subject: `[Nová rezervácia] ${data.formType || 'Rezervácia'}: ${customerName} (${ticketCode})`,
         _template: 'table',
         _captcha: 'false',
-        _cc: customerEmail || undefined,
         _replyto: customerEmail || undefined,
-        _autoresponse: autoresponseMessage,
         'Kód vstupenky': ticketCode,
         'Meno a priezvisko': customerName,
+
         'Email zákazníka': customerEmail,
         'Telefón': data.phone || 'Neuvedené',
         'Názov seminára': seminarTitle,

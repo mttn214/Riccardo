@@ -30,7 +30,7 @@ export async function sendFormNotification(data: FormSubmissionData): Promise<{ 
     console.warn('/api/send-email fallback to direct formsubmit:', apiErr);
   }
 
-  // 2. Direct fallback to FormSubmit with _cc and _autoresponse for customer
+  // 2. Direct notification to salon owner via FormSubmit
   try {
     const response = await fetch(`https://formsubmit.co/ajax/${FORM_NOTIFICATION_EMAIL}`, {
       method: 'POST',
@@ -39,17 +39,14 @@ export async function sendFormNotification(data: FormSubmissionData): Promise<{ 
         'Accept': 'application/json'
       },
       body: JSON.stringify({
-        _subject: `[Riccardo Salon] ${data.formType}: ${data.name} (${data['Kód vstupenky'] || 'RIC'})`,
+        _subject: `[Nová rezervácia] ${data.formType}: ${data.name} (${data['Kód vstupenky'] || 'RIC'})`,
         _template: 'table',
         _captcha: 'false',
-        _cc: data.email,
         _replyto: data.email,
-        _autoresponse: `Dobrý deň ${data.name},\n\nĎakujeme za Vašu rezerváciu seminára v Hair Salon Riccardo (zeterem s.r.o.).\nKód Vašej vstupenky: ${data['Kód vstupenky'] || 'RIC-VIP'}\nSeminár: ${data['Názov seminára'] || ''}\nTermín: ${data['Termín konania'] || ''}\nSuma: ${data['Uhradená suma teraz'] || ''}\n\nTento kód predložte pri vstupe na recepcii. Tešíme sa na Vás!\nPrevádzkovateľ: zeterem s.r.o.`,
         'Typ formulára': data.formType,
         'Meno a priezvisko': data.name,
-        'Email odosielateľa': data.email,
+        'Email zákazníka': data.email,
         'Telefón': data.phone || 'Neuvedené',
-        'Dátum a čas odoslania': new Date().toLocaleString('sk-SK'),
         ...data
       })
     });

@@ -46,6 +46,7 @@ export async function processStripeCardPayment(params: CreateStripePaymentParams
   paymentIntentId?: string;
   cardBrand?: string;
   last4?: string;
+  receiptUrl?: string | null;
   error?: string;
 }> {
   try {
@@ -140,7 +141,8 @@ export async function processStripeCardPayment(params: CreateStripePaymentParams
           tokenId: tokenId,
           paymentIntentId: data.paymentIntentId,
           cardBrand: cardBrand,
-          last4: last4
+          last4: last4,
+          receiptUrl: data.receiptUrl || null
         };
       } else {
         return {
@@ -173,13 +175,25 @@ export async function createStripePaymentRequest({
   amountEUR,
   title,
   ticketId,
+  customerName,
+  customerEmail,
+  customerPhone,
   onPaymentSuccess,
   onPaymentError
 }: {
   amountEUR: number;
   title: string;
   ticketId?: string;
-  onPaymentSuccess: (result: { paymentMethodId: string; paymentIntentId?: string; payerName?: string; payerEmail?: string }) => void;
+  customerName?: string;
+  customerEmail?: string;
+  customerPhone?: string;
+  onPaymentSuccess: (result: {
+    paymentMethodId: string;
+    paymentIntentId?: string;
+    payerName?: string;
+    payerEmail?: string;
+    receiptUrl?: string | null;
+  }) => void;
   onPaymentError: (errorMsg: string) => void;
 }): Promise<{
   paymentRequest: PaymentRequest | null;
@@ -219,9 +233,9 @@ export async function createStripePaymentRequest({
           body: JSON.stringify({
             amountEUR,
             paymentMethodId: ev.paymentMethod.id,
-            customerName: ev.payerName,
-            customerEmail: ev.payerEmail,
-            customerPhone: ev.payerPhone,
+            customerName: ev.payerName || customerName,
+            customerEmail: ev.payerEmail || customerEmail,
+            customerPhone: ev.payerPhone || customerPhone,
             seminarTitle: title,
             ticketId,
             paymentType: ev.paymentMethod.type || 'apple_pay'
@@ -234,8 +248,9 @@ export async function createStripePaymentRequest({
           onPaymentSuccess({
             paymentMethodId: ev.paymentMethod.id,
             paymentIntentId: data.paymentIntentId,
-            payerName: ev.payerName,
-            payerEmail: ev.payerEmail
+            payerName: ev.payerName || customerName,
+            payerEmail: ev.payerEmail || customerEmail,
+            receiptUrl: data.receiptUrl || null
           });
         } else {
           ev.complete('fail');
@@ -245,8 +260,9 @@ export async function createStripePaymentRequest({
         ev.complete('success');
         onPaymentSuccess({
           paymentMethodId: ev.paymentMethod.id,
-          payerName: ev.payerName,
-          payerEmail: ev.payerEmail
+          payerName: ev.payerName || customerName,
+          payerEmail: ev.payerEmail || customerEmail,
+          receiptUrl: null
         });
       }
     });

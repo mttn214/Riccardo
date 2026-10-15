@@ -120,14 +120,28 @@ export default async function handler(req, res) {
       });
     }
 
+    let receiptUrl = null;
+    if (paymentIntent.latest_charge) {
+      try {
+        const charge = typeof paymentIntent.latest_charge === 'object'
+          ? paymentIntent.latest_charge
+          : await stripe.charges.retrieve(paymentIntent.latest_charge);
+        receiptUrl = charge?.receipt_url || null;
+      } catch (e) {
+        console.warn('Could not retrieve charge receipt:', e);
+      }
+    }
+
     return res.status(200).json({
       success: true,
       paymentIntentId: paymentIntent.id,
       status: paymentIntent.status,
       clientSecret: paymentIntent.client_secret,
       amount: paymentIntent.amount / 100,
-      currency: paymentIntent.currency
+      currency: paymentIntent.currency,
+      receiptUrl
     });
+
   } catch (error) {
     console.error('Chyba Stripe spracovania:', error);
     return res.status(400).json({

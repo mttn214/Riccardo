@@ -20,7 +20,8 @@ import {
   AlertCircle,
   Sparkles,
   Printer,
-  Download
+  Download,
+  Receipt
 } from 'lucide-react';
 import confetti from 'canvas-confetti';
 import { sendFormNotification } from '../services/formService';
@@ -103,6 +104,7 @@ export const ReservationModal: React.FC<ReservationModalProps> = ({
   const [isProcessingPayment, setIsProcessingPayment] = useState(false);
   const [paymentStatusText, setPaymentStatusText] = useState('');
   const [confirmationCode, setConfirmationCode] = useState('');
+  const [stripeReceiptUrl, setStripeReceiptUrl] = useState<string | null>(null);
   
   // Stripe Gateway integration states
   const [stripePaymentRequest, setStripePaymentRequest] = useState<any>(null);
@@ -125,6 +127,7 @@ export const ReservationModal: React.FC<ReservationModalProps> = ({
         setFormData((prev) => ({ ...prev, ...initialFormData }));
       }
       setStripeError('');
+      setStripeReceiptUrl(null);
       setIsTestModeCardNotice(false);
       setIsProcessingPayment(false);
       setFormErrors({});
@@ -175,13 +178,18 @@ export const ReservationModal: React.FC<ReservationModalProps> = ({
     paymentStatus,
     stripeTokenId,
     stripePaymentIntentId,
+    receiptUrl,
   }: {
     methodTitle: string;
     paymentStatus: string;
     stripeTokenId?: string;
     stripePaymentIntentId?: string;
+    receiptUrl?: string | null;
   }) => {
     setIsProcessingPayment(true);
+    if (receiptUrl) {
+      setStripeReceiptUrl(receiptUrl);
+    }
     setPaymentStatusText('Odosielam záväznú rezerváciu a vystavujem vstupenku...');
     
     const randomId = `RIC-${selectedSeminar.city.slice(0, 3).toUpperCase()}-${Math.floor(1000 + Math.random() * 9000)}`;
@@ -200,6 +208,7 @@ export const ReservationModal: React.FC<ReservationModalProps> = ({
       'Stav platby': paymentStatus,
       'Stripe Token ID': stripeTokenId || 'Neuplatnené',
       'Stripe Payment Intent ID': stripePaymentIntentId || 'Neuplatnené',
+      'Stripe Doklad': receiptUrl || 'Neuplatnené',
       'Platobný režim': paymentOption === 'deposit' ? 'Záloha 100 € (Doplatok na mieste)' : 'Celá suma vopred',
       'Uhradená suma teraz': `${amountToPayNow} €`,
       'Zostáva doplatiť': paymentOption === 'deposit' ? `${totalPackagePriceEUR - 100} €` : '0 € (Plne uhradené)',
@@ -229,12 +238,16 @@ export const ReservationModal: React.FC<ReservationModalProps> = ({
     createStripePaymentRequest({
       amountEUR: amountToPayNow,
       title: selectedSeminar.title,
-      onPaymentSuccess: async ({ paymentMethodId, paymentIntentId, payerName, payerEmail }) => {
+      customerName: formData.fullName,
+      customerEmail: formData.email,
+      customerPhone: formData.phone,
+      onPaymentSuccess: async ({ paymentMethodId, paymentIntentId, payerName, payerEmail, receiptUrl }) => {
         await completeReservation({
           methodTitle: 'Apple Pay (Priama autorizácia)',
           paymentStatus: 'Autorizované / Uhradené cez Apple Pay',
           stripeTokenId: paymentMethodId,
           stripePaymentIntentId: paymentIntentId,
+          receiptUrl,
         });
       },
       onPaymentError: (err) => {
@@ -246,39 +259,62 @@ export const ReservationModal: React.FC<ReservationModalProps> = ({
       setStripePaymentRequest(res.paymentRequest);
       setCanApplePay(res.canPayWithApplePay);
       setCanGooglePay(res.canPayWithGooglePay);
-
-      // Mount native Stripe Elements PaymentRequestButton if supported
-      if (res.paymentRequest && (res.canPayWithApplePay || res.canPayWithGooglePay)) {
-        try {
-          const stripe = await getStripe();
-          if (stripe && isMounted) {
-            const elements = stripe.elements();
-            const prBtn = elements.create('paymentRequestButton', {
-              paymentRequest: res.paymentRequest,
-              style: {
-                paymentRequestButton: {
-                  theme: 'dark',
-                  height: '56px',
-                  type: 'buy',
-                },
-              },
-            });
-            const mountEl = document.getElementById('native-apple-pay-element');
-            if (mountEl) {
-              mountEl.innerHTML = '';
-              prBtn.mount('#native-apple-pay-element');
-            }
-          }
-        } catch (mountErr) {
-          console.warn('Native PaymentRequestButton mount:', mountErr);
-        }
-      }
     });
 
     return () => {
       isMounted = false;
     };
-  }, [isOpen, step, amountToPayNow, selectedSeminar]);
+  }, [isOpen, step, amountToPayNow, selectedSeminar, formData.fullName, formData.email, formData.phone]);
+
+  // Dedicated Mount Effect for native Apple Pay / Google Pay Stripe Elements Button
+  useEffect(() => {
+    if (!isOpen || step !== 3 || !stripePaymentRequest) return;
+    if (paymentMethod !== 'apple_pay' && paymentMethod !== 'google_pay') return;
+
+    let isCurrent = true;
+    let prButton: any = null;
+
+    const targetId = paymentMethod === 'apple_pay' ? 'native-apple-pay-element' : 'native-google-pay-element';
+    const isSupported = paymentMethod === 'apple_pay' ? canApplePay : canGooglePay;
+
+    if (!isSupported) return;
+
+    (async () => {
+      try {
+        const stripe = await getStripe();
+        if (!stripe || !isCurrent) return;
+
+        const mountEl = document.getElementById(targetId);
+        if (!mountEl) return;
+
+        mountEl.innerHTML = '';
+        const elements = stripe.elements();
+        prButton = elements.create('paymentRequestButton', {
+          paymentRequest: stripePaymentRequest,
+          style: {
+            paymentRequestButton: {
+              theme: 'dark',
+              height: '56px',
+              type: 'buy',
+            },
+          },
+        });
+        prButton.mount(`#${targetId}`);
+      } catch (mountErr) {
+        console.warn('Native PaymentRequestButton mount error:', mountErr);
+      }
+    })();
+
+    return () => {
+      isCurrent = false;
+      if (prButton) {
+        try {
+          prButton.unmount();
+          prButton.destroy();
+        } catch (_) {}
+      }
+    };
+  }, [isOpen, step, paymentMethod, stripePaymentRequest, canApplePay, canGooglePay]);
 
 
   // Format Card Number (adds space every 4 digits)
@@ -378,6 +414,7 @@ export const ReservationModal: React.FC<ReservationModalProps> = ({
         paymentStatus: 'Autorizované / Uhradené cez Stripe',
         stripeTokenId: stripeResult.tokenId,
         stripePaymentIntentId: stripeResult.paymentIntentId,
+        receiptUrl: stripeResult.receiptUrl,
       });
       return;
     }
@@ -1307,28 +1344,30 @@ Adresa salónu: Novohradská 3, 984 01 Lučenec
                   </div>
 
                   {/* Native Stripe Elements Mount Point (renders Apple's native WebKit button in Safari) */}
-                  <div id="native-apple-pay-element" className="w-full empty:hidden" />
-
-                  {/* Fallback Direct Apple Pay Button */}
-                  <button
-                    type="button"
-                    onClick={handleApplePayPayment}
-                    disabled={isProcessingPayment}
-                    className="w-full py-4 px-6 rounded-2xl bg-black hover:bg-zinc-900 active:scale-[0.98] border border-zinc-700/80 text-white font-semibold text-base transition-all flex items-center justify-center gap-3 shadow-2xl cursor-pointer"
-                  >
-                    {isProcessingPayment ? (
-                      <div className="flex items-center gap-2 text-zinc-300 text-sm">
-                        <Loader2 className="w-5 h-5 animate-spin text-white" />
-                        <span>{paymentStatusText || 'Inicializujem Apple Pay...'}</span>
-                      </div>
-                    ) : (
-                      <div className="flex items-center justify-center gap-2.5">
-                        <ApplePayLogo className="h-6 w-auto fill-white text-white" />
-                        <span className="text-zinc-500 font-light text-lg">|</span>
-                        <span className="tracking-tight text-white font-semibold">Zaplatiť {amountToPayNow} €</span>
-                      </div>
-                    )}
-                  </button>
+                  {canApplePay ? (
+                    <div id="native-apple-pay-element" className="w-full min-h-[56px]" />
+                  ) : (
+                    /* Fallback Direct Apple Pay Button when not supported on this device/browser */
+                    <button
+                      type="button"
+                      onClick={handleApplePayPayment}
+                      disabled={isProcessingPayment}
+                      className="w-full py-4 px-6 rounded-2xl bg-black hover:bg-zinc-900 active:scale-[0.98] border border-zinc-700/80 text-white font-semibold text-base transition-all flex items-center justify-center gap-3 shadow-2xl cursor-pointer"
+                    >
+                      {isProcessingPayment ? (
+                        <div className="flex items-center gap-2 text-zinc-300 text-sm">
+                          <Loader2 className="w-5 h-5 animate-spin text-white" />
+                          <span>{paymentStatusText || 'Inicializujem Apple Pay...'}</span>
+                        </div>
+                      ) : (
+                        <div className="flex items-center justify-center gap-2.5">
+                          <ApplePayLogo className="h-6 w-auto fill-white text-white" />
+                          <span className="text-zinc-500 font-light text-lg">|</span>
+                          <span className="tracking-tight text-white font-semibold">Zaplatiť {amountToPayNow} €</span>
+                        </div>
+                      )}
+                    </button>
+                  )}
 
                   <p className="text-[11px] text-zinc-500 text-center">
                     Platba prebehne priamo cez Apple Wallet (Touch ID / Face ID) bez opustenia stránky • Prevádzkovateľ: zeterem s.r.o.
@@ -1348,25 +1387,29 @@ Adresa salónu: Novohradská 3, 984 01 Lučenec
                     </span>
                   </div>
 
-                  <button
-                    type="button"
-                    onClick={handleGooglePayPayment}
-                    disabled={isProcessingPayment}
-                    className="w-full py-4 px-6 rounded-2xl bg-black hover:bg-zinc-900 active:scale-[0.98] border border-zinc-700/80 text-white font-semibold text-base transition-all flex items-center justify-center gap-3 shadow-2xl cursor-pointer"
-                  >
-                    {isProcessingPayment ? (
-                      <div className="flex items-center gap-2 text-zinc-300 text-sm">
-                        <Loader2 className="w-5 h-5 animate-spin text-white" />
-                        <span>{paymentStatusText || 'Inicializujem Google Pay...'}</span>
-                      </div>
-                    ) : (
-                      <div className="flex items-center justify-center gap-2.5">
-                        <GooglePayLogo className="h-5 w-auto" lightText={true} />
-                        <span className="text-zinc-500 font-light text-lg">|</span>
-                        <span className="tracking-tight text-white font-semibold">Zaplatiť {amountToPayNow} €</span>
-                      </div>
-                    )}
-                  </button>
+                  {canGooglePay ? (
+                    <div id="native-google-pay-element" className="w-full min-h-[56px]" />
+                  ) : (
+                    <button
+                      type="button"
+                      onClick={handleGooglePayPayment}
+                      disabled={isProcessingPayment}
+                      className="w-full py-4 px-6 rounded-2xl bg-black hover:bg-zinc-900 active:scale-[0.98] border border-zinc-700/80 text-white font-semibold text-base transition-all flex items-center justify-center gap-3 shadow-2xl cursor-pointer"
+                    >
+                      {isProcessingPayment ? (
+                        <div className="flex items-center gap-2 text-zinc-300 text-sm">
+                          <Loader2 className="w-5 h-5 animate-spin text-white" />
+                          <span>{paymentStatusText || 'Inicializujem Google Pay...'}</span>
+                        </div>
+                      ) : (
+                        <div className="flex items-center justify-center gap-2.5">
+                          <GooglePayLogo className="h-5 w-auto" lightText={true} />
+                          <span className="text-zinc-500 font-light text-lg">|</span>
+                          <span className="tracking-tight text-white font-semibold">Zaplatiť {amountToPayNow} €</span>
+                        </div>
+                      )}
+                    </button>
+                  )}
 
                   <p className="text-[11px] text-zinc-500 text-center">
                     Bezpečné spracovanie platby cez účet Google • Prevádzkovateľ: zeterem s.r.o.
@@ -1621,6 +1664,22 @@ Adresa salónu: Novohradská 3, 984 01 Lučenec
                   <span>Stiahnuť potvrdenie (.txt)</span>
                 </button>
               </div>
+
+              {/* Official Stripe Payment Receipt (if available) */}
+              {stripeReceiptUrl && (
+                <div className="max-w-md mx-auto pt-1">
+                  <a
+                    href={stripeReceiptUrl}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="w-full py-3 px-4 rounded-xl bg-zinc-900 hover:bg-zinc-850 border border-emerald-500/40 text-emerald-300 hover:text-white font-medium text-xs transition-all flex items-center justify-center gap-2 shadow-lg"
+                  >
+                    <Receipt className="w-4 h-4 text-emerald-400" />
+                    <span>Zobraziť oficiálny doklad o platbe (Stripe Doklad)</span>
+                    <ArrowUpRight className="w-3.5 h-3.5 text-zinc-400" />
+                  </a>
+                </div>
+              )}
 
               {/* Add to Calendar Action Buttons */}
               <div className="space-y-2 pt-2">
