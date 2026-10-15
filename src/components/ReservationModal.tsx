@@ -128,11 +128,15 @@ export const ReservationModal: React.FC<ReservationModalProps> = ({
     }
   }, [step]);
 
-  if (!isOpen) return null;
-
   const currentTier =
-    selectedSeminar.tiers.find((t) => t.id === selectedTierId) ||
-    selectedSeminar.tiers[0];
+    selectedSeminar?.tiers?.find((t) => t.id === selectedTierId) ||
+    selectedSeminar?.tiers?.[0] || {
+      id: 'tier-default',
+      name: 'Standard',
+      priceEUR: 290,
+      description: 'Základná účasť',
+      features: []
+    };
 
   const brushPrice = 38;
   const auditPrice = 65;
@@ -197,37 +201,36 @@ export const ReservationModal: React.FC<ReservationModalProps> = ({
 
   // Initialize Stripe Payment Request (Apple Pay / Google Pay) on Step 3
   useEffect(() => {
-    if (step === 3) {
-      setStripeError('');
-      let isMounted = true;
+    if (!isOpen || step !== 3) return;
+    setStripeError('');
+    let isMounted = true;
 
-      createStripePaymentRequest({
-        amountEUR: amountToPayNow,
-        title: selectedSeminar.title,
-        onPaymentSuccess: async ({ paymentMethodId, paymentIntentId, payerName, payerEmail }) => {
-          await completeReservation({
-            methodTitle: paymentMethod === 'apple_pay' ? 'Apple Pay (Stripe overené)' : 'Google Pay (Stripe overené)',
-            paymentStatus: 'Autorizované cez Stripe',
-            stripeTokenId: paymentMethodId,
-            stripePaymentIntentId: paymentIntentId,
-          });
-        },
-        onPaymentError: (err) => {
-          setIsProcessingPayment(false);
-          setStripeError(err);
-        }
-      }).then((res) => {
-        if (!isMounted) return;
-        setStripePaymentRequest(res.paymentRequest);
-        setCanApplePay(res.canPayWithApplePay);
-        setCanGooglePay(res.canPayWithGooglePay);
-      });
+    createStripePaymentRequest({
+      amountEUR: amountToPayNow,
+      title: selectedSeminar.title,
+      onPaymentSuccess: async ({ paymentMethodId, paymentIntentId, payerName, payerEmail }) => {
+        await completeReservation({
+          methodTitle: paymentMethod === 'apple_pay' ? 'Apple Pay (Stripe overené)' : 'Google Pay (Stripe overené)',
+          paymentStatus: 'Autorizované cez Stripe',
+          stripeTokenId: paymentMethodId,
+          stripePaymentIntentId: paymentIntentId,
+        });
+      },
+      onPaymentError: (err) => {
+        setIsProcessingPayment(false);
+        setStripeError(err);
+      }
+    }).then((res) => {
+      if (!isMounted) return;
+      setStripePaymentRequest(res.paymentRequest);
+      setCanApplePay(res.canPayWithApplePay);
+      setCanGooglePay(res.canPayWithGooglePay);
+    });
 
-      return () => {
-        isMounted = false;
-      };
-    }
-  }, [step, amountToPayNow, selectedSeminar]);
+    return () => {
+      isMounted = false;
+    };
+  }, [isOpen, step, amountToPayNow, selectedSeminar]);
 
   // Format Card Number (adds space every 4 digits)
   const handleCardNumberChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -401,6 +404,8 @@ export const ReservationModal: React.FC<ReservationModalProps> = ({
     setIsTestModeCardNotice(false);
     onClose();
   };
+
+  if (!isOpen) return null;
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center p-3 sm:p-6 bg-black/90 backdrop-blur-2xl text-white animate-fadeIn">
