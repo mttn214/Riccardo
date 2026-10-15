@@ -672,3 +672,82 @@ export const PAST_SEMINAR_RECAPS = [
     highlight: "Vypredané za 4 hodiny od zverejnenia. Komorná atmosféra priamo v materskom salóne v Lučenci s individuálnym prístupom."
   }
 ];
+
+export interface FAQItem {
+  id: string;
+  question: string;
+  answer: string;
+  category: "Priebeh" | "Vybavenie" | "Certifikácia" | "Rezervácia";
+}
+
+export const ACADEMY_FAQ_DATA: FAQItem[] = [
+  {
+    id: "faq-1",
+    category: "Priebeh",
+    question: "Prečo je kapacita striktne obmedzená na maximálne 6 kaderníkov?",
+    answer: "Richard Čonka odmieta masové školenia v kongresových sálach, kde školiteľ nemá čas na jednotlivcov. Naším cieľom je elitný prenos zručností — Richard sa osobne venuje každému strihu, uhlu vyťahovania prameňov a vedeniu nožníc každého jedného účastníka. Preto sú semináre vypísané iba raz za 1 až 2 mesiace a miesta sa zapĺňajú okamžite."
+  },
+  {
+    id: "faq-2",
+    category: "Vybavenie",
+    question: "Čo si musím priniesť so sebou na masterclass?",
+    answer: "Potrebujete len svoje obľúbené osobné nožnice, prestrihávacie nožnice a hrebene, s ktorými ste zvyknutí pracovať. Profesionálne cvičné hlavy z prémiových 100% pravých vlasov, fény, žehličky, profesionálny styling a skriptá sú kompletne zabezpečené v ateliéri."
+  },
+  {
+    id: "faq-3",
+    category: "Certifikácia",
+    question: "Aký certifikát po absolvovaní seminára získam?",
+    answer: "Získate oficiálny tlačený certifikát Riccardo Academy s osobným podpisom Richarda Čonku, víťaza Czech & Slovak Hairdressing Awards. Certifikát potvrdzuje zvládnutie pokročilých techník fúkanej, strihu alebo balayage podľa štandardov oceneného ateliéru."
+  },
+  {
+    id: "faq-4",
+    category: "Priebeh",
+    question: "Je v cene masterpassu zahrnuté občerstvenie a obed?",
+    answer: "Áno, celý deň máte k dispozícii prémiovú kávu, nealko, snacky a spoločný obed v cene. Počas obeda prebieha uvoľnený networking a otvorená diskusia o cenotvorbe, marketingu salónu a komunikácii s prémiovou klientelou."
+  },
+  {
+    id: "faq-5",
+    category: "Rezervácia",
+    question: "Ako funguje VIP čakacia listina, ak sú miesta vypredané?",
+    answer: "Ak je aktuálny termín obsadený, zapíšte sa na VIP čakaciu listinu. Získate prednostné upozornenie o novom termíne (SMS alebo e-mail) 24 hodín predtým, než sa drop oficiálne zverejní na sociálnych sieťach."
+  },
+  {
+    id: "faq-6",
+    category: "Rezervácia",
+    question: "Aké sú platobné a storno podmienky?",
+    answer: "Miesto je záväzne rezervované po úhrade zálohy (100 €). Doplatok sa hradí v deň konania. V prípade nepredvídaných okolností je možné rezerváciu bezplatne previesť na kolegu alebo kolegyňu z vášho salónu."
+  }
+];
+
+export const PAST_SOLD_OUT_SEMINARS = [
+  {
+    id: "past-1",
+    title: "Umenie fúkanej & Signature Styling",
+    date: "Október 2026",
+    seatsTotal: 6,
+    soldOutTime: "Vypredané za 4 hodiny",
+    attendeesFrom: ["Bratislava", "Košice", "Banská Bystrica", "Brno"],
+    rating: "5.0 ★ (6/6 odporúčaní)",
+    image: "/images/riccardo/richard_conka_hda_2.jpg"
+  },
+  {
+    id: "past-2",
+    title: "Precízny mikrobob & Geometria",
+    date: "August 2026",
+    seatsTotal: 6,
+    soldOutTime: "Vypredané za 9 hodín",
+    attendeesFrom: ["Praha", "Žilina", "Zvolen", "Lučenec"],
+    rating: "5.0 ★ (6/6 odporúčaní)",
+    image: "/images/riccardo/richard_conka_hda_4.jpg"
+  },
+  {
+    id: "past-3",
+    title: "Balayage Alchemy & Dim-Out",
+    date: "Jún 2026",
+    seatsTotal: 6,
+    soldOutTime: "Vypredané za 6 hodín",
+    attendeesFrom: ["Trnava", "Nitra", "Poprad", "Bratislava"],
+    rating: "5.0 ★ (6/6 odporúčaní)",
+    image: "/images/riccardo/richard_conka_hda_1.jpg"
+  }
+];

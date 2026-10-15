@@ -3,8 +3,9 @@ import { Link } from 'react-router-dom';
 import { Hero } from '../components/Hero';
 import { SEMINARS_DATA, PORTFOLIO_DATA, STYLIST_PROFILE, TESTIMONIALS_DATA, TESTIMONIALS_STATS, PortfolioItem } from '../data/content';
 import { formatPrice } from '../utils/currency';
-import { ArrowUpRight, Check, Trophy, MoveHorizontal, Star, CheckCircle2, ChevronLeft, ChevronRight } from 'lucide-react';
+import { ArrowUpRight, Check, Trophy, MoveHorizontal, Star, CheckCircle2, ChevronLeft, ChevronRight, Bell } from 'lucide-react';
 import { GoogleIcon, FacebookIcon } from '../components/SocialIcons';
+import { WaitlistModal } from '../components/WaitlistModal';
 
 interface HomePageProps {
   onOpenBooking: () => void;
@@ -22,6 +23,7 @@ export const HomePage: React.FC<HomePageProps> = ({ onOpenBooking, onSelectPortf
   const [scrollLeftState, setScrollLeftState] = useState(0);
   const [canScrollLeft, setCanScrollLeft] = useState(false);
   const [canScrollRight, setCanScrollRight] = useState(true);
+  const [isWaitlistOpen, setIsWaitlistOpen] = useState(false);
 
   const checkReviewScroll = () => {
     if (!reviewsSliderRef.current) return;
@@ -162,10 +164,18 @@ export const HomePage: React.FC<HomePageProps> = ({ onOpenBooking, onSelectPortf
                       </span>
                     </div>
 
-                    <div className="flex items-center gap-3">
+                    <div className="flex flex-wrap items-center gap-3">
+                      <button
+                        onClick={() => setIsWaitlistOpen(true)}
+                        className="inline-flex items-center gap-1.5 px-4 py-2.5 rounded-full text-xs font-medium bg-zinc-900 hover:bg-zinc-800 text-zinc-300 hover:text-white transition-colors border border-zinc-800"
+                      >
+                        <Bell className="w-3.5 h-3.5 text-amber-400" />
+                        <span>VIP Waitlist</span>
+                      </button>
+
                       <Link
                         to="/seminare"
-                        className="px-4 py-2.5 rounded-full text-xs font-medium text-zinc-400 hover:text-white transition-colors"
+                        className="px-4 py-2.5 rounded-full text-xs font-medium text-zinc-400 hover:text-white transition-colors hidden sm:inline-block"
                       >
                         Viac informácií
                       </Link>
@@ -474,6 +484,12 @@ export const HomePage: React.FC<HomePageProps> = ({ onOpenBooking, onSelectPortf
           </div>
         </div>
       </section>
+
+      {/* VIP Waitlist Modal */}
+      <WaitlistModal
+        isOpen={isWaitlistOpen}
+        onClose={() => setIsWaitlistOpen(false)}
+      />
     </div>
   );
 };

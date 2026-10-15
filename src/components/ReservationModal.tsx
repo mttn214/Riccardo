@@ -9,7 +9,8 @@ import {
   ArrowRight,
   ArrowLeft,
   QrCode,
-  Check
+  Check,
+  ArrowUpRight
 } from 'lucide-react';
 import confetti from 'canvas-confetti';
 
@@ -533,14 +534,23 @@ END:VCALENDAR`;
                 </div>
               </div>
 
-              <div className="flex justify-center gap-3">
+              <div className="flex flex-wrap items-center justify-center gap-2.5">
                 <button
                   onClick={handleDownloadCalendar}
-                  className="px-4 py-2 rounded-full bg-zinc-900 hover:bg-zinc-850 border border-zinc-800 text-xs font-medium text-white transition-all flex items-center gap-1.5"
+                  className="px-4 py-2 rounded-full bg-zinc-900 hover:bg-zinc-800 border border-zinc-750 text-xs font-medium text-white transition-all flex items-center gap-1.5 shadow-sm"
                 >
-                  <Calendar className="w-3.5 h-3.5" />
-                  <span>Uložiť do kalendára (.ics)</span>
+                  <Calendar className="w-3.5 h-3.5 text-zinc-300" />
+                  <span>Apple / Outlook (.ics)</span>
                 </button>
+                <a
+                  href={`https://calendar.google.com/calendar/render?action=TEMPLATE&text=${encodeURIComponent(selectedSeminar.title + ' — Hair Salon Riccardo')}&details=${encodeURIComponent('Masterclass s Richardom Čonkom. Kód rezervácie: ' + confirmationCode + '. Vstupenka bola potvrdená.')}&location=${encodeURIComponent(selectedSeminar.venue + ', Lučenec')}`}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="px-4 py-2 rounded-full bg-zinc-900 hover:bg-zinc-800 border border-zinc-750 text-xs font-medium text-white transition-all flex items-center gap-1.5 shadow-sm"
+                >
+                  <ArrowUpRight className="w-3.5 h-3.5 text-zinc-300" />
+                  <span>Google Kalendár</span>
+                </a>
               </div>
             </div>
           )}
