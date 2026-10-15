@@ -13,6 +13,9 @@ import { PortfolioPage } from './pages/PortfolioPage';
 import { AwardsPage } from './pages/AwardsPage';
 import { TestimonialsPage } from './pages/TestimonialsPage';
 import { ContactPage } from './pages/ContactPage';
+import { TermsPage } from './pages/TermsPage';
+import { PrivacyPage } from './pages/PrivacyPage';
+import { RefundCancellationPage } from './pages/RefundCancellationPage';
 import { Phone, Calendar } from 'lucide-react';
 import { verifyStripeSession } from './services/stripeService';
 import { sendFormNotification } from './services/formService';
@@ -72,7 +75,7 @@ export function App() {
             'Platobný režim': 'Celá suma vopred',
             'Uhradená suma teraz': `${res.amountTotal || tier.priceEUR} €`,
             'Kód vstupenky': ticketCode,
-            'Prevádzkovateľ eshopu': 'zeterem s.r.o.'
+            'Prevádzkovateľ eshopu': 'ZETEREM s.r.o.'
           });
 
           localStorage.removeItem('riccardo_pending_booking');
@@ -146,6 +149,9 @@ export function App() {
           <Route path="/ocenenia" element={<AwardsPage />} />
           <Route path="/referencie" element={<TestimonialsPage />} />
           <Route path="/salon" element={<ContactPage />} />
+          <Route path="/obchodne-podmienky" element={<TermsPage />} />
+          <Route path="/ochrana-udajov" element={<PrivacyPage />} />
+          <Route path="/reklamacny-poriadok" element={<RefundCancellationPage />} />
           <Route path="*" element={<Navigate to="/" replace />} />
         </Routes>
       </main>

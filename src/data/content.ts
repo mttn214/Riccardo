@@ -106,6 +106,29 @@ export const STYLIST_PROFILE = {
   ]
 };
 
+export const COMPANY_DETAILS = {
+  legalName: "ZETEREM s.r.o.",
+  tradeName: "Hair Salon Riccardo & Academy",
+  ico: "47 520 817",
+  dic: "2023950863",
+  vatStatus: "Neplatiteľ DPH (nie je platiteľom DPH podľa § 4 zákona o DPH)",
+  registeredOffice: "Haličská cesta 942/3, 984 01 Lučenec, Slovenská republika",
+  salonAddress: "J. Kármána 1727/30, 984 01 Lučenec, Slovenská republika",
+  courtRegistration: "Obchodný register Okresného súdu Banská Bystrica, Oddiel: Sro, Vložka číslo: 25734/S",
+  managingDirector: "Richard Čonka",
+  contactEmail: "hair.riccardo@gmail.com",
+  phone: "+421 915 869 758",
+  secondaryPhone: "+421 908 261 740",
+  supervisoryAuthority: {
+    name: "Slovenská obchodná inšpekcia (SOI)",
+    inspectorate: "Inšpektorát SOI pre Banskobystrický kraj",
+    address: "Kuzmányho 18, 974 01 Banská Bystrica 1",
+    department: "Odbor výkonu dozoru",
+    web: "https://www.soi.sk"
+  },
+  arsPlatform: "https://ec.europa.eu/consumers/odr"
+};
+
 export const SEMINARS_DATA: Seminar[] = [
   {
     id: "sem-umenie-fukanej-lucenec",

@@ -395,7 +395,7 @@ export const SeminarDetailModal: React.FC<SeminarDetailModalProps> = ({
         <div className="p-4 sm:p-5 bg-zinc-950 border-t border-zinc-850 flex items-center justify-between text-xs text-zinc-500">
           <div className="flex items-center gap-2">
             <span className="w-1.5 h-1.5 rounded-full bg-emerald-400" />
-            <span className="text-zinc-300 font-medium">Hair Salon Riccardo • Atelier Lučenec (zeterem s.r.o.)</span>
+            <span className="text-zinc-300 font-medium">Hair Salon Riccardo • Atelier Lučenec (ZETEREM s.r.o.)</span>
           </div>
 
           <div className="flex items-center gap-3">

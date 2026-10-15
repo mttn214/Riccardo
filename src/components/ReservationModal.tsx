@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { Seminar, SEMINARS_DATA } from '../data/content';
+import { Seminar, SEMINARS_DATA, COMPANY_DETAILS } from '../data/content';
 import { Currency, formatPrice } from '../utils/currency';
 import {
   X,
@@ -222,7 +222,7 @@ export const ReservationModal: React.FC<ReservationModalProps> = ({
       'Fakturačná adresa': formData.billingAddress || 'Neuvedené',
       'Doplnky': `${addOnBrush ? 'Termokefa (+38€) ' : ''}${addOnAudit ? 'Audit (+65€)' : ''}` || 'Žiadne',
       'Poznámka': formData.notes || 'Žiadna',
-      'Prevádzkovateľ eshopu': 'zeterem s.r.o.'
+      'Prevádzkovateľ eshopu': COMPANY_DETAILS.legalName
     });
 
     setIsProcessingPayment(false);
@@ -440,7 +440,7 @@ export const ReservationModal: React.FC<ReservationModalProps> = ({
     // 5. Faktúra / Prevod na účet (alebo úhrada na mieste)
     if (paymentMethod === 'transfer') {
       await completeReservation({
-        methodTitle: 'Faktúra / Prevod na účet (zeterem s.r.o.)',
+        methodTitle: `Faktúra / Prevod na účet (${COMPANY_DETAILS.legalName})`,
         paymentStatus: 'Záväzne rezervované — čaká na úhradu zálohovej faktúry',
       });
       return;
@@ -543,8 +543,8 @@ export const ReservationModal: React.FC<ReservationModalProps> = ({
   // Download Ticket text file
   const handleDownloadTicketFile = () => {
     const textContent = `=====================================================
-HAIR SALON RICCARDO — OFICIÁLNA VSTUPENKA
-Prevádzkovateľ: zeterem s.r.o.
+HAIR SALON RICCARDO & ACADEMY — OFICIÁLNA VSTUPENKA
+Prevádzkovateľ & Dodávateľ: ${COMPANY_DETAILS.legalName}
 =====================================================
 
 KÓD VSTUPENKY: ${confirmationCode}
@@ -552,19 +552,35 @@ STAV: POTVRDENÉ & GARANTOVANÉ
 
 SEMINÁR: ${selectedSeminar.title}
 DÁTUM: ${selectedSeminar.dates}
-MIESTO: ${selectedSeminar.venue}, ${selectedSeminar.city} (Atelier)
-LEKTOR: Richard Čonka
+MIESTO: ${selectedSeminar.venue}, ${selectedSeminar.city} (Atelier Riccardo)
+LEKTOR: ${COMPANY_DETAILS.managingDirector} (víťaz Czech & Slovak Hairdressing Awards)
 
 ÚČASTNÍK: ${formData.fullName}
 SALÓN / MESTO: ${formData.salonName || formData.city || 'Neuvedené'}
+EMAIL: ${formData.email}
+TELEFÓN: ${formData.phone}
+${formData.billingType === 'salon' && formData.companyName ? `FAKTURAČNÉ ÚDAJE:\nFirma: ${formData.companyName}\nIČO: ${formData.ico}\nDIČ: ${formData.dic}\nSídlo: ${formData.billingAddress}\n` : ''}
 BALÍČEK: ${currentTier.name} (${totalPackagePriceEUR} €)
 SPÔSOB PLATBY: ${paymentMethod.toUpperCase()}
-UHRADENÁ SUMA: ${amountToPayNow} €
+UHRADENÁ SUMA: ${amountToPayNow} € (${paymentOption === 'deposit' ? `Záloha 100 €, doplatok ${totalPackagePriceEUR - 100} € na mieste` : 'Uhradená celá suma vopred'})
+
+DODÁVATEĽ A PREVÁDZKOVATEĽ:
+Obchodné meno: ${COMPANY_DETAILS.legalName}
+IČO: ${COMPANY_DETAILS.ico}
+DIČ: ${COMPANY_DETAILS.dic}
+DPH: ${COMPANY_DETAILS.vatStatus}
+Sídlo: ${COMPANY_DETAILS.registeredOffice}
+Zápis: ${COMPANY_DETAILS.courtRegistration}
+Adresa ateliéru: ${COMPANY_DETAILS.salonAddress}
+Email: ${COMPANY_DETAILS.contactEmail}
+Tel: ${COMPANY_DETAILS.phone}
 
 INŠTRUKCIE:
 Túto vstupenku alebo kód predložte pri príchode na recepcii.
-Kontakt: +421 908 261 740 | hair.riccardo@gmail.com
-Adresa salónu: Novohradská 3, 984 01 Lučenec
+Všeobecné obchodné podmienky a storno podmienky:
+https://riccardo-zednici.vercel.app/obchodne-podmienky
+https://riccardo-zednici.vercel.app/reklamacny-poriadok
+Orgán dozoru: ${COMPANY_DETAILS.supervisoryAuthority.name}, ${COMPANY_DETAILS.supervisoryAuthority.inspectorate}
 =====================================================`;
     const blob = new Blob([textContent], { type: 'text/plain;charset=utf-8' });
     const url = window.URL.createObjectURL(blob);
@@ -579,7 +595,7 @@ Adresa salónu: Novohradská 3, 984 01 Lučenec
 
 
   const handleDownloadCalendar = () => {
-    const icsContent = `BEGIN:VCALENDAR\r\nVERSION:2.0\r\nPRODID:-//Hair Salon Riccardo//Masterclass Reservations//SK\r\nBEGIN:VEVENT\r\nSUMMARY:${selectedSeminar.title} — Hair Salon Riccardo\r\nDESCRIPTION:Masterclass s Richardom Čonkom. Kód rezervácie: ${confirmationCode}. Prevádzkovateľ: zeterem s.r.o.\r\nLOCATION:${selectedSeminar.venue}, ${selectedSeminar.city}\r\nSTATUS:CONFIRMED\r\nEND:VEVENT\r\nEND:VCALENDAR`;
+    const icsContent = `BEGIN:VCALENDAR\r\nVERSION:2.0\r\nPRODID:-//Hair Salon Riccardo//Masterclass Reservations//SK\r\nBEGIN:VEVENT\r\nSUMMARY:${selectedSeminar.title} — Hair Salon Riccardo\r\nDESCRIPTION:Masterclass s Richardom Čonkom. Kód rezervácie: ${confirmationCode}. Prevádzkovateľ: ${COMPANY_DETAILS.legalName}.\r\nLOCATION:${selectedSeminar.venue}, ${selectedSeminar.city}\r\nSTATUS:CONFIRMED\r\nEND:VEVENT\r\nEND:VCALENDAR`;
     const blob = new Blob([icsContent], { type: 'text/calendar;charset=utf-8' });
     const url = window.URL.createObjectURL(blob);
     const link = document.createElement('a');
@@ -615,7 +631,7 @@ Adresa salónu: Novohradská 3, 984 01 Lučenec
                 Krok {step} zo 4
               </span>
               <span className="text-[11px] text-zinc-500 font-medium">
-                Prevádzkovateľ: <strong className="text-zinc-400">zeterem s.r.o.</strong>
+                Prevádzkovateľ: <strong className="text-zinc-400">{COMPANY_DETAILS.legalName}</strong>
               </span>
             </div>
             <h2 className="text-lg sm:text-xl font-semibold text-white tracking-tight">
@@ -1001,7 +1017,7 @@ Adresa salónu: Novohradská 3, 984 01 Lučenec
                       </div>
                     </div>
                     <div className="text-[11px] text-zinc-500 pt-1">
-                      Daňový doklad a faktúru pre váš salón vystavuje: <strong className="text-zinc-300">zeterem s.r.o.</strong>
+                      Daňový doklad a faktúru pre váš salón vystavuje: <strong className="text-zinc-300">{COMPANY_DETAILS.legalName}</strong> (IČO: {COMPANY_DETAILS.ico}, {COMPANY_DETAILS.vatStatus})
                     </div>
                   </div>
                 )}
@@ -1018,6 +1034,47 @@ Adresa salónu: Novohradská 3, 984 01 Lučenec
                   onChange={(e) => setFormData({ ...formData, notes: e.target.value })}
                   className="w-full bg-zinc-900 border border-zinc-800 text-white p-3 rounded-xl text-xs sm:text-sm focus:outline-none focus:border-zinc-500"
                 />
+              </div>
+
+              {/* Statutory Legal Consent Box */}
+              <div className="p-4 rounded-2xl bg-zinc-900/70 border border-zinc-850 space-y-2.5 text-xs text-zinc-400">
+                <div className="flex items-start gap-2.5">
+                  <div className="mt-0.5 w-4 h-4 rounded bg-zinc-800 border border-zinc-700 flex items-center justify-center text-white flex-shrink-0">
+                    <Check className="w-3 h-3 text-emerald-400" />
+                  </div>
+                  <p className="text-[11px] leading-relaxed text-zinc-400">
+                    Odoslaním a úhradou rezervácie potvrdzujete, že ste sa oboznámili so{' '}
+                    <a
+                      href="/obchodne-podmienky"
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="text-white underline hover:text-zinc-200"
+                    >
+                      Všeobecnými obchodnými podmienkami (VOP)
+                    </a>{' '}
+                    a{' '}
+                    <a
+                      href="/ochrana-udajov"
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="text-white underline hover:text-zinc-200"
+                    >
+                      Zásadami ochrany osobných údajov
+                    </a>{' '}
+                    prevádzkovateľa <strong>{COMPANY_DETAILS.legalName}</strong> (IČO: {COMPANY_DETAILS.ico}).
+                  </p>
+                </div>
+                <div className="pt-2 border-t border-zinc-850/60 flex items-center justify-between text-[10px] text-zinc-500">
+                  <span>100% garancia spokojnosti po 1. dni</span>
+                  <a
+                    href="/reklamacny-poriadok"
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="hover:text-zinc-300 underline"
+                  >
+                    Storno & Reklamačný poriadok
+                  </a>
+                </div>
               </div>
 
             </div>
@@ -1072,8 +1129,8 @@ Adresa salónu: Novohradská 3, 984 01 Lučenec
                 </div>
 
                 {/* Operator disclosure */}
-                <div className="pt-2 text-[11px] text-zinc-500 border-t border-zinc-850 flex items-center justify-between">
-                  <span>Predajca a prevádzkovateľ: <strong className="text-zinc-300">zeterem s.r.o.</strong></span>
+                <div className="pt-2 text-[11px] text-zinc-500 border-t border-zinc-850 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-1">
+                  <span>Predajca & Prevádzkovateľ: <strong className="text-zinc-300">{COMPANY_DETAILS.legalName}</strong> (IČO: {COMPANY_DETAILS.ico}, {COMPANY_DETAILS.vatStatus})</span>
                   <div className="flex items-center gap-1 text-emerald-400">
                     <ShieldCheck className="w-3.5 h-3.5" />
                     <span>256-bit SSL</span>
@@ -1086,7 +1143,7 @@ Adresa salónu: Novohradská 3, 984 01 Lučenec
                 <div className="flex items-center gap-2">
                   <span className="w-2 h-2 rounded-full bg-emerald-400 animate-pulse" />
                   <span className="text-[11px] font-medium text-zinc-300">
-                    Stripe Platobná Brána • zeterem s.r.o.
+                    Stripe Platobná Brána • {COMPANY_DETAILS.legalName}
                   </span>
                 </div>
                 <span className="text-[10px] text-emerald-400/90 font-mono bg-emerald-950/60 border border-emerald-800/60 px-2 py-0.5 rounded-full">
@@ -1120,7 +1177,7 @@ Adresa salónu: Novohradská 3, 984 01 Lučenec
                       type="button"
                       onClick={() => completeReservation({
                         methodTitle: 'Rezervácia s úhradou na účet / na mieste',
-                        paymentStatus: 'Rezervované — platba na účet zeterem s.r.o.'
+                        paymentStatus: `Rezervované — platba na účet ${COMPANY_DETAILS.legalName}`
                       })}
                       className="px-3 py-1.5 rounded-lg bg-zinc-800 text-zinc-200 font-medium text-xs hover:bg-zinc-700 transition-all flex items-center gap-1.5"
                     >
@@ -1327,7 +1384,7 @@ Adresa salónu: Novohradská 3, 984 01 Lučenec
 
                   <div className="flex items-center justify-center gap-1.5 text-[11px] text-zinc-500 pt-1">
                     <ShieldCheck className="w-3.5 h-3.5 text-zinc-400" />
-                    <span>Zabezpečené cez Stripe 3D Secure • Prevádzkovateľ: zeterem s.r.o.</span>
+                    <span>Zabezpečené cez Stripe 3D Secure • Prevádzkovateľ: {COMPANY_DETAILS.legalName}</span>
                   </div>
                 </div>
               )}
@@ -1370,7 +1427,7 @@ Adresa salónu: Novohradská 3, 984 01 Lučenec
                   )}
 
                   <p className="text-[11px] text-zinc-500 text-center">
-                    Platba prebehne priamo cez Apple Wallet (Touch ID / Face ID) bez opustenia stránky • Prevádzkovateľ: zeterem s.r.o.
+                    Platba prebehne priamo cez Apple Wallet (Touch ID / Face ID) bez opustenia stránky • Prevádzkovateľ: {COMPANY_DETAILS.legalName}
                   </p>
                 </div>
               )}
@@ -1412,7 +1469,7 @@ Adresa salónu: Novohradská 3, 984 01 Lučenec
                   )}
 
                   <p className="text-[11px] text-zinc-500 text-center">
-                    Bezpečné spracovanie platby cez účet Google • Prevádzkovateľ: zeterem s.r.o.
+                    Bezpečné spracovanie platby cez účet Google • Prevádzkovateľ: {COMPANY_DETAILS.legalName}
                   </p>
                 </div>
               )}
@@ -1450,13 +1507,13 @@ Adresa salónu: Novohradská 3, 984 01 Lučenec
                   </button>
 
                   <p className="text-[11px] text-zinc-500 text-center">
-                    Budete presmerovaný do aplikácie Revolut na 1-klikové potvrdenie • Prevádzkovateľ: zeterem s.r.o.
+                    Budete presmerovaný do aplikácie Revolut na 1-klikové potvrdenie • Prevádzkovateľ: {COMPANY_DETAILS.legalName}
                   </p>
                 </div>
               )}
 
 
-              {/* 5. Prevod / Faktúra na účet (zeterem s.r.o.) */}
+              {/* 5. Prevod / Faktúra na účet */}
               {paymentMethod === 'transfer' && (
                 <div className="p-5 rounded-2xl bg-zinc-900/60 border border-zinc-850 space-y-4 animate-fadeIn">
                   <div className="flex items-center justify-between text-xs text-zinc-400">
@@ -1467,7 +1524,11 @@ Adresa salónu: Novohradská 3, 984 01 Lučenec
                   <div className="p-4 rounded-xl bg-zinc-950 border border-zinc-800 space-y-2.5 text-xs">
                     <div className="flex justify-between items-center">
                       <span className="text-zinc-500">Príjemca / Prevádzkovateľ:</span>
-                      <strong className="text-white">zeterem s.r.o.</strong>
+                      <strong className="text-white">{COMPANY_DETAILS.legalName}</strong>
+                    </div>
+                    <div className="flex justify-between items-center">
+                      <span className="text-zinc-500">IČO / DIČ dodávateľa:</span>
+                      <span className="text-zinc-300 font-mono">IČO: {COMPANY_DETAILS.ico} | DIČ: {COMPANY_DETAILS.dic}</span>
                     </div>
                     <div className="flex justify-between items-center">
                       <span className="text-zinc-500">Banka:</span>
@@ -1540,7 +1601,7 @@ Adresa salónu: Novohradská 3, 984 01 Lučenec
                   Tešíme sa na vás, {formData.fullName}.
                 </h3>
                 <p className="text-xs sm:text-sm text-zinc-400 max-w-md mx-auto leading-relaxed">
-                  Vaša rezervácia a platba boli úspešne spracované. Potvrdenie s kódom vstupenky a daňový doklad vystavený prevádzkovateľom <strong>zeterem s.r.o.</strong> boli odoslané na <strong>{formData.email}</strong>.
+                  Vaša rezervácia a platba boli úspešne spracované. Potvrdenie s kódom vstupenky a daňový doklad vystavený prevádzkovateľom <strong>{COMPANY_DETAILS.legalName}</strong> boli odoslané na <strong>{formData.email}</strong>.
                 </p>
               </div>
 
@@ -1578,7 +1639,7 @@ Adresa salónu: Novohradská 3, 984 01 Lučenec
                     <span className="text-xs font-bold tracking-wider text-white uppercase block">
                       RICCARDO ACADEMY • VIP VSTUPENKA
                     </span>
-                    <span className="text-[11px] text-zinc-500">Prevádzkovateľ: zeterem s.r.o.</span>
+                    <span className="text-[11px] text-zinc-500">Prevádzkovateľ: {COMPANY_DETAILS.legalName}</span>
                   </div>
                   <span className="font-mono text-xs text-emerald-400 bg-emerald-950/80 border border-emerald-500/40 px-2.5 py-1 rounded-lg font-bold">
                     {confirmationCode}
@@ -1638,6 +1699,17 @@ Adresa salónu: Novohradská 3, 984 01 Lučenec
                   </div>
                 </div>
 
+                {/* Official Supplier & Tax Notice for Salons / Accounting */}
+                <div className="pt-3 border-t border-zinc-800 text-[10px] text-zinc-500 font-mono space-y-1">
+                  <div className="flex justify-between items-baseline">
+                    <span className="text-zinc-300 font-sans font-semibold">{COMPANY_DETAILS.legalName}</span>
+                    <span>IČO: {COMPANY_DETAILS.ico} | DIČ: {COMPANY_DETAILS.dic}</span>
+                  </div>
+                  <div className="text-[10px] text-zinc-500 font-sans">Sídlo: {COMPANY_DETAILS.registeredOffice}</div>
+                  <div className="text-[10px] text-zinc-500 font-sans">Prevádzka: {COMPANY_DETAILS.salonAddress}</div>
+                  <div className="text-[9px] text-zinc-600 font-sans leading-relaxed">{COMPANY_DETAILS.courtRegistration} • {COMPANY_DETAILS.vatStatus}</div>
+                </div>
+
                 <div className="pt-3 border-t border-zinc-800 flex items-center justify-between text-xs text-zinc-400">
                   <span>Platná elektronická vstupenka</span>
                   <span className="font-semibold text-white">Balíček: {currentTier.name} ({totalPackagePriceEUR} €)</span>
@@ -1695,7 +1767,7 @@ Adresa salónu: Novohradská 3, 984 01 Lučenec
                     <span>Apple / Outlook (.ics)</span>
                   </button>
                   <a
-                    href={`https://calendar.google.com/calendar/render?action=TEMPLATE&text=${encodeURIComponent(selectedSeminar.title + ' — Hair Salon Riccardo')}&details=${encodeURIComponent('Masterclass s Richardom Čonkom. Kód vstupenky: ' + confirmationCode + '. Prevádzkovateľ: zeterem s.r.o. Vstupenka bola riadne zaevidovaná.')}&location=${encodeURIComponent(selectedSeminar.venue + ', Lučenec')}`}
+                    href={`https://calendar.google.com/calendar/render?action=TEMPLATE&text=${encodeURIComponent(selectedSeminar.title + ' — Hair Salon Riccardo')}&details=${encodeURIComponent('Masterclass s Richardom Čonkom. Kód vstupenky: ' + confirmationCode + '. Prevádzkovateľ: ' + COMPANY_DETAILS.legalName + '. Vstupenka bola riadne zaevidovaná.')}&location=${encodeURIComponent(selectedSeminar.venue + ', Lučenec')}`}
                     target="_blank"
                     rel="noopener noreferrer"
                     className="px-4 py-2 rounded-full bg-zinc-900 hover:bg-zinc-800 border border-zinc-750 text-xs font-medium text-white transition-all flex items-center gap-1.5 shadow-sm"
@@ -1726,7 +1798,7 @@ Adresa salónu: Novohradská 3, 984 01 Lučenec
               </button>
             ) : (
               <div className="text-xs text-zinc-500">
-                Prevádzkovateľ eshopu: <strong className="text-zinc-400 font-medium">zeterem s.r.o.</strong>
+                Prevádzkovateľ eshopu: <strong className="text-zinc-400 font-medium">{COMPANY_DETAILS.legalName}</strong>
               </div>
             )}
 

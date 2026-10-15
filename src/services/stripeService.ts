@@ -1,7 +1,7 @@
 import { loadStripe, Stripe, PaymentRequest } from '@stripe/stripe-js';
 
 /**
- * Stripe Service for Hair Salon Riccardo / zeterem s.r.o.
+ * Stripe Service for Hair Salon Riccardo / ZETEREM s.r.o.
  * Fully wired to client Stripe.js and backend /api/pay (Stripe Serverless).
  */
 export const STRIPE_PUBLISHABLE_KEY = 'pk_test_51UQoDrHFKYzQN3E7Y5Fix2WRZT4EhqLQzqnlN40yTvdFbCxHnAiU2oSG15CxZoEQeF1lPKO6yuBaimp2vw3Ag32R00tzYoVzmA';
@@ -210,7 +210,7 @@ export async function createStripePaymentRequest({
       country: 'SK',
       currency: 'eur',
       total: {
-        label: `${title} (zeterem s.r.o.)`,
+        label: `${title} (ZETEREM s.r.o.)`,
         amount: Math.round(amountEUR * 100),
       },
       requestPayerName: true,
