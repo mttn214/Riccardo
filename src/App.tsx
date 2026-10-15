@@ -199,6 +199,10 @@ export function App() {
       <PortfolioModal
         item={portfolioItem}
         onClose={() => setPortfolioItem(null)}
+        onBookSeminar={(seminar, tierId) => {
+          setPortfolioItem(null);
+          handleOpenBooking(seminar, tierId);
+        }}
       />
     </div>
   );
