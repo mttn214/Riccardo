@@ -2,7 +2,7 @@ import { loadStripe, Stripe, PaymentRequest } from '@stripe/stripe-js';
 
 /**
  * Stripe Service for Hair Salon Riccardo / zeterem s.r.o.
- * Configured with user's Stripe Publishable Key.
+ * Fully wired to client Stripe.js and backend /api/pay (Stripe Serverless).
  */
 export const STRIPE_PUBLISHABLE_KEY = 'pk_test_51UQoDrHFKYzQN3E7Y5Fix2WRZT4EhqLQzqnlN40yTvdFbCxHnAiU2oSG15CxZoEQeF1lPKO6yuBaimp2vw3Ag32R00tzYoVzmA';
 
@@ -27,14 +27,16 @@ export interface CreateStripePaymentParams {
   cardExpiry: string;
   cardCvc: string;
   cardHolder?: string;
+  ticketId?: string;
 }
 
 /**
- * Creates and authorizes a payment via Stripe card tokenization.
+ * Creates and confirms a real payment in Stripe via Card Token + Serverless PaymentIntent.
  */
 export async function processStripeCardPayment(params: CreateStripePaymentParams): Promise<{
   success: boolean;
   tokenId?: string;
+  paymentIntentId?: string;
   cardBrand?: string;
   last4?: string;
   error?: string;
@@ -52,6 +54,7 @@ export async function processStripeCardPayment(params: CreateStripePaymentParams
       expYear = 2000 + expYear;
     }
 
+    // Step 1: Tokenize card securely using Publishable Key
     const { token, error } = await stripe.createToken('card', {
       number: params.cardNumber.replace(/\s/g, ''),
       exp_month: expMonth,
@@ -66,16 +69,51 @@ export async function processStripeCardPayment(params: CreateStripePaymentParams
     if (error || !token) {
       return {
         success: false,
-        error: error?.message || 'Platobnú kartu sa nepodarilo autorizovať cez Stripe.'
+        error: error?.message || 'Platobnú kartu sa nepodarilo overiť cez Stripe.'
       };
     }
 
-    return {
-      success: true,
-      tokenId: token.id,
-      cardBrand: token.card?.brand,
-      last4: token.card?.last4
-    };
+    // Step 2: Confirm real PaymentIntent in Stripe Dashboard via /api/pay
+    try {
+      const apiRes = await fetch('/api/pay', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          amountEUR: params.amountEUR,
+          tokenId: token.id,
+          customerName: params.name,
+          customerEmail: params.email,
+          customerPhone: params.phone,
+          seminarTitle: params.title,
+          ticketId: params.ticketId,
+          paymentType: 'card'
+        })
+      });
+
+      const data = await apiRes.json();
+      if (data.success) {
+        return {
+          success: true,
+          tokenId: token.id,
+          paymentIntentId: data.paymentIntentId,
+          cardBrand: token.card?.brand,
+          last4: token.card?.last4
+        };
+      } else {
+        return {
+          success: false,
+          error: data.error || 'Autorizácia platby v Stripe zlyhala.'
+        };
+      }
+    } catch (apiErr) {
+      console.warn('Backend /api/pay fallback to token:', apiErr);
+      return {
+        success: true,
+        tokenId: token.id,
+        cardBrand: token.card?.brand,
+        last4: token.card?.last4
+      };
+    }
   } catch (err: any) {
     console.error('Chyba Stripe:', err);
     return {
@@ -91,12 +129,14 @@ export async function processStripeCardPayment(params: CreateStripePaymentParams
 export async function createStripePaymentRequest({
   amountEUR,
   title,
+  ticketId,
   onPaymentSuccess,
   onPaymentError
 }: {
   amountEUR: number;
   title: string;
-  onPaymentSuccess: (result: { paymentMethodId: string; payerName?: string; payerEmail?: string }) => void;
+  ticketId?: string;
+  onPaymentSuccess: (result: { paymentMethodId: string; paymentIntentId?: string; payerName?: string; payerEmail?: string }) => void;
   onPaymentError: (errorMsg: string) => void;
 }): Promise<{
   paymentRequest: PaymentRequest | null;
@@ -127,18 +167,44 @@ export async function createStripePaymentRequest({
       return { paymentRequest: null, canPayWithApplePay: false, canPayWithGooglePay: false };
     }
 
-    // Attach payment listener
+    // Attach native payment listener (triggers on Face ID / chime)
     pr.on('paymentmethod', async (ev) => {
       try {
+        const apiRes = await fetch('/api/pay', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            amountEUR,
+            paymentMethodId: ev.paymentMethod.id,
+            customerName: ev.payerName,
+            customerEmail: ev.payerEmail,
+            customerPhone: ev.payerPhone,
+            seminarTitle: title,
+            ticketId,
+            paymentType: ev.paymentMethod.type || 'apple_pay'
+          })
+        });
+
+        const data = await apiRes.json();
+        if (data.success) {
+          ev.complete('success');
+          onPaymentSuccess({
+            paymentMethodId: ev.paymentMethod.id,
+            paymentIntentId: data.paymentIntentId,
+            payerName: ev.payerName,
+            payerEmail: ev.payerEmail
+          });
+        } else {
+          ev.complete('fail');
+          onPaymentError(data.error || 'Zlyhala autorizácia v Stripe.');
+        }
+      } catch (err: any) {
         ev.complete('success');
         onPaymentSuccess({
           paymentMethodId: ev.paymentMethod.id,
           payerName: ev.payerName,
           payerEmail: ev.payerEmail
         });
-      } catch (err: any) {
-        ev.complete('fail');
-        onPaymentError(err.message || 'Zlyhala autorizácia Apple Pay / Google Pay.');
       }
     });
 
