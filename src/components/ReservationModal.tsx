@@ -20,6 +20,7 @@ import {
 import confetti from 'canvas-confetti';
 import { sendFormNotification } from '../services/formService';
 import { ApplePayLogo, GooglePayLogo, RevolutIcon, CreditCardBrandIcons } from './PaymentIcons';
+import { processStripeCardPayment, createStripePaymentRequest } from '../services/stripeService';
 
 interface ReservationModalProps {
   isOpen: boolean;
@@ -81,6 +82,12 @@ export const ReservationModal: React.FC<ReservationModalProps> = ({
   const [isProcessingPayment, setIsProcessingPayment] = useState(false);
   const [paymentStatusText, setPaymentStatusText] = useState('');
   const [confirmationCode, setConfirmationCode] = useState('');
+  
+  // Stripe Gateway integration states
+  const [stripePaymentRequest, setStripePaymentRequest] = useState<any>(null);
+  const [canApplePay, setCanApplePay] = useState<boolean>(false);
+  const [canGooglePay, setCanGooglePay] = useState<boolean>(false);
+  const [stripeError, setStripeError] = useState<string>('');
 
   useEffect(() => {
     if (initialSeminar) {
@@ -118,6 +125,69 @@ export const ReservationModal: React.FC<ReservationModalProps> = ({
   // Amount to be paid in step 3
   const amountToPayNow = paymentOption === 'deposit' ? 100 : totalPackagePriceEUR;
 
+  // Initialize Stripe Payment Request (Apple Pay / Google Pay) on Step 3
+  useEffect(() => {
+    if (step === 3) {
+      setStripeError('');
+      let isMounted = true;
+
+      createStripePaymentRequest({
+        amountEUR: amountToPayNow,
+        title: selectedSeminar.title,
+        onPaymentSuccess: async ({ paymentMethodId, payerName, payerEmail }) => {
+          setIsProcessingPayment(true);
+          setPaymentStatusText('Spracovávam overenú platbu cez Stripe...');
+          const randomId = `RIC-${selectedSeminar.city.slice(0, 3).toUpperCase()}-${Math.floor(1000 + Math.random() * 9000)}`;
+          setConfirmationCode(randomId);
+
+          await sendFormNotification({
+            formType: 'Rezervácia seminára',
+            name: payerName || formData.fullName,
+            email: payerEmail || formData.email,
+            phone: formData.phone,
+            'Názov seminára': selectedSeminar.title,
+            'Termín konania': selectedSeminar.dates,
+            'Miesto konania': `${selectedSeminar.venue}, ${selectedSeminar.city}`,
+            'Zvolený balíček': `${currentTier.name} (${formatPrice(totalPackagePriceEUR, currency)})`,
+            'Spôsob platby': paymentMethod === 'apple_pay' ? 'Apple Pay (Stripe overené)' : 'Google Pay (Stripe overené)',
+            'Stripe Payment Method ID': paymentMethodId,
+            'Stripe Status': 'Autorizované cez Stripe Test Gateway',
+            'Platobný režim': paymentOption === 'deposit' ? 'Záloha 100 € (Doplatok na mieste)' : 'Celá suma vopred',
+            'Uhradená suma teraz': `${amountToPayNow} €`,
+            'Zostáva doplatiť': paymentOption === 'deposit' ? `${totalPackagePriceEUR - 100} €` : '0 € (Plne uhradené)',
+            'Kód vstupenky': randomId,
+            'Názov salónu': formData.salonName || 'Neuvedené',
+            'Mesto salónu': formData.city || 'Neuvedené',
+            'Dĺžka praxe': formData.experience,
+            'Fakturačný subjekt': formData.billingType === 'salon' ? (formData.companyName || formData.salonName || 'Firma/Salón') : 'Súkromná osoba',
+            'IČO': formData.ico || 'Neuvedené',
+            'DIČ / IČ DPH': formData.dic || 'Neuvedené',
+            'Fakturačná adresa': formData.billingAddress || 'Neuvedené',
+            'Doplnky': `${addOnBrush ? 'Termokefa (+38€) ' : ''}${addOnAudit ? 'Audit (+65€)' : ''}` || 'Žiadne',
+            'Poznámka': formData.notes || 'Žiadna',
+            'Prevádzkovateľ eshopu': 'zeterem s.r.o.'
+          });
+
+          setIsProcessingPayment(false);
+          setStep(4);
+        },
+        onPaymentError: (err) => {
+          setIsProcessingPayment(false);
+          setStripeError(err);
+        }
+      }).then((res) => {
+        if (!isMounted) return;
+        setStripePaymentRequest(res.paymentRequest);
+        setCanApplePay(res.canPayWithApplePay);
+        setCanGooglePay(res.canPayWithGooglePay);
+      });
+
+      return () => {
+        isMounted = false;
+      };
+    }
+  }, [step, amountToPayNow, selectedSeminar]);
+
   // Format Card Number (adds space every 4 digits)
   const handleCardNumberChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const raw = e.target.value.replace(/\D/g, '').slice(0, 16);
@@ -149,61 +219,133 @@ export const ReservationModal: React.FC<ReservationModalProps> = ({
 
   // Handle Payment Execution
   const handleProcessPayment = async () => {
+    setStripeError('');
+
+    // 1. Platobná karta cez Stripe API
     if (paymentMethod === 'card') {
       if (!cardNumber || cardNumber.replace(/\s/g, '').length < 15 || !cardExpiry || !cardCvc) {
-        alert('Prosím vyplňte platné údaje platobnej karty.');
+        setStripeError('Prosím vyplňte platné údaje platobnej karty (16 číslic, platnosť MM/RR a 3-miestny CVC kód).');
+        return;
+      }
+
+      setIsProcessingPayment(true);
+      setPaymentStatusText('Odosielam a autorizujem platbu cez Stripe...');
+
+      const stripeResult = await processStripeCardPayment({
+        amountEUR: amountToPayNow,
+        title: selectedSeminar.title,
+        name: formData.fullName,
+        email: formData.email,
+        phone: formData.phone,
+        city: formData.city,
+        address: formData.billingAddress,
+        cardNumber,
+        cardExpiry,
+        cardCvc,
+        cardHolder,
+      });
+
+      if (!stripeResult.success) {
+        setIsProcessingPayment(false);
+        setStripeError(stripeResult.error || 'Platobnú kartu sa nepodarilo autorizovať cez Stripe.');
+        return;
+      }
+
+      const randomId = `RIC-${selectedSeminar.city.slice(0, 3).toUpperCase()}-${Math.floor(1000 + Math.random() * 9000)}`;
+      setConfirmationCode(randomId);
+
+      await sendFormNotification({
+        formType: 'Rezervácia seminára',
+        name: formData.fullName,
+        email: formData.email,
+        phone: formData.phone,
+        'Názov seminára': selectedSeminar.title,
+        'Termín konania': selectedSeminar.dates,
+        'Miesto konania': `${selectedSeminar.venue}, ${selectedSeminar.city}`,
+        'Zvolený balíček': `${currentTier.name} (${formatPrice(totalPackagePriceEUR, currency)})`,
+        'Spôsob platby': `Platobná karta (${stripeResult.cardBrand?.toUpperCase() || 'KARTA'} •••• ${stripeResult.last4 || cardNumber.slice(-4)}) cez Stripe`,
+        'Stripe Token ID': stripeResult.tokenId,
+        'Stripe Režim': 'Autorizované cez Stripe Test Gateway (zeterem s.r.o.)',
+        'Platobný režim': paymentOption === 'deposit' ? 'Záloha 100 € (Doplatok na mieste)' : 'Celá suma vopred',
+        'Uhradená suma teraz': `${amountToPayNow} €`,
+        'Zostáva doplatiť': paymentOption === 'deposit' ? `${totalPackagePriceEUR - 100} €` : '0 € (Plne uhradené)',
+        'Kód vstupenky': randomId,
+        'Názov salónu': formData.salonName || 'Neuvedené',
+        'Mesto salónu': formData.city || 'Neuvedené',
+        'Dĺžka praxe': formData.experience,
+        'Fakturačný subjekt': formData.billingType === 'salon' ? (formData.companyName || formData.salonName || 'Firma/Salón') : 'Súkromná osoba',
+        'IČO': formData.ico || 'Neuvedené',
+        'DIČ / IČ DPH': formData.dic || 'Neuvedené',
+        'Fakturačná adresa': formData.billingAddress || 'Neuvedené',
+        'Doplnky': `${addOnBrush ? 'Termokefa (+38€) ' : ''}${addOnAudit ? 'Audit (+65€)' : ''}` || 'Žiadne',
+        'Poznámka': formData.notes || 'Žiadna',
+        'Prevádzkovateľ eshopu': 'zeterem s.r.o.'
+      });
+
+      setIsProcessingPayment(false);
+      setStep(4);
+      return;
+    }
+
+    // 2. Apple Pay
+    if (paymentMethod === 'apple_pay') {
+      if (stripePaymentRequest && canApplePay) {
+        setIsProcessingPayment(true);
+        setPaymentStatusText('Otváram Apple Pay na vašom zariadení...');
+        stripePaymentRequest.show();
+        setIsProcessingPayment(false);
+        return;
+      } else {
+        setStripeError('Apple Pay na webe vyžaduje overenie domény v Stripe Dashboarde (Settings ➡️ Payment methods ➡️ Apple Pay) a zariadenie Apple s kartou v peňaženke. Pre test platby môžete zvoliť záložku „Platobná karta“.');
         return;
       }
     }
 
-    setIsProcessingPayment(true);
-    setPaymentStatusText('Pripájam k bezpečnej platobnej bráne...');
+    // 3. Google Pay
+    if (paymentMethod === 'google_pay') {
+      if (stripePaymentRequest && canGooglePay) {
+        setIsProcessingPayment(true);
+        setPaymentStatusText('Otváram Google Pay...');
+        stripePaymentRequest.show();
+        setIsProcessingPayment(false);
+        return;
+      } else {
+        setStripeError('Google Pay peňaženka nie je v tomto prehliadači pripravená. Zvoľte prosím záložku „Platobná karta“.');
+        return;
+      }
+    }
 
-    // Simulate realistic 3DS / Payment gateway authorization
-    await new Promise((r) => setTimeout(r, 700));
-    setPaymentStatusText('Overujem platbu cez zeterem s.r.o. ...');
-    
-    await new Promise((r) => setTimeout(r, 900));
-    setPaymentStatusText('Platba úspešne autorizovaná.');
+    // 4. Revolut Pay
+    if (paymentMethod === 'revolut_pay') {
+      setIsProcessingPayment(true);
+      setPaymentStatusText('Spracovávam rezerváciu cez Revolut Pay...');
+      await new Promise((r) => setTimeout(r, 1000));
 
-    const randomId = `RIC-${selectedSeminar.city.slice(0, 3).toUpperCase()}-${Math.floor(1000 + Math.random() * 9000)}`;
-    setConfirmationCode(randomId);
+      const randomId = `RIC-${selectedSeminar.city.slice(0, 3).toUpperCase()}-${Math.floor(1000 + Math.random() * 9000)}`;
+      setConfirmationCode(randomId);
 
-    const paymentMethodLabel = 
-      paymentMethod === 'apple_pay' ? 'Apple Pay' :
-      paymentMethod === 'google_pay' ? 'Google Pay' :
-      paymentMethod === 'revolut_pay' ? 'Revolut Pay' :
-      `Platobná karta (končiaca na ${cardNumber.slice(-4) || '••••'})`;
+      await sendFormNotification({
+        formType: 'Rezervácia seminára',
+        name: formData.fullName,
+        email: formData.email,
+        phone: formData.phone,
+        'Názov seminára': selectedSeminar.title,
+        'Termín konania': selectedSeminar.dates,
+        'Miesto konania': `${selectedSeminar.venue}, ${selectedSeminar.city}`,
+        'Zvolený balíček': `${currentTier.name} (${formatPrice(totalPackagePriceEUR, currency)})`,
+        'Spôsob platby': 'Revolut Pay (zeterem s.r.o.)',
+        'Platobný režim': paymentOption === 'deposit' ? 'Záloha 100 € (Doplatok na mieste)' : 'Celá suma vopred',
+        'Uhradená suma teraz': `${amountToPayNow} €`,
+        'Zostáva doplatiť': paymentOption === 'deposit' ? `${totalPackagePriceEUR - 100} €` : '0 € (Plne uhradené)',
+        'Kód vstupenky': randomId,
+        'Názov salónu': formData.salonName || 'Neuvedené',
+        'Prevádzkovateľ eshopu': 'zeterem s.r.o.'
+      });
 
-    // Send real email notification to carlitomio214@gmail.com
-    await sendFormNotification({
-      formType: 'Rezervácia seminára',
-      name: formData.fullName,
-      email: formData.email,
-      phone: formData.phone,
-      'Názov seminára': selectedSeminar.title,
-      'Termín konania': selectedSeminar.dates,
-      'Miesto konania': `${selectedSeminar.venue}, ${selectedSeminar.city}`,
-      'Zvolený balíček': `${currentTier.name} (${formatPrice(totalPackagePriceEUR, currency)})`,
-      'Spôsob platby': paymentMethodLabel,
-      'Platobný režim': paymentOption === 'deposit' ? 'Záloha 100 € (Doplatok na mieste)' : 'Celá suma vopred',
-      'Uhradená suma teraz': `${amountToPayNow} €`,
-      'Zostáva doplatiť': paymentOption === 'deposit' ? `${totalPackagePriceEUR - 100} €` : '0 € (Plne uhradené)',
-      'Kód vstupenky': randomId,
-      'Názov salónu': formData.salonName || 'Neuvedené',
-      'Mesto salónu': formData.city || 'Neuvedené',
-      'Dĺžka praxe': formData.experience,
-      'Fakturačný subjekt': formData.billingType === 'salon' ? (formData.companyName || formData.salonName || 'Firma/Salón') : 'Súkromná osoba',
-      'IČO': formData.ico || 'Neuvedené',
-      'DIČ / IČ DPH': formData.dic || 'Neuvedené',
-      'Fakturačná adresa': formData.billingAddress || 'Neuvedené',
-      'Doplnky': `${addOnBrush ? 'Termokefa (+38€) ' : ''}${addOnAudit ? 'Audit (+65€)' : ''}` || 'Žiadne',
-      'Poznámka': formData.notes || 'Žiadna',
-      'Prevádzkovateľ eshopu': 'zeterem s.r.o.'
-    });
-
-    setIsProcessingPayment(false);
-    setStep(4);
+      setIsProcessingPayment(false);
+      setStep(4);
+      return;
+    }
   };
 
   const handleDownloadCalendar = () => {
@@ -680,6 +822,30 @@ export const ReservationModal: React.FC<ReservationModalProps> = ({
                   </div>
                 </div>
               </div>
+
+              {/* Stripe Gateway Status Pill */}
+              <div className="flex items-center justify-between text-xs px-3.5 py-2.5 rounded-xl bg-zinc-900 border border-zinc-800 text-zinc-400">
+                <div className="flex items-center gap-2">
+                  <span className="w-2 h-2 rounded-full bg-emerald-400 animate-pulse" />
+                  <span className="text-[11px] font-medium text-zinc-300">
+                    Stripe Platobná Brána • zeterem s.r.o.
+                  </span>
+                </div>
+                <span className="text-[10px] text-emerald-400/90 font-mono bg-emerald-950/60 border border-emerald-800/60 px-2 py-0.5 rounded-full">
+                  Stripe Test Mode Aktívny
+                </span>
+              </div>
+
+              {/* Stripe Error or Info Box */}
+              {stripeError && (
+                <div className="p-4 rounded-2xl bg-amber-500/10 border border-amber-500/30 text-amber-200 text-xs flex items-start gap-3 animate-fadeIn">
+                  <ShieldCheck className="w-5 h-5 mt-0.5 flex-shrink-0 text-amber-400" />
+                  <div className="flex-1">
+                    <p className="font-semibold text-amber-300">Upozornenie k platbe:</p>
+                    <p className="mt-1 text-zinc-300 leading-relaxed">{stripeError}</p>
+                  </div>
+                </div>
+              )}
 
               {/* Payment Methods Grid */}
               <div className="space-y-3">
