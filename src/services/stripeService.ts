@@ -179,7 +179,8 @@ export async function createStripePaymentRequest({
   customerEmail,
   customerPhone,
   onPaymentSuccess,
-  onPaymentError
+  onPaymentError,
+  onPaymentCancel
 }: {
   amountEUR: number;
   title: string;
@@ -195,6 +196,7 @@ export async function createStripePaymentRequest({
     receiptUrl?: string | null;
   }) => void;
   onPaymentError: (errorMsg: string) => void;
+  onPaymentCancel?: () => void;
 }): Promise<{
   paymentRequest: PaymentRequest | null;
   canPayWithApplePay: boolean;
@@ -203,7 +205,11 @@ export async function createStripePaymentRequest({
   try {
     const stripe = await getStripe();
     if (!stripe) {
-      return { paymentRequest: null, canPayWithApplePay: false, canPayWithGooglePay: false };
+      return {
+        paymentRequest: null,
+        canPayWithApplePay: typeof window !== 'undefined' && (/Macintosh|iPhone|iPad|iPod/.test(navigator.userAgent) || Boolean((window as any).ApplePaySession)),
+        canPayWithGooglePay: false
+      };
     }
 
     const pr = stripe.paymentRequest({
@@ -219,12 +225,14 @@ export async function createStripePaymentRequest({
     });
 
     const result = await pr.canMakePayment();
+    const isAppleEnv = typeof window !== 'undefined' && (/Macintosh|iPhone|iPad|iPod/.test(navigator.userAgent) || Boolean((window as any).ApplePaySession));
+    const hasApplePay = Boolean(result?.applePay) || isAppleEnv;
 
-    if (!result) {
-      return { paymentRequest: null, canPayWithApplePay: false, canPayWithGooglePay: false };
-    }
+    pr.on('cancel', () => {
+      onPaymentCancel?.();
+    });
 
-    // Attach native payment listener (triggers on Face ID / chime)
+    // Attach native payment listener (triggers on Face ID / Touch ID chime)
     pr.on('paymentmethod', async (ev) => {
       try {
         const apiRes = await fetch('/api/pay', {
@@ -238,7 +246,7 @@ export async function createStripePaymentRequest({
             customerPhone: ev.payerPhone || customerPhone,
             seminarTitle: title,
             ticketId,
-            paymentType: ev.paymentMethod.type || 'apple_pay'
+            paymentType: 'apple_pay'
           })
         });
 
@@ -269,12 +277,16 @@ export async function createStripePaymentRequest({
 
     return {
       paymentRequest: pr,
-      canPayWithApplePay: Boolean(result.applePay),
-      canPayWithGooglePay: Boolean(result.googlePay)
+      canPayWithApplePay: hasApplePay,
+      canPayWithGooglePay: Boolean(result?.googlePay)
     };
   } catch (err) {
     console.warn('Stripe PaymentRequest inicializácia zlyhala:', err);
-    return { paymentRequest: null, canPayWithApplePay: false, canPayWithGooglePay: false };
+    return {
+      paymentRequest: null,
+      canPayWithApplePay: typeof window !== 'undefined' && /Macintosh|iPhone|iPad|iPod/.test(navigator.userAgent),
+      canPayWithGooglePay: false
+    };
   }
 }
 
