@@ -14,13 +14,12 @@ import {
   Lock,
   CreditCard,
   Building2,
-  Sparkles,
   CheckCircle2,
   Loader2
 } from 'lucide-react';
 import confetti from 'canvas-confetti';
 import { sendFormNotification } from '../services/formService';
-import { ApplePayIcon, GooglePayIcon, RevolutPayIcon, CreditCardBrandIcons } from './PaymentIcons';
+import { ApplePayLogo, GooglePayLogo, RevolutIcon, CreditCardBrandIcons } from './PaymentIcons';
 
 interface ReservationModalProps {
   isOpen: boolean;
@@ -700,7 +699,9 @@ export const ReservationModal: React.FC<ReservationModalProps> = ({
                         : 'bg-zinc-950 border-zinc-800 text-zinc-400 hover:text-white hover:border-zinc-700'
                     }`}
                   >
-                    <ApplePayIcon className="w-12 h-7" />
+                    <div className="h-6 flex items-center justify-center">
+                      <ApplePayLogo className="h-5 w-auto text-white" />
+                    </div>
                     <span className="text-[11px] font-semibold">Apple Pay</span>
                   </button>
 
@@ -714,7 +715,9 @@ export const ReservationModal: React.FC<ReservationModalProps> = ({
                         : 'bg-zinc-950 border-zinc-800 text-zinc-400 hover:text-white hover:border-zinc-700'
                     }`}
                   >
-                    <GooglePayIcon className="w-12 h-7" />
+                    <div className="h-6 flex items-center justify-center">
+                      <GooglePayLogo className="h-4 w-auto" lightText={true} />
+                    </div>
                     <span className="text-[11px] font-semibold">Google Pay</span>
                   </button>
 
@@ -728,7 +731,10 @@ export const ReservationModal: React.FC<ReservationModalProps> = ({
                         : 'bg-zinc-950 border-zinc-800 text-zinc-400 hover:text-white hover:border-zinc-700'
                     }`}
                   >
-                    <RevolutPayIcon className="w-12 h-7" />
+                    <div className="h-6 flex items-center justify-center gap-1.5">
+                      <RevolutIcon className="h-4 w-4 text-white" />
+                      <span className="text-xs font-bold text-white tracking-tight">Pay</span>
+                    </div>
                     <span className="text-[11px] font-semibold">Revolut Pay</span>
                   </button>
 
@@ -742,7 +748,9 @@ export const ReservationModal: React.FC<ReservationModalProps> = ({
                         : 'bg-zinc-950 border-zinc-800 text-zinc-400 hover:text-white hover:border-zinc-700'
                     }`}
                   >
-                    <CreditCard className="w-6 h-6 text-white" />
+                    <div className="h-6 flex items-center justify-center">
+                      <CreditCard className="w-5 h-5 text-white" />
+                    </div>
                     <span className="text-[11px] font-semibold">Platobná karta</span>
                   </button>
 
@@ -760,13 +768,13 @@ export const ReservationModal: React.FC<ReservationModalProps> = ({
                     type="button"
                     onClick={handleProcessPayment}
                     disabled={isProcessingPayment}
-                    className="w-full py-3.5 px-6 rounded-2xl bg-white text-black font-semibold text-sm hover:bg-zinc-200 transition-all flex items-center justify-center gap-2 active:scale-95 shadow-xl"
+                    className="w-full py-4 px-6 rounded-2xl bg-white text-black font-semibold text-sm hover:bg-zinc-100 transition-all flex items-center justify-center gap-2.5 active:scale-95 shadow-xl"
                   >
-                    <ApplePayIcon className="w-10 h-5" />
-                    <span>Zaplatiť {amountToPayNow} €</span>
+                    <ApplePayLogo className="h-6 w-auto" fill="#000000" />
+                    <span className="font-semibold text-base">Zaplatiť {amountToPayNow} €</span>
                   </button>
                   <p className="text-[11px] text-zinc-500 text-center">
-                    Platba prebehne priamo cez Apple Pay kartu uloženú vo vašom zariadení.
+                    Platba prebehne priamo cez Apple Pay kartu uloženú vo vašom Apple zariadení.
                   </p>
                 </div>
               )}
@@ -781,10 +789,10 @@ export const ReservationModal: React.FC<ReservationModalProps> = ({
                     type="button"
                     onClick={handleProcessPayment}
                     disabled={isProcessingPayment}
-                    className="w-full py-3.5 px-6 rounded-2xl bg-zinc-900 hover:bg-zinc-850 border border-zinc-700 text-white font-semibold text-sm transition-all flex items-center justify-center gap-2 active:scale-95 shadow-xl"
+                    className="w-full py-4 px-6 rounded-2xl bg-black hover:bg-zinc-900 border border-zinc-700 text-white font-semibold text-sm transition-all flex items-center justify-center gap-2.5 active:scale-95 shadow-xl"
                   >
-                    <GooglePayIcon className="w-10 h-5" />
-                    <span>Zaplatiť {amountToPayNow} €</span>
+                    <GooglePayLogo className="h-5 w-auto" lightText={true} />
+                    <span className="font-semibold text-base">Zaplatiť {amountToPayNow} €</span>
                   </button>
                   <p className="text-[11px] text-zinc-500 text-center">
                     Bezpečné spracovanie platby cez účet Google.
@@ -802,10 +810,10 @@ export const ReservationModal: React.FC<ReservationModalProps> = ({
                     type="button"
                     onClick={handleProcessPayment}
                     disabled={isProcessingPayment}
-                    className="w-full py-3.5 px-6 rounded-2xl bg-black hover:bg-zinc-900 border border-zinc-700 text-white font-semibold text-sm transition-all flex items-center justify-center gap-2 active:scale-95 shadow-xl"
+                    className="w-full py-4 px-6 rounded-2xl bg-white hover:bg-zinc-100 text-black font-semibold text-sm transition-all flex items-center justify-center gap-2.5 active:scale-95 shadow-xl"
                   >
-                    <RevolutPayIcon className="w-10 h-5" />
-                    <span>Zaplatiť {amountToPayNow} € cez Revolut</span>
+                    <RevolutIcon className="h-5 w-5" fill="#000000" />
+                    <span className="font-semibold text-base">Zaplatiť cez Revolut Pay ({amountToPayNow} €)</span>
                   </button>
                   <p className="text-[11px] text-zinc-500 text-center">
                     Budete presmerovaný do aplikácie Revolut na 1-klikové potvrdenie.
