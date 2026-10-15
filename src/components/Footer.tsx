@@ -118,9 +118,14 @@ export const Footer: React.FC = () => {
 
         {/* Bottom Bar */}
         <div className="pt-8 flex flex-col sm:flex-row items-center justify-between gap-4 text-zinc-500">
-          <p>
-            © {new Date().getFullYear()} Hair Salon Riccardo. Všetky práva vyhradené. J. Kármána 1727/30, 984 01 Lučenec.
-          </p>
+          <div>
+            <p className="text-zinc-400">
+              © {new Date().getFullYear()} Hair Salon Riccardo. Všetky práva vyhradené. J. Kármána 1727/30, 984 01 Lučenec.
+            </p>
+            <p className="text-[11px] text-zinc-600 mt-1">
+              Prevádzkovateľ eshopu a vzdelávacieho portálu: <strong className="text-zinc-400 font-medium">zeterem s.r.o.</strong>
+            </p>
+          </div>
 
           <button
             onClick={scrollToTop}
