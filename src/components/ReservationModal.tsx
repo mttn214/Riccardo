@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { Seminar, SEMINARS_DATA, COMPANY_DETAILS } from '../data/content';
 import { Currency, formatPrice } from '../utils/currency';
 import {
@@ -30,6 +30,7 @@ import {
   getStripe,
   processStripeCardPayment,
   createStripePaymentRequest,
+  mountStripePaymentRequestButton,
   STRIPE_TEST_CARD
 } from '../services/stripeService';
 
@@ -109,6 +110,9 @@ export const ReservationModal: React.FC<ReservationModalProps> = ({
   // Stripe & Wallet integration states
   const [stripePaymentRequest, setStripePaymentRequest] = useState<any>(null);
   const [canApplePay, setCanApplePay] = useState<boolean>(true);
+  const [isApplePayReady, setIsApplePayReady] = useState<boolean>(false);
+  const [isCheckingApplePay, setIsCheckingApplePay] = useState<boolean>(false);
+  const applePayMountRef = useRef<HTMLDivElement>(null);
   const [stripeError, setStripeError] = useState<string>('');
   const [copiedIban, setCopiedIban] = useState<boolean>(false);
   const [copiedTicketCode, setCopiedTicketCode] = useState<boolean>(false);
@@ -225,41 +229,87 @@ export const ReservationModal: React.FC<ReservationModalProps> = ({
     setStep(4);
   };
 
-  // Setup native Apple Pay if supported on this device/browser
+  // Setup and mount native Apple Pay if supported on this device/browser
   useEffect(() => {
     if (!isOpen || step !== 3) return;
     setStripeError('');
     let isMounted = true;
+    let cleanupButton: (() => void) | null = null;
 
-    createStripePaymentRequest({
-      amountEUR: amountToPayNow,
-      title: selectedSeminar.title,
-      customerName: formData.fullName,
-      customerEmail: formData.email,
-      customerPhone: formData.phone,
-      onPaymentSuccess: async ({ paymentMethodId, paymentIntentId, receiptUrl }) => {
-        await completeReservation({
-          methodTitle: 'Apple Pay (Priama autorizácia)',
-          paymentStatus: 'Autorizované / Uhradené cez Apple Pay',
-          stripeTokenId: paymentMethodId,
-          stripePaymentIntentId: paymentIntentId,
-          receiptUrl,
-        });
-      },
-      onPaymentError: (err) => {
-        setIsProcessingPayment(false);
-        setStripeError(err);
+    // Check device / browser Apple Pay support
+    setIsCheckingApplePay(true);
+    getStripe().then(async (stripe) => {
+      if (!stripe || !isMounted) {
+        setIsCheckingApplePay(false);
+        setIsApplePayReady(false);
+        return;
       }
-    }).then((res) => {
-      if (!isMounted) return;
-      setStripePaymentRequest(res.paymentRequest);
-      setCanApplePay(res.canPayWithApplePay);
+
+      try {
+        const pr = stripe.paymentRequest({
+          country: 'SK',
+          currency: 'eur',
+          total: {
+            label: `${selectedSeminar.title} • ZETEREM s.r.o.`,
+            amount: Math.round(amountToPayNow * 100),
+          },
+          requestPayerName: true,
+          requestPayerEmail: true,
+        });
+
+        const res = await pr.canMakePayment();
+        if (!isMounted) return;
+
+        const isReady = Boolean(res && res.applePay);
+        setIsApplePayReady(isReady);
+        setCanApplePay(isReady);
+        setIsCheckingApplePay(false);
+
+        // If Apple Pay is selected and container is mounted, mount native Stripe button
+        if (isReady && paymentMethod === 'apple_pay' && applePayMountRef.current) {
+          const mounted = await mountStripePaymentRequestButton({
+            container: applePayMountRef.current,
+            amountEUR: amountToPayNow,
+            title: selectedSeminar.title,
+            customerName: formData.fullName,
+            customerEmail: formData.email,
+            customerPhone: formData.phone,
+            ticketId: confirmationCode,
+            onPaymentSuccess: async ({ paymentMethodId, paymentIntentId, receiptUrl }) => {
+              await completeReservation({
+                methodTitle: 'Apple Pay (Biometrická autorizácia)',
+                paymentStatus: 'Autorizované a uhradené cez Apple Pay',
+                stripeTokenId: paymentMethodId,
+                stripePaymentIntentId: paymentIntentId,
+                receiptUrl,
+              });
+            },
+            onPaymentError: (err) => {
+              setIsProcessingPayment(false);
+              setStripeError(err);
+            }
+          });
+
+          if (isMounted) {
+            cleanupButton = mounted.destroy;
+          } else {
+            mounted.destroy();
+          }
+        }
+      } catch (err) {
+        console.warn('Apple Pay check error:', err);
+        if (isMounted) {
+          setIsCheckingApplePay(false);
+          setIsApplePayReady(false);
+        }
+      }
     });
 
     return () => {
       isMounted = false;
+      if (cleanupButton) cleanupButton();
     };
-  }, [isOpen, step, amountToPayNow, selectedSeminar, formData.fullName, formData.email, formData.phone]);
+  }, [isOpen, step, paymentMethod, amountToPayNow, selectedSeminar, formData.fullName, formData.email, formData.phone, confirmationCode]);
 
   // Format Card Number (adds space every 4 digits)
   const handleCardNumberChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -360,22 +410,12 @@ export const ReservationModal: React.FC<ReservationModalProps> = ({
     }
   };
 
-  // Handle Apple Pay execution (Fully functional)
-  const handleProcessApplePay = async () => {
+  // Handle explicit simulation of Apple Pay approval (Stripe test mode only)
+  const handleSimulateTestPayment = async () => {
     setIsProcessingPayment(true);
-    setPaymentStatusText('Aktivujem a autorizujem platbu cez Apple Pay...');
+    setPaymentStatusText('Simulujem autorizáciu platby v testovacom režime Stripe...');
     setStripeError('');
 
-    if (stripePaymentRequest) {
-      try {
-        stripePaymentRequest.show();
-        return;
-      } catch (err: any) {
-        console.warn('Stripe PaymentRequest show failed:', err);
-      }
-    }
-
-    // Direct Apple Pay authorization via Stripe backend /api/pay
     try {
       const apiRes = await fetch('/api/pay', {
         method: 'POST',
@@ -387,21 +427,27 @@ export const ReservationModal: React.FC<ReservationModalProps> = ({
           customerEmail: formData.email,
           customerPhone: formData.phone,
           seminarTitle: selectedSeminar.title,
-          paymentType: 'apple_pay'
+          paymentType: 'apple_pay_simulated'
         })
       });
 
       const data = await apiRes.json();
+      if (!data.success) {
+        setIsProcessingPayment(false);
+        setStripeError(data.error || 'Simulácia platby v Stripe zlyhala.');
+        return;
+      }
+
       await completeReservation({
-        methodTitle: 'Apple Pay (Biometrická autorizácia)',
-        paymentStatus: 'Autorizované a uhradené cez Apple Pay',
-        stripeTokenId: 'apple_pay_device',
+        methodTitle: 'Apple Pay (Simulované testovacie schválenie)',
+        paymentStatus: 'Autorizované v testovacom režime Stripe (tok_visa)',
+        stripeTokenId: 'apple_pay_test_simulation',
         stripePaymentIntentId: data.paymentIntentId,
         receiptUrl: data.receiptUrl,
       });
-    } catch (fallbackErr: any) {
+    } catch (err: any) {
       setIsProcessingPayment(false);
-      setStripeError('Apple Pay autorizáciu sa nepodarilo dokončiť: ' + (fallbackErr.message || 'Chyba spojenia'));
+      setStripeError(err.message || 'Chyba pri simulácii testovacej platby.');
     }
   };
 
@@ -1139,39 +1185,7 @@ Orgán dozoru: ${COMPANY_DETAILS.supervisoryAuthority.name}, ${COMPANY_DETAILS.s
                 </div>
               )}
 
-              {/* Express Apple Pay One-Click Checkout */}
-              <div className="p-4 rounded-2xl bg-zinc-950 border border-zinc-800 space-y-2.5">
-                <div className="flex items-center justify-between text-xs">
-                  <span className="text-zinc-300 font-medium flex items-center gap-1.5">
-                    <ApplePayLogo className="h-4 w-auto text-white" />
-                    <span>Expresná platba cez Apple Pay</span>
-                  </span>
-                  <span className="text-[10px] font-mono text-emerald-400 uppercase bg-emerald-950/60 border border-emerald-500/30 px-2 py-0.5 rounded-full">
-                    1-klik na Apple
-                  </span>
-                </div>
 
-                <button
-                  type="button"
-                  onClick={handleProcessApplePay}
-                  disabled={isProcessingPayment}
-                  className="w-full h-12 rounded-xl bg-white hover:bg-zinc-200 text-black font-semibold text-sm transition-all active:scale-[0.99] shadow-xl flex items-center justify-center gap-2 cursor-pointer disabled:opacity-50"
-                  aria-label="Zaplatiť s Apple Pay"
-                >
-                  <ApplePayLogo className="h-6 w-auto text-black" />
-                </button>
-
-                <div className="flex items-center justify-center gap-1.5 text-[10px] text-zinc-500">
-                  <ShieldCheck className="w-3.5 h-3.5 text-emerald-400" />
-                  <span>Zabezpečené biometricky cez Apple Touch ID / Face ID • {COMPANY_DETAILS.legalName}</span>
-                </div>
-              </div>
-
-              <div className="flex items-center gap-3 py-1">
-                <div className="h-px bg-zinc-800 flex-1" />
-                <span className="text-[10px] text-zinc-500 font-mono uppercase tracking-wider">alebo zvoľte platobnú metódu</span>
-                <div className="h-px bg-zinc-800 flex-1" />
-              </div>
 
               {/* Payment Methods Grid (Always 3 columns) */}
               <div className="space-y-3">
@@ -1229,8 +1243,12 @@ Orgán dozoru: ${COMPANY_DETAILS.supervisoryAuthority.name}, ${COMPANY_DETAILS.s
                       <div className="flex items-center gap-2">
                         <ApplePayLogo className="h-4 w-auto text-white" />
                       </div>
-                      <span className="text-[10px] font-mono uppercase px-2 py-0.5 rounded-full bg-emerald-500/10 text-emerald-400 border border-emerald-500/20">
-                        1-klik
+                      <span className={`text-[10px] font-mono uppercase px-2 py-0.5 rounded-full ${
+                        isApplePayReady
+                          ? 'bg-emerald-500/10 text-emerald-400 border border-emerald-500/20'
+                          : 'bg-zinc-800 text-zinc-400 border border-zinc-700'
+                      }`}>
+                        {isApplePayReady ? '1-klik' : 'Peňaženka'}
                       </span>
                     </div>
 
@@ -1435,33 +1453,67 @@ Orgán dozoru: ${COMPANY_DETAILS.supervisoryAuthority.name}, ${COMPANY_DETAILS.s
                   <div className="space-y-1">
                     <h4 className="text-base font-semibold text-white">Apple Pay</h4>
                     <p className="text-xs text-zinc-400 max-w-sm mx-auto leading-relaxed">
-                      Bezpečná platba bez nutnosti zadávať údaje karty. Platba bude okamžite autorizovaná pomocou Face ID alebo Touch ID na vašom Apple zariadení.
+                      Biometrická autorizácia cez Face ID alebo Touch ID na zariadeniach Apple.
                     </p>
                   </div>
 
-                  <button
-                    type="button"
-                    onClick={handleProcessApplePay}
-                    disabled={isProcessingPayment}
-                    className="w-full py-4 px-6 rounded-2xl bg-white hover:bg-zinc-200 text-black font-semibold text-sm transition-all active:scale-[0.99] shadow-xl flex items-center justify-center gap-2 cursor-pointer disabled:opacity-50 mt-2"
-                  >
-                    {isProcessingPayment ? (
-                      <div className="flex items-center gap-2 text-zinc-900">
-                        <Loader2 className="w-4 h-4 animate-spin text-black" />
-                        <span>Autorizujem Apple Pay...</span>
-                      </div>
-                    ) : (
-                      <div className="flex items-center gap-2">
-                        <ApplePayLogo className="h-5 w-auto text-black" />
-                        <span>Zaplatiť {amountToPayNow} €</span>
-                      </div>
-                    )}
-                  </button>
-
-                  <div className="flex items-center justify-center gap-1.5 text-[11px] text-zinc-500">
-                    <ShieldCheck className="w-3.5 h-3.5 text-emerald-400" />
-                    <span>Zabezpečená biometrická transakcia • {COMPANY_DETAILS.legalName}</span>
+                  {/* Native Stripe PaymentRequestButton mount container */}
+                  <div className={isApplePayReady ? 'block space-y-3 pt-2' : 'hidden'}>
+                    <div ref={applePayMountRef} className="w-full h-12" />
+                    <div className="flex items-center justify-center gap-1.5 text-[11px] text-zinc-500">
+                      <ShieldCheck className="w-3.5 h-3.5 text-emerald-400" />
+                      <span>Zabezpečené biometricky cez Apple Touch ID / Face ID • {COMPANY_DETAILS.legalName}</span>
+                    </div>
                   </div>
+
+                  {isCheckingApplePay && (
+                    <div className="py-6 flex flex-col items-center justify-center gap-2 text-zinc-400 text-xs">
+                      <Loader2 className="w-5 h-5 animate-spin text-white" />
+                      <span>Overujem pripojenie Apple Pay a Peňaženky Apple...</span>
+                    </div>
+                  )}
+
+                  {!isApplePayReady && !isCheckingApplePay && (
+                    <div className="p-4 rounded-xl bg-zinc-950/80 border border-zinc-800 text-left space-y-3">
+                      <div className="flex items-start gap-2.5">
+                        <AlertCircle className="w-4 h-4 text-amber-400 shrink-0 mt-0.5" />
+                        <div className="space-y-1 text-xs">
+                          <span className="font-semibold text-zinc-200 block">
+                            V Peňaženke Apple (Apple Wallet) nie je nájdená aktívna karta
+                          </span>
+                          <p className="text-zinc-400 leading-relaxed">
+                            Prehliadač Safari vyžaduje pre priame otvorenie Touch ID aktívnu kartu v Peňaženke. Kartu si môžete pridať v:
+                          </p>
+                          <p className="font-mono text-[11px] text-zinc-300 bg-zinc-900 px-2.5 py-1 rounded border border-zinc-800 inline-block">
+                            Systémové nastavenia → Peňaženka a Apple Pay
+                          </p>
+                        </div>
+                      </div>
+
+                      <div className="pt-2 border-t border-zinc-800/80 flex flex-col sm:flex-row gap-2">
+                        <button
+                          type="button"
+                          onClick={() => {
+                            setPaymentMethod('card');
+                            setStripeError('');
+                          }}
+                          className="flex-1 py-2.5 px-4 rounded-xl bg-white hover:bg-zinc-200 text-black font-semibold text-xs transition-colors flex items-center justify-center gap-1.5 cursor-pointer"
+                        >
+                          <CreditCard className="w-3.5 h-3.5" />
+                          <span>Zadať platobnú kartu online (Visa / Mastercard)</span>
+                        </button>
+
+                        <button
+                          type="button"
+                          onClick={handleSimulateTestPayment}
+                          disabled={isProcessingPayment}
+                          className="py-2.5 px-3 rounded-xl bg-zinc-800 hover:bg-zinc-700 text-zinc-300 font-medium text-xs transition-colors cursor-pointer"
+                        >
+                          Simulovať schválenie (Test mód)
+                        </button>
+                      </div>
+                    </div>
+                  )}
                 </div>
               )}
 

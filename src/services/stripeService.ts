@@ -290,6 +290,122 @@ export async function createStripePaymentRequest({
   }
 }
 
+/**
+ * Mounts the official native Stripe PaymentRequestButton (Apple Pay / Google Pay)
+ * into a DOM container. Clicking this button triggers the genuine Apple Pay Touch ID / Face ID sheet.
+ */
+export async function mountStripePaymentRequestButton({
+  container,
+  amountEUR,
+  title,
+  customerName,
+  customerEmail,
+  customerPhone,
+  ticketId,
+  onPaymentSuccess,
+  onPaymentError,
+}: {
+  container: HTMLElement;
+  amountEUR: number;
+  title: string;
+  customerName?: string;
+  customerEmail?: string;
+  customerPhone?: string;
+  ticketId?: string;
+  onPaymentSuccess: (res: any) => void;
+  onPaymentError: (err: string) => void;
+}): Promise<{
+  supported: boolean;
+  destroy: () => void;
+}> {
+  try {
+    const stripe = await getStripe();
+    if (!stripe) return { supported: false, destroy: () => {} };
+
+    const pr = stripe.paymentRequest({
+      country: 'SK',
+      currency: 'eur',
+      total: {
+        label: `${title} • ZETEREM s.r.o.`,
+        amount: Math.round(amountEUR * 100),
+      },
+      requestPayerName: true,
+      requestPayerEmail: true,
+    });
+
+    const result = await pr.canMakePayment();
+    console.log('mountStripePaymentRequestButton canMakePayment result:', result);
+
+    if (!result || (!result.applePay && !result.googlePay)) {
+      return { supported: false, destroy: () => {} };
+    }
+
+    const elements = stripe.elements();
+    const prButton = elements.create('paymentRequestButton', {
+      paymentRequest: pr,
+      style: {
+        paymentRequestButton: {
+          type: 'default',
+          theme: 'light',
+          height: '48px',
+        },
+      },
+    });
+
+    pr.on('paymentmethod', async (ev) => {
+      try {
+        const apiRes = await fetch('/api/pay', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            amountEUR,
+            paymentMethodId: ev.paymentMethod.id,
+            customerName: ev.payerName || customerName,
+            customerEmail: ev.payerEmail || customerEmail,
+            customerPhone: ev.payerPhone || customerPhone,
+            seminarTitle: title,
+            ticketId,
+            paymentType: ev.paymentMethod.type || 'apple_pay',
+          }),
+        });
+
+        const data = await apiRes.json();
+        if (data.success) {
+          ev.complete('success');
+          onPaymentSuccess({
+            paymentMethodId: ev.paymentMethod.id,
+            paymentIntentId: data.paymentIntentId,
+            payerName: ev.payerName || customerName,
+            payerEmail: ev.payerEmail || customerEmail,
+            receiptUrl: data.receiptUrl || null,
+          });
+        } else {
+          ev.complete('fail');
+          onPaymentError(data.error || 'Zlyhala autorizácia v Stripe.');
+        }
+      } catch (err: any) {
+        ev.complete('fail');
+        onPaymentError(err.message || 'Chyba spojenia pri Apple Pay autorizácii.');
+      }
+    });
+
+    container.innerHTML = '';
+    prButton.mount(container);
+
+    return {
+      supported: true,
+      destroy: () => {
+        try {
+          prButton.destroy();
+        } catch (_) {}
+      },
+    };
+  } catch (e: any) {
+    console.warn('mountStripePaymentRequestButton error:', e);
+    return { supported: false, destroy: () => {} };
+  }
+}
+
 
 
 export async function verifyStripeSession(sessionId: string): Promise<{
