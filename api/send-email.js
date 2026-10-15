@@ -17,55 +17,60 @@ export default async function handler(req, res) {
 
   try {
     const data = req.body || {};
-    const customerEmail = data.email || data['Email odosielateľa'];
-    const customerName = data.name || data['Meno a priezvisko'] || 'Vážený zákazník';
+    const customerEmail = data.email || data['Email odosielateľa'] || data['Email zákazníka'];
+    const customerName = data.name || data['Meno a priezvisko'] || 'Záujemca';
     const ticketCode = data['Kód vstupenky'] || 'RIC-VIP';
     const seminarTitle = data['Názov seminára'] || 'Masterclass';
     const dates = data['Termín konania'] || '';
     const venue = data['Miesto konania'] || 'Atelier Riccardo';
-    const amount = data['Uhradená suma teraz'] || '';
+    const amount = data['Uhradená suma teraz'] || data['Uhradená suma'] || '';
 
-    const autoresponseMessage = `Dobrý deň ${customerName},
+    const isContact = data.formType === 'Kontaktná správa';
+    const isWaitlist = data.formType === 'VIP Waitlist';
 
-Ďakujeme za Vašu rezerváciu seminára v Hair Salon Riccardo (zeterem s.r.o.). Vaša platba a rezervácia boli úspešne potvrdené.
+    let emailSubject = `[Nová rezervácia] ${data.formType || 'Rezervácia'}: ${customerName} (${ticketCode})`;
+    let payload = {};
 
--------------------------------------------
-OFICIÁLNY KÓD VSTUPENKY: ${ticketCode}
--------------------------------------------
-
-Seminár: ${seminarTitle}
-Termín konania: ${dates}
-Miesto konania: ${venue}
-Zvolený balíček: ${data['Zvolený balíček'] || 'Účasť'}
-Uhradená suma: ${amount}
-Spôsob platby: ${data['Spôsob platby'] || 'Apple Pay'}
-Stav: Potvrdené a garantované
-
-Tento kód alebo vstupenku predložte pri vstupe na recepcii.
-V prípade otázok nás môžete kedykoľvek kontaktovať na tel. čísle: +421 908 261 740.
-
-S pozdravom,
-Richard Čonka & tím Hair Salon Riccardo
-Prevádzkovateľ eshopu: zeterem s.r.o.`;
-
-    // 1. Submit to FormSubmit with _cc and _autoresponse for both salon and customer
-    const formSubmitRes = await fetch('https://formsubmit.co/ajax/carlitomio214@gmail.com', {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-        'Accept': 'application/json',
-        'Origin': 'https://riccardo-zednici.vercel.app',
-        'Referer': 'https://riccardo-zednici.vercel.app',
-        'User-Agent': 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36'
-      },
-      body: JSON.stringify({
-        _subject: `[Nová rezervácia] ${data.formType || 'Rezervácia'}: ${customerName} (${ticketCode})`,
+    if (isContact) {
+      const subjectText = data['Predmet správy'] || data.subject || 'Správa z webu';
+      emailSubject = `[Kontaktná správa] ${subjectText}: ${customerName}`;
+      payload = {
+        _subject: emailSubject,
+        _template: 'table',
+        _captcha: 'false',
+        _replyto: customerEmail || undefined,
+        'Typ formulára': 'Kontaktná správa',
+        'Meno a priezvisko': customerName,
+        'Email odosielateľa': customerEmail,
+        'Telefón': data.phone || 'Neuvedené',
+        'Predmet správy': subjectText,
+        'Text správy': data['Text správy'] || data.message || '',
+        'Dátum a čas odoslania': new Date().toLocaleString('sk-SK')
+      };
+    } else if (isWaitlist) {
+      emailSubject = `[VIP Waitlist] Záujemca o seminár: ${customerName}`;
+      payload = {
+        _subject: emailSubject,
+        _template: 'table',
+        _captcha: 'false',
+        _replyto: customerEmail || undefined,
+        'Typ formulára': 'VIP Waitlist',
+        'Meno a priezvisko': customerName,
+        'Email záujemcu': customerEmail,
+        'Telefón': data.phone || 'Neuvedené',
+        'Preferovaný termín': data['Preferovaný termín'] || data.preferredDate || 'Najbližší možný',
+        'Poznámka': data['Poznámka'] || data.note || '',
+        'Dátum a čas odoslania': new Date().toLocaleString('sk-SK')
+      };
+    } else {
+      // Standard reservation
+      payload = {
+        _subject: emailSubject,
         _template: 'table',
         _captcha: 'false',
         _replyto: customerEmail || undefined,
         'Kód vstupenky': ticketCode,
         'Meno a priezvisko': customerName,
-
         'Email zákazníka': customerEmail,
         'Telefón': data.phone || 'Neuvedené',
         'Názov seminára': seminarTitle,
@@ -77,7 +82,20 @@ Prevádzkovateľ eshopu: zeterem s.r.o.`;
         'Stav platby': data['Stav platby'] || 'Autorizované',
         'Prevádzkovateľ': 'zeterem s.r.o.',
         'Dátum a čas odoslania': new Date().toLocaleString('sk-SK')
-      })
+      };
+    }
+
+    // Submit to FormSubmit with salon mailbox
+    const formSubmitRes = await fetch('https://formsubmit.co/ajax/carlitomio214@gmail.com', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'Accept': 'application/json',
+        'Origin': 'https://riccardo-zednici.vercel.app',
+        'Referer': 'https://riccardo-zednici.vercel.app',
+        'User-Agent': 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36'
+      },
+      body: JSON.stringify(payload)
     });
 
     const resText = await formSubmitRes.text();
@@ -85,7 +103,6 @@ Prevádzkovateľ eshopu: zeterem s.r.o.`;
     try {
       result = JSON.parse(resText);
     } catch (e) {
-      // FormSubmit may respond with text, treat 200 as ok
       result = { success: formSubmitRes.ok, message: resText.slice(0, 100) };
     }
 
@@ -96,7 +113,7 @@ Prevádzkovateľ eshopu: zeterem s.r.o.`;
     });
 
   } catch (error) {
-    console.error('Chyba odoslania emailu:', error);
+    console.error('Chyba odoslania formulára:', error);
     return res.status(500).json({
       success: false,
       error: error.message || 'Nepodarilo sa odoslať notifikáciu.'

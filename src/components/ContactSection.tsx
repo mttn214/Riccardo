@@ -202,7 +202,7 @@ export const ContactSection: React.FC = () => {
                         placeholder="Meno a priezvisko"
                         value={formData.name}
                         onChange={(e) => setFormData({ ...formData, name: e.target.value })}
-                        className="w-full bg-zinc-900 border border-zinc-800 text-white px-3.5 py-2.5 rounded-xl text-xs sm:text-sm focus:outline-none focus:border-zinc-500 transition-colors"
+                        className="h-11 w-full bg-zinc-900 border border-zinc-800 text-white px-4 rounded-xl text-xs sm:text-sm focus:outline-none focus:border-zinc-500 transition-colors"
                       />
                     </div>
 
@@ -216,7 +216,7 @@ export const ContactSection: React.FC = () => {
                         placeholder="vas@email.sk"
                         value={formData.email}
                         onChange={(e) => setFormData({ ...formData, email: e.target.value })}
-                        className="w-full bg-zinc-900 border border-zinc-800 text-white px-3.5 py-2.5 rounded-xl text-xs sm:text-sm focus:outline-none focus:border-zinc-500 transition-colors"
+                        className="h-11 w-full bg-zinc-900 border border-zinc-800 text-white px-4 rounded-xl text-xs sm:text-sm focus:outline-none focus:border-zinc-500 transition-colors"
                       />
                     </div>
                   </div>
@@ -232,7 +232,7 @@ export const ContactSection: React.FC = () => {
                         placeholder="+421 9xx xxx xxx"
                         value={formData.phone}
                         onChange={(e) => setFormData({ ...formData, phone: e.target.value })}
-                        className="w-full bg-zinc-900 border border-zinc-800 text-white px-3.5 py-2.5 rounded-xl text-xs sm:text-sm focus:outline-none focus:border-zinc-500 transition-colors"
+                        className="h-11 w-full bg-zinc-900 border border-zinc-800 text-white px-4 rounded-xl text-xs sm:text-sm focus:outline-none focus:border-zinc-500 transition-colors"
                       />
                     </div>
 
@@ -240,15 +240,18 @@ export const ContactSection: React.FC = () => {
                       <label className="text-xs text-zinc-400 block mb-1.5 font-medium">
                         Predmet
                       </label>
-                      <select
-                        value={formData.subject}
-                        onChange={(e) => setFormData({ ...formData, subject: e.target.value })}
-                        className="w-full bg-zinc-900 border border-zinc-800 text-white px-3 py-2.5 rounded-xl text-xs sm:text-sm focus:outline-none focus:border-zinc-500 transition-colors"
-                      >
-                        <option>Otázka k seminárom</option>
-                        <option>Záujem o školenie tímu v našom salóne</option>
-                        <option>Iná požiadavka</option>
-                      </select>
+                      <div className="relative">
+                        <select
+                          value={formData.subject}
+                          onChange={(e) => setFormData({ ...formData, subject: e.target.value })}
+                          className="h-11 w-full bg-zinc-900 border border-zinc-800 text-white px-4 pr-10 rounded-xl text-xs sm:text-sm focus:outline-none focus:border-zinc-500 transition-colors appearance-none cursor-pointer"
+                        >
+                          <option value="Otázka k seminárom" className="bg-zinc-900 text-white">Otázka k seminárom</option>
+                          <option value="Záujem o školenie tímu v našom salóne" className="bg-zinc-900 text-white">Záujem o školenie tímu v našom salóne</option>
+                          <option value="Iná požiadavka" className="bg-zinc-900 text-white">Iná požiadavka</option>
+                        </select>
+                        <ChevronDown className="w-4 h-4 text-zinc-400 pointer-events-none absolute right-3.5 top-1/2 -translate-y-1/2" />
+                      </div>
                     </div>
                   </div>
 
@@ -262,15 +265,16 @@ export const ContactSection: React.FC = () => {
                       placeholder="Vaša správa..."
                       value={formData.message}
                       onChange={(e) => setFormData({ ...formData, message: e.target.value })}
-                      className="w-full bg-zinc-900 border border-zinc-800 text-white p-3 rounded-xl text-xs sm:text-sm focus:outline-none focus:border-zinc-500 transition-colors"
+                      className="w-full bg-zinc-900 border border-zinc-800 text-white p-4 rounded-xl text-xs sm:text-sm focus:outline-none focus:border-zinc-500 transition-colors resize-none"
                     />
                   </div>
 
                   <button
                     type="submit"
-                    className="w-full sm:w-auto px-6 py-2.5 rounded-full bg-white text-black text-xs font-semibold hover:bg-zinc-200 transition-all active:scale-95 shadow-sm"
+                    disabled={isSubmitting}
+                    className="w-full sm:w-auto px-6 py-3 rounded-full bg-white text-black text-xs font-semibold hover:bg-zinc-200 transition-all active:scale-95 shadow-sm disabled:opacity-50 cursor-pointer"
                   >
-                    Odoslať správu
+                    {isSubmitting ? 'Odosielam správu...' : 'Odoslať správu'}
                   </button>
                 </form>
               )}

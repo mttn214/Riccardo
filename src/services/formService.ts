@@ -39,7 +39,9 @@ export async function sendFormNotification(data: FormSubmissionData): Promise<{ 
         'Accept': 'application/json'
       },
       body: JSON.stringify({
-        _subject: `[Nová rezervácia] ${data.formType}: ${data.name} (${data['Kód vstupenky'] || 'RIC'})`,
+        _subject: data.formType === 'Kontaktná správa'
+          ? `[Kontaktná správa] ${data['Predmet správy'] || 'Dotaz'}: ${data.name}`
+          : `[Nová rezervácia] ${data.formType}: ${data.name} (${data['Kód vstupenky'] || 'RIC'})`,
         _template: 'table',
         _captcha: 'false',
         _replyto: data.email,
