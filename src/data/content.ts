@@ -320,59 +320,6 @@ export const PORTFOLIO_DATA: PortfolioItem[] = [
     technique: "Uvoľnené kontúrové partie lemujúce lícne kosti, asymetrické vyváženie váhy účesu.",
     toolsUsed: "Kefa s prírodnými štetinami, zmatňujúca stylingová hlina.",
     awardsWon: "Víťaz: Cena verejnosti SR (Czech & Slovak Hairdressing Awards 2023)"
-  },
-  {
-    id: "port-1",
-    title: "Ikonická Riccardo Glam Fúkaná & Objem",
-    category: "Umenie Fúkanej & Styling",
-    year: "2026",
-    collection: "Signature Atelier Series",
-    image: "https://images.unsplash.com/photo-1522337360788-8b13dee7a37e?q=80&w=1200&auto=format&fit=crop",
-    beforeImage: "https://images.unsplash.com/photo-1595476108010-b4d1f102b1b1?q=80&w=1200&auto=format&fit=crop",
-    hasBeforeAfter: true,
-    description: "Ukážka legendárnej fúkanej cez okrúhlu termálnu kefu bez použitia kulmy. Vlasy získavajú maximálny objem od korienkov, hodvábny zrkadlový lesk a pohyb, ktorý vydrží niekoľko dní.",
-    technique: "Termálna rotácia kefy s napínaním, studený šok na fixáciu kučery, ľahký finálny olejový závoj.",
-    toolsUsed: "Termálna kefa Riccardo 45mm, profesionálny iontový fén, termo-ochranný lotion.",
-    awardsWon: "Základ autorského seminára 'Umenie fúkanej'"
-  },
-  {
-    id: "port-3",
-    title: "Cashmere Blonde AirTouch Transformácia",
-    category: "Balayage & Farba",
-    year: "2026",
-    collection: "Blonde Alchemy Salon Collection",
-    image: "https://images.unsplash.com/photo-1580618672591-eb180b1a973f?q=80&w=1200&auto=format&fit=crop",
-    beforeImage: "https://images.unsplash.com/photo-1560869713-7d0a29430803?q=80&w=1200&auto=format&fit=crop",
-    hasBeforeAfter: true,
-    description: "Kompletná salónna premena z fádneho a nerovnomerného zosvetlenia na luxusnú kašmírovú blond s jemným hĺbkovým odrastom. Maximálna jemnosť a prirodzený lesk.",
-    technique: "AirTouch separácia pod 45° uhlom, mikro-melír v kontúre tváre (money piece), zónové tónovanie.",
-    formula: "Koreňový tieň: 6.1 + 7.0 s 1.5% vyvíjačom; Dĺžky: 10.12 + 9.32 Champagne Glaze.",
-    toolsUsed: "Fén na AirTouch separáciu, balayage štetce s jemnými štetinami."
-  },
-  {
-    id: "port-4",
-    title: "Moderný Francúzsky Mikrobob",
-    category: "Precízne Strihy",
-    year: "2025",
-    collection: "Geometric Lines",
-    image: "https://images.unsplash.com/photo-1519699047748-de8e457a634e?q=80&w=1200&auto=format&fit=crop",
-    description: "Čistá línia v úrovni sánky s jemne predĺženými prednými partiami. Strih lichotí lícnym kostiam a vytvára optický lifting celej tváre.",
-    technique: "Klubový strih pri nulovej elevácii, vnútorné odľahčenie na zátylku pre stabilitu tvaru.",
-    toolsUsed: "Nožnice 5.5\", hrebienok s karbónovými zubami."
-  },
-  {
-    id: "port-6",
-    title: "Čokoládový Bronde Balayage & Umenie Fúkanej",
-    category: "Balayage & Farba",
-    year: "2026",
-    collection: "Autumn Dimension",
-    image: "https://images.unsplash.com/photo-1607083206968-13611e3d76db?q=80&w=1200&auto=format&fit=crop",
-    beforeImage: "https://images.unsplash.com/photo-1524504388940-b1c1722653e1?q=80&w=1200&auto=format&fit=crop",
-    hasBeforeAfter: true,
-    description: "Multidimenzionálna hnedá farba s jemnými karamelovými a medovými odleskami pre tmavovlásky, ktoré túžia po presvetlení bez drastickej zmeny.",
-    technique: "Voľnoruká maľba (freestyle painting) s tónovaním v kyslom pH pre maximálne uzatvorenie kutikuly.",
-    formula: "Základ: 5.0 studená horká čokoláda; Svetlé akcenty: 8.31 + 7.7 karamelové mlieko.",
-    toolsUsed: "Drevená balayage doska, široká okrúhla termokefa."
   }
 ];
 
@@ -418,7 +365,7 @@ export const AWARDS_DATA: Award[] = [
     location: "Slovensko",
     status: "Čestné uznanie",
     citation: "Hair Salon Riccardo v Lučenci je aktívnym partnerským salónom, ktorý bezplatne strihá a odovzdáva vlasy pre výrobu parochní pre onkologické pacientky.",
-    image: "https://images.unsplash.com/photo-1534447677768-be436bb09401?q=80&w=800&auto=format&fit=crop",
+    image: "/images/riccardo/salon_logo_wall.jpg",
     badgeIcon: "Heart"
   },
   {
@@ -430,7 +377,7 @@ export const AWARDS_DATA: Award[] = [
     location: "Lučenec / Banskobystrický kraj",
     status: "Víťaz",
     citation: "Ocenenie za dlhodobo najvyššie hodnotenie služieb, profesionalitu tímu a príjemnú rodinnú atmosféru v Lučenci.",
-    image: "https://images.unsplash.com/photo-1513151233558-d860c5398176?q=80&w=800&auto=format&fit=crop",
+    image: "/images/riccardo/hda_winners_group_hires.jpg",
     badgeIcon: "Sparkles"
   },
   {
@@ -442,7 +389,7 @@ export const AWARDS_DATA: Award[] = [
     location: "Praha, Česká republika",
     status: "Nominácia",
     citation: "Prebojovanie sa medzi elitu kaderníckeho remesla v Česku a na Slovensku s precíznou pánskou kolekciou.",
-    image: "https://images.unsplash.com/photo-1549465220-1a8b9238cd48?q=80&w=800&auto=format&fit=crop",
+    image: "/images/riccardo/richard_conka_stage_award.jpg",
     badgeIcon: "Medal"
   }
 ];
@@ -668,7 +615,7 @@ export const PAST_SEMINAR_RECAPS = [
     attendees: 6,
     countriesRepresented: "SR & ČR",
     rating: "5.0 / 5.0",
-    image: "https://images.unsplash.com/photo-1522337360788-8b13dee7a37e?q=80&w=800&auto=format&fit=crop",
+    image: "/images/riccardo/richard_conka_hda_2.jpg",
     highlight: "Vypredané za 4 hodiny od zverejnenia. Komorná atmosféra priamo v materskom salóne v Lučenci s individuálnym prístupom."
   }
 ];

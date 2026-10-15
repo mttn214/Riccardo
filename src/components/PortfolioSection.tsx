@@ -7,18 +7,16 @@ interface PortfolioSectionProps {
 }
 
 export const PortfolioSection: React.FC<PortfolioSectionProps> = ({ onSelectItem }) => {
-  const [selectedCategory, setSelectedCategory] = useState<string>('Všetky');
+  const [selectedCategory, setSelectedCategory] = useState<string>('Všetky diela');
 
   const categories = [
-    'Všetky',
+    'Všetky diela',
     'Umenie Fúkanej & Styling',
-    'Balayage & Farba',
-    'Precízne Strihy',
-    'Svadobné & Spoločenské'
+    'Precízne Strihy'
   ];
 
   const filteredItems = PORTFOLIO_DATA.filter((item) => {
-    return selectedCategory === 'Všetky' || item.category === selectedCategory;
+    return selectedCategory === 'Všetky diela' || item.category === selectedCategory;
   });
 
   return (
@@ -27,14 +25,19 @@ export const PortfolioSection: React.FC<PortfolioSectionProps> = ({ onSelectItem
         
         {/* Section Heading */}
         <div className="max-w-2xl mb-12">
-          <span className="text-xs uppercase tracking-[0.2em] text-zinc-500 font-medium block mb-2">
-            Tvorba & Výsledky
-          </span>
+          <div className="flex flex-wrap items-center gap-2 mb-2">
+            <span className="text-xs uppercase tracking-[0.2em] text-zinc-500 font-medium">
+              Autentická Tvorba & Diela
+            </span>
+            <span className="text-[10px] uppercase tracking-wider px-2.5 py-0.5 rounded-full bg-zinc-900 border border-zinc-800 text-zinc-300 font-medium">
+              100% Autentické fotografie • Bez AI
+            </span>
+          </div>
           <h2 className="text-3xl sm:text-5xl font-semibold tracking-[-0.03em] leading-tight mb-4">
-            Galéria prác a premeny.
+            Galéria prác a kolekcií.
           </h2>
           <p className="text-sm sm:text-base text-zinc-400 font-normal leading-relaxed">
-            Výber zo salónnej práce v Lučenci, súťažných kolekcií z Czech & Slovak Hairdressing Awards a fúkaných účesov. Kliknutím zobrazíte detail a posuvník premeny.
+            Výhradne originálne fotografie diel Richarda Čonku vrátane ocenených kolekcií z Czech & Slovak Hairdressing Awards v Prahe. Kliknutím zobrazíte detail, použité techniky a ocenenia.
           </p>
         </div>
 
