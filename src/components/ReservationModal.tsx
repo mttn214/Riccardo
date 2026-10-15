@@ -85,6 +85,7 @@ export const ReservationModal: React.FC<ReservationModalProps> = ({
   });
 
   const [formErrors, setFormErrors] = useState<{ [key: string]: string }>({});
+  const [termsAccepted, setTermsAccepted] = useState(false);
 
   // Add-ons
   const [addOnBrush, setAddOnBrush] = useState(false);
@@ -361,6 +362,7 @@ export const ReservationModal: React.FC<ReservationModalProps> = ({
       if (!formData.fullName.trim()) errs.fullName = 'Zadajte prosím vaše meno a priezvisko.';
       if (!formData.email.trim() || !formData.email.includes('@')) errs.email = 'Zadajte platnú emailovú adresu.';
       if (!formData.phone.trim() || formData.phone.trim().length < 6) errs.phone = 'Zadajte telefónne číslo pre SMS notifikáciu.';
+      if (!termsAccepted) errs.terms = 'Pre pokračovanie k platbe musíte potvrdiť súhlas so Všeobecnými obchodnými podmienkami (VOP) a Zásadami ochrany osobných údajov.';
 
       if (Object.keys(errs).length > 0) {
         setFormErrors(errs);
@@ -612,6 +614,8 @@ Orgán dozoru: ${COMPANY_DETAILS.supervisoryAuthority.name}, ${COMPANY_DETAILS.s
     setPaymentOption('full');
     setStripeError('');
     setIsTestModeCardNotice(false);
+    setTermsAccepted(false);
+    setFormErrors({});
     onClose();
   };
 
@@ -1036,40 +1040,103 @@ Orgán dozoru: ${COMPANY_DETAILS.supervisoryAuthority.name}, ${COMPANY_DETAILS.s
                 />
               </div>
 
-              {/* Statutory Legal Consent Box */}
-              <div className="p-4 rounded-2xl bg-zinc-900/70 border border-zinc-850 space-y-2.5 text-xs text-zinc-400">
-                <div className="flex items-start gap-2.5">
-                  <div className="mt-0.5 w-4 h-4 rounded bg-zinc-800 border border-zinc-700 flex items-center justify-center text-white flex-shrink-0">
-                    <Check className="w-3 h-3 text-emerald-400" />
+              {/* Statutory Legal Consent Box (Interactive Checkbox) */}
+              <div
+                role="checkbox"
+                aria-checked={termsAccepted}
+                tabIndex={0}
+                onKeyDown={(e) => {
+                  if (e.key === ' ' || e.key === 'Enter') {
+                    e.preventDefault();
+                    setTermsAccepted((prev) => {
+                      const next = !prev;
+                      if (next && formErrors.terms) {
+                        setFormErrors((curr) => {
+                          const copy = { ...curr };
+                          delete copy.terms;
+                          return copy;
+                        });
+                      }
+                      return next;
+                    });
+                  }
+                }}
+                onClick={() => {
+                  setTermsAccepted((prev) => {
+                    const next = !prev;
+                    if (next && formErrors.terms) {
+                      setFormErrors((curr) => {
+                        const copy = { ...curr };
+                        delete copy.terms;
+                        return copy;
+                      });
+                    }
+                    return next;
+                  });
+                }}
+                className={`p-4 rounded-2xl border transition-all cursor-pointer select-none space-y-2.5 text-xs focus:outline-none focus:ring-2 focus:ring-white/40 ${
+                  formErrors.terms
+                    ? 'bg-red-950/25 border-red-500 ring-1 ring-red-500/40 shadow-lg'
+                    : termsAccepted
+                    ? 'bg-zinc-900 border-white shadow-md ring-1 ring-white/20'
+                    : 'bg-zinc-900/60 border-zinc-700 hover:border-zinc-500 hover:bg-zinc-900'
+                }`}
+              >
+                <div className="flex items-start gap-3">
+                  <div
+                    className={`mt-0.5 w-5 h-5 rounded-md border flex items-center justify-center transition-all flex-shrink-0 ${
+                      termsAccepted
+                        ? 'bg-white border-white text-black shadow'
+                        : formErrors.terms
+                        ? 'bg-zinc-950 border-red-400'
+                        : 'bg-zinc-950 border-zinc-500 hover:border-zinc-300'
+                    }`}
+                  >
+                    {termsAccepted && (
+                      <Check className="w-3.5 h-3.5 text-black stroke-[3]" />
+                    )}
                   </div>
-                  <p className="text-[11px] leading-relaxed text-zinc-400">
-                    Odoslaním a úhradou rezervácie potvrdzujete, že ste sa oboznámili so{' '}
-                    <a
-                      href="/obchodne-podmienky"
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      className="text-white underline hover:text-zinc-200"
-                    >
-                      Všeobecnými obchodnými podmienkami (VOP)
-                    </a>{' '}
-                    a{' '}
-                    <a
-                      href="/ochrana-udajov"
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      className="text-white underline hover:text-zinc-200"
-                    >
-                      Zásadami ochrany osobných údajov
-                    </a>{' '}
-                    prevádzkovateľa <strong>{COMPANY_DETAILS.legalName}</strong> (IČO: {COMPANY_DETAILS.ico}).
-                  </p>
+                  <div className="flex-1">
+                    <p className={`text-[11px] leading-relaxed transition-colors ${termsAccepted ? 'text-zinc-200' : 'text-zinc-300'}`}>
+                      Odoslaním a úhradou rezervácie záväzne potvrdzujem, že som sa oboznámil/a a súhlasím so{' '}
+                      <a
+                        href="/obchodne-podmienky"
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        onClick={(e) => e.stopPropagation()}
+                        className="text-white underline hover:text-zinc-200 font-medium"
+                      >
+                        Všeobecnými obchodnými podmienkami (VOP)
+                      </a>{' '}
+                      a{' '}
+                      <a
+                        href="/ochrana-udajov"
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        onClick={(e) => e.stopPropagation()}
+                        className="text-white underline hover:text-zinc-200 font-medium"
+                      >
+                        Zásadami ochrany osobných údajov
+                      </a>{' '}
+                      prevádzkovateľa <strong>{COMPANY_DETAILS.legalName}</strong> (IČO: {COMPANY_DETAILS.ico}).
+                    </p>
+                  </div>
                 </div>
+
+                {formErrors.terms && (
+                  <div className="pt-1 flex items-center gap-1.5 text-red-400 text-[11px] font-medium animate-fadeIn">
+                    <AlertCircle className="w-3.5 h-3.5 flex-shrink-0" />
+                    <span>{formErrors.terms}</span>
+                  </div>
+                )}
+
                 <div className="pt-2 border-t border-zinc-850/60 flex items-center justify-between text-[10px] text-zinc-500">
-                  <span>100% garancia spokojnosti po 1. dni</span>
+                  <span className="text-zinc-400">100% garancia spokojnosti po 1. dni</span>
                   <a
                     href="/reklamacny-poriadok"
                     target="_blank"
                     rel="noopener noreferrer"
+                    onClick={(e) => e.stopPropagation()}
                     className="hover:text-zinc-300 underline"
                   >
                     Storno & Reklamačný poriadok
@@ -1805,7 +1872,11 @@ Orgán dozoru: ${COMPANY_DETAILS.supervisoryAuthority.name}, ${COMPANY_DETAILS.s
             <button
               type="button"
               onClick={handleNextStep}
-              className="px-6 py-2.5 rounded-full bg-white text-black text-xs sm:text-sm font-semibold hover:bg-zinc-200 transition-all active:scale-95 flex items-center gap-1.5 shadow-lg"
+              className={`px-6 py-2.5 rounded-full text-xs sm:text-sm font-semibold transition-all active:scale-95 flex items-center gap-1.5 shadow-lg cursor-pointer ${
+                step === 2 && !termsAccepted
+                  ? 'bg-zinc-850 text-zinc-400 border border-zinc-750 hover:bg-zinc-800 hover:text-white'
+                  : 'bg-white text-black hover:bg-zinc-200'
+              }`}
             >
               <span>{step === 1 ? 'Pokračovať na údaje' : 'Prejsť k platbe'}</span>
               <ArrowRight className="w-3.5 h-3.5" />
