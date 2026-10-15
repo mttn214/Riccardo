@@ -29,10 +29,10 @@ export const Navbar: React.FC<NavbarProps> = ({ onOpenBooking }) => {
 
   return (
     <header
-      className={`fixed top-0 left-0 right-0 z-40 transition-all duration-300 ${
+      className={`fixed top-0 left-0 right-0 z-40 border-b transition-colors duration-300 transform-gpu will-change-[background-color,border-color] ${
         isScrolled
-          ? 'bg-black/85 backdrop-blur-xl border-b border-white/[0.08] py-3.5'
-          : 'bg-black/40 backdrop-blur-md py-4 sm:py-5'
+          ? 'bg-black/90 backdrop-blur-xl border-zinc-850 py-3.5 sm:py-4'
+          : 'bg-black/40 backdrop-blur-md border-transparent py-4 sm:py-4.5'
       }`}
     >
       <div className="max-w-6xl mx-auto px-4 sm:px-6">

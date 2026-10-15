@@ -6,6 +6,7 @@ import { formatPrice } from '../utils/currency';
 import { ArrowUpRight, Check, Trophy, MoveHorizontal, Star, CheckCircle2, ChevronLeft, ChevronRight, Bell } from 'lucide-react';
 import { GoogleIcon, FacebookIcon } from '../components/SocialIcons';
 import { WaitlistModal } from '../components/WaitlistModal';
+import { AppleScrollShowcase } from '../components/AppleScrollShowcase';
 
 interface HomePageProps {
   onOpenBooking: () => void;
@@ -82,6 +83,9 @@ export const HomePage: React.FC<HomePageProps> = ({ onOpenBooking, onSelectPortf
         }}
         onExplorePortfolio={() => {}}
       />
+
+      {/* Apple-style Interactive Sticky Scroll Showcase */}
+      <AppleScrollShowcase onOpenBooking={onOpenBooking} />
 
       {/* SECTION: The Upcoming Exclusive Masterclass Drop */}
       <section id="featured-drop" className="py-24 sm:py-32 bg-black border-t border-zinc-900 text-white">
