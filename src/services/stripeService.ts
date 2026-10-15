@@ -30,11 +30,18 @@ export interface CreateStripePaymentParams {
   ticketId?: string;
 }
 
+export const STRIPE_TEST_CARD = {
+  number: '4242 4242 4242 4242',
+  expiry: '12/28',
+  cvc: '123'
+};
+
 /**
  * Creates and confirms a real payment in Stripe via Card Token + Serverless PaymentIntent.
  */
 export async function processStripeCardPayment(params: CreateStripePaymentParams): Promise<{
   success: boolean;
+  isTestModeRealCard?: boolean;
   tokenId?: string;
   paymentIntentId?: string;
   cardBrand?: string;
@@ -67,9 +74,18 @@ export async function processStripeCardPayment(params: CreateStripePaymentParams
     });
 
     if (error || !token) {
+      const errMsg = error?.message || '';
+      const isTestModeRealCard =
+        errMsg.toLowerCase().includes('real card') ||
+        errMsg.toLowerCase().includes('test mode') ||
+        error?.code === 'card_declined';
+
       return {
         success: false,
-        error: error?.message || 'Platobnú kartu sa nepodarilo overiť cez Stripe.'
+        isTestModeRealCard,
+        error: isTestModeRealCard
+          ? 'Zadali ste reálnu bankovú kartu do testovacieho prostredia Stripe. Testovací režim zámerne odmieta reálne karty, aby vám nestiahol peniaze. Pre otestovanie použite tlačidlo „Vložiť testovaciu kartu“, alebo potvrďte rezerváciu na faktúru / mieste.'
+          : (errMsg || 'Platobnú kartu sa nepodarilo overiť cez Stripe.')
       };
     }
 
