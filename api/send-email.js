@@ -55,7 +55,8 @@ Prevádzkovateľ eshopu: zeterem s.r.o.`;
         'Content-Type': 'application/json',
         'Accept': 'application/json',
         'Origin': 'https://riccardo-zednici.vercel.app',
-        'Referer': 'https://riccardo-zednici.vercel.app'
+        'Referer': 'https://riccardo-zednici.vercel.app',
+        'User-Agent': 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36'
       },
       body: JSON.stringify({
         _subject: `[Riccardo Salon] ${data.formType || 'Rezervácia'}: ${customerName} (${ticketCode})`,
@@ -80,13 +81,21 @@ Prevádzkovateľ eshopu: zeterem s.r.o.`;
       })
     });
 
-    const result = await formSubmitRes.json();
+    const resText = await formSubmitRes.text();
+    let result = { success: formSubmitRes.ok };
+    try {
+      result = JSON.parse(resText);
+    } catch (e) {
+      // FormSubmit may respond with text, treat 200 as ok
+      result = { success: formSubmitRes.ok, message: resText.slice(0, 100) };
+    }
 
     return res.status(200).json({
       success: true,
       deliveredTo: ['carlitomio214@gmail.com', customerEmail].filter(Boolean),
       formSubmitResult: result
     });
+
   } catch (error) {
     console.error('Chyba odoslania emailu:', error);
     return res.status(500).json({
