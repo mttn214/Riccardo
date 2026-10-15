@@ -330,7 +330,7 @@ export const HomePage: React.FC<HomePageProps> = ({ onOpenBooking, onSelectPortf
             <div>
               <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-zinc-900 border border-zinc-800 text-[11px] font-medium text-zinc-300 mb-3">
                 <CheckCircle2 className="w-3.5 h-3.5 text-emerald-400" />
-                <span>Overené hodnotenia Google Maps & Facebook (5.0 ★)</span>
+                <span>Overené hodnotenia Google Maps & Facebook (Hodnotenie 5.0)</span>
               </div>
               <h2 className="text-3xl sm:text-5xl font-semibold tracking-[-0.03em] leading-tight">
                 Dôvera klientov v číslach.

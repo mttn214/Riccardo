@@ -224,6 +224,40 @@ export const PortfolioModal: React.FC<PortfolioModalProps> = ({
                 </div>
               </div>
 
+              {/* Mini 6-Chairs Visual Status */}
+              <div className="space-y-1.5 pt-1">
+                <div className="flex items-center justify-between text-[11px] font-mono text-zinc-400">
+                  <span>Stav kresiel v ateliéri:</span>
+                  <span className="text-amber-300 font-bold">4 obsadené • 2 voľné</span>
+                </div>
+                <div className="grid grid-cols-6 gap-1.5">
+                  <div className="p-2 rounded-xl bg-zinc-950 border border-zinc-850 text-center text-[10px] font-mono text-zinc-500">
+                    <span className="block font-bold">#01</span>
+                    <span className="text-[9px]">Obsadené</span>
+                  </div>
+                  <div className="p-2 rounded-xl bg-zinc-950 border border-zinc-850 text-center text-[10px] font-mono text-zinc-500">
+                    <span className="block font-bold">#02</span>
+                    <span className="text-[9px]">Obsadené</span>
+                  </div>
+                  <div className="p-2 rounded-xl bg-zinc-950 border border-zinc-850 text-center text-[10px] font-mono text-zinc-500">
+                    <span className="block font-bold">#03</span>
+                    <span className="text-[9px]">Obsadené</span>
+                  </div>
+                  <div className="p-2 rounded-xl bg-zinc-950 border border-zinc-850 text-center text-[10px] font-mono text-zinc-500">
+                    <span className="block font-bold">#04</span>
+                    <span className="text-[9px]">Obsadené</span>
+                  </div>
+                  <div className="p-2 rounded-xl bg-amber-950/60 border border-amber-400 text-center text-[10px] font-mono text-amber-300 font-bold shadow-[0_0_15px_rgba(251,191,36,0.2)] animate-pulse">
+                    <span className="block font-bold">#05</span>
+                    <span className="text-[9px]">VOĽNÉ</span>
+                  </div>
+                  <div className="p-2 rounded-xl bg-amber-950/60 border border-amber-400 text-center text-[10px] font-mono text-amber-300 font-bold shadow-[0_0_15px_rgba(251,191,36,0.2)] animate-pulse">
+                    <span className="block font-bold">#06</span>
+                    <span className="text-[9px]">VOĽNÉ</span>
+                  </div>
+                </div>
+              </div>
+
               {/* Action Buttons ("Bojovať o miesto") */}
               <div className="pt-2 flex flex-col sm:flex-row items-stretch sm:items-center gap-3">
                 <button

@@ -674,7 +674,7 @@ export const PAST_SOLD_OUT_SEMINARS = [
     seatsTotal: 6,
     soldOutTime: "Vypredané za 4 hodiny",
     attendeesFrom: ["Bratislava", "Košice", "Banská Bystrica", "Brno"],
-    rating: "5.0 ★ (6/6 odporúčaní)",
+    rating: "Hodnotenie 5.0 (6/6 odporúčaní)",
     image: "/images/riccardo/richard_conka_hda_2.jpg"
   },
   {
@@ -684,7 +684,7 @@ export const PAST_SOLD_OUT_SEMINARS = [
     seatsTotal: 6,
     soldOutTime: "Vypredané za 9 hodín",
     attendeesFrom: ["Praha", "Žilina", "Zvolen", "Lučenec"],
-    rating: "5.0 ★ (6/6 odporúčaní)",
+    rating: "Hodnotenie 5.0 (6/6 odporúčaní)",
     image: "/images/riccardo/richard_conka_hda_4.jpg"
   },
   {
@@ -694,7 +694,7 @@ export const PAST_SOLD_OUT_SEMINARS = [
     seatsTotal: 6,
     soldOutTime: "Vypredané za 6 hodín",
     attendeesFrom: ["Trnava", "Nitra", "Poprad", "Bratislava"],
-    rating: "5.0 ★ (6/6 odporúčaní)",
+    rating: "Hodnotenie 5.0 (6/6 odporúčaní)",
     image: "/images/riccardo/richard_conka_hda_1.jpg"
   }
 ];

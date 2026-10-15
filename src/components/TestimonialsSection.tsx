@@ -139,7 +139,10 @@ export const TestimonialsSection: React.FC = () => {
             <div className="lg:col-span-4 space-y-1.5 py-4 lg:py-0 border-y lg:border-y-0 lg:border-x border-zinc-850 lg:px-8">
               {TESTIMONIALS_STATS.distribution.map((d) => (
                 <div key={d.stars} className="flex items-center gap-3 text-xs">
-                  <span className="w-5 text-right font-mono text-zinc-400">{d.stars}★</span>
+                  <span className="w-6 text-right font-mono text-zinc-400 flex items-center justify-end gap-0.5">
+                    {d.stars}
+                    <Star className="w-2.5 h-2.5 fill-amber-400 text-amber-400" />
+                  </span>
                   <div className="flex-1 h-2 rounded-full bg-zinc-900 overflow-hidden">
                     <div
                       className="h-full bg-amber-400 rounded-full"
@@ -171,7 +174,9 @@ export const TestimonialsSection: React.FC = () => {
                   </div>
                   <div>
                     <strong className="block font-medium">Google Maps Recenzie</strong>
-                    <span className="text-[11px] text-zinc-400">44+ recenzií • 5.0 ★</span>
+                    <span className="text-[11px] text-zinc-400 flex items-center gap-1">
+                      44+ recenzií • 5.0 <Star className="w-2.5 h-2.5 fill-amber-400 text-amber-400 inline" />
+                    </span>
                   </div>
                 </div>
                 <ArrowUpRight className="w-4 h-4 text-zinc-400 group-hover:text-white group-hover:translate-x-0.5 transition-all" />

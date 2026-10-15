@@ -107,7 +107,7 @@ export async function processStripeCardPayment(params: CreateStripePaymentParams
           success: false,
           isTestModeRealCard,
           error: isTestModeRealCard
-            ? 'Zadali ste reálnu bankovú kartu do testovacieho prostredia Stripe. Testovací režim zámerne odmieta reálne karty, aby vám nestiahol peniaze. Pre otestovanie použite tlačidlo „⚡ Vložiť testovaciu kartu (4242...)“, alebo potvrďte rezerváciu na faktúru / mieste.'
+            ? 'Zadali ste reálnu bankovú kartu do testovacieho prostredia Stripe. Testovací režim zámerne odmieta reálne karty, aby vám nestiahol peniaze. Pre otestovanie použite tlačidlo „Vložiť testovaciu kartu (4242...)“, alebo potvrďte rezerváciu na faktúru / mieste.'
             : (errMsg || 'Platobnú kartu sa nepodarilo overiť cez Stripe.')
         };
       }

@@ -1113,7 +1113,7 @@ Adresa salónu: Novohradská 3, 984 01 Lučenec
                       className="px-3 py-1.5 rounded-lg bg-amber-400 text-black font-semibold text-xs hover:bg-amber-300 transition-all flex items-center gap-1.5 shadow"
                     >
                       <Sparkles className="w-3.5 h-3.5" />
-                      <span>⚡ Vložiť testovaciu kartu (4242...)</span>
+                      <span>Vložiť testovaciu kartu (4242...)</span>
                     </button>
 
                     <button
@@ -1257,7 +1257,7 @@ Adresa salónu: Novohradská 3, 984 01 Lučenec
                       className="px-3 py-1.5 rounded-lg bg-zinc-800 hover:bg-zinc-700 border border-zinc-700 text-white font-medium text-[11px] flex items-center gap-1.5 transition-all shadow-sm"
                     >
                       <Sparkles className="w-3.5 h-3.5 text-amber-400" />
-                      <span>⚡ Vložiť testovaciu kartu (4242...)</span>
+                      <span>Vložiť testovaciu kartu (4242...)</span>
                     </button>
                   </div>
 
