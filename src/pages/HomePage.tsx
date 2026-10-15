@@ -6,7 +6,6 @@ import { formatPrice } from '../utils/currency';
 import { ArrowUpRight, Check, Trophy, MoveHorizontal, Star, CheckCircle2, ChevronLeft, ChevronRight, Bell } from 'lucide-react';
 import { GoogleIcon, FacebookIcon } from '../components/SocialIcons';
 import { WaitlistModal } from '../components/WaitlistModal';
-import { FeaturedCourseStickyShowcase } from '../components/FeaturedCourseStickyShowcase';
 
 interface HomePageProps {
   onOpenBooking: () => void;
@@ -84,14 +83,118 @@ export const HomePage: React.FC<HomePageProps> = ({ onOpenBooking, onSelectPortf
         onExplorePortfolio={() => {}}
       />
 
-      {/* Featured Masterclass Apple Sticky Showcase (Woman Locks, Content Scrolls) */}
-      {featuredSeminar && (
-        <FeaturedCourseStickyShowcase
-          seminar={featuredSeminar}
-          onOpenBooking={() => onOpenBooking()}
-          onOpenWaitlist={() => setIsWaitlistOpen(true)}
-        />
-      )}
+      {/* SECTION: The Upcoming Exclusive Masterclass Drop */}
+      <section id="featured-drop" className="py-24 sm:py-32 bg-black border-t border-zinc-900 text-white">
+        <div className="max-w-6xl mx-auto px-4 sm:px-6">
+          <div className="flex flex-col md:flex-row md:items-end justify-between gap-4 mb-12">
+            <div>
+              <span className="text-xs uppercase tracking-[0.2em] text-zinc-500 font-medium block mb-2">
+                Najbližší autorský masterclass
+              </span>
+              <h2 className="text-3xl sm:text-5xl font-semibold tracking-[-0.03em] leading-tight">
+                Vzácnosť. Nie masovosť.
+              </h2>
+            </div>
+            <Link
+              to="/seminare"
+              className="inline-flex items-center gap-1.5 text-xs sm:text-sm text-zinc-400 hover:text-white font-medium transition-colors"
+            >
+              <span>Všetky termíny a harmonogram</span>
+              <ArrowUpRight className="w-4 h-4" />
+            </Link>
+          </div>
+
+          {/* Spotlight Card */}
+          {featuredSeminar && (
+            <div className="rounded-3xl bg-zinc-950 border border-zinc-800/90 overflow-hidden shadow-2xl">
+              <div className="grid grid-cols-1 lg:grid-cols-12">
+                <div className="lg:col-span-5 relative min-h-[320px] bg-zinc-900 overflow-hidden">
+                  <img
+                    src={featuredSeminar.image}
+                    alt={featuredSeminar.title}
+                    className="w-full h-full object-cover object-top filter brightness-[0.85] contrast-[1.05]"
+                  />
+                  <div className="absolute top-4 left-4">
+                    <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-black/80 backdrop-blur-md border border-white/15 text-[11px] font-medium text-white shadow-lg">
+                      <span className="w-1.5 h-1.5 rounded-full bg-amber-400" />
+                      Zostávajú posledné {featuredSeminar.availableSeats} miesta z 6
+                    </span>
+                  </div>
+                </div>
+
+                <div className="lg:col-span-7 p-8 sm:p-12 flex flex-col justify-between space-y-6">
+                  <div>
+                    <div className="flex items-center gap-2 text-xs text-zinc-500 font-medium mb-2">
+                      <span className="text-zinc-300">{featuredSeminar.dates}</span>
+                      <span>•</span>
+                      <span>{featuredSeminar.city} (Atelier)</span>
+                    </div>
+
+                    <h3 className="text-2xl sm:text-3xl font-semibold text-white tracking-tight leading-snug mb-3">
+                      {featuredSeminar.title}
+                    </h3>
+
+                    <p className="text-sm text-zinc-400 leading-relaxed font-normal mb-6">
+                      {featuredSeminar.description}
+                    </p>
+
+                    <div className="space-y-2 py-4 border-y border-zinc-850 text-xs sm:text-sm text-zinc-300">
+                      <div className="flex items-center gap-2">
+                        <span className="w-1.5 h-1.5 rounded-full bg-white flex-shrink-0" />
+                        <span>Prísna kapacita 6 kaderníkov pre garanciu osobnej spätnej väzby</span>
+                      </div>
+                      <div className="flex items-center gap-2">
+                        <span className="w-1.5 h-1.5 rounded-full bg-white flex-shrink-0" />
+                        <span>Hands-on prax na reálnych modelkách a cvičných hlavách</span>
+                      </div>
+                      <div className="flex items-center gap-2">
+                        <span className="w-1.5 h-1.5 rounded-full bg-white flex-shrink-0" />
+                        <span>Termokefa Riccardo, pracovné skriptá a certifikát v cene</span>
+                      </div>
+                    </div>
+                  </div>
+
+                  <div className="pt-2 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
+                    <div>
+                      <span className="text-[10px] uppercase text-zinc-500 block font-medium">
+                        Plná účasť (All-Inclusive)
+                      </span>
+                      <span className="text-2xl sm:text-3xl font-semibold text-white">
+                        {formatPrice(featuredSeminar.tiers[0]?.priceEUR || 380)}
+                      </span>
+                    </div>
+
+                    <div className="flex flex-wrap items-center gap-3">
+                      <button
+                        onClick={() => setIsWaitlistOpen(true)}
+                        className="inline-flex items-center gap-1.5 px-4 py-2.5 rounded-full text-xs font-medium bg-zinc-900 hover:bg-zinc-800 text-zinc-300 hover:text-white transition-colors border border-zinc-800 cursor-pointer"
+                      >
+                        <Bell className="w-3.5 h-3.5 text-amber-400" />
+                        <span>VIP Waitlist</span>
+                      </button>
+
+                      <Link
+                        to="/seminare"
+                        className="px-4 py-2.5 rounded-full text-xs font-medium text-zinc-400 hover:text-white transition-colors hidden sm:inline-block"
+                      >
+                        Viac informácií
+                      </Link>
+
+                      <button
+                        onClick={onOpenBooking}
+                        className="inline-flex items-center justify-center gap-1.5 px-6 py-2.5 rounded-full text-xs sm:text-sm font-semibold bg-white text-black hover:bg-zinc-200 transition-all active:scale-95 shadow-lg shadow-white/10 cursor-pointer"
+                      >
+                        <span>Rezervovať miesto</span>
+                        <ArrowUpRight className="w-4 h-4" />
+                      </button>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          )}
+        </div>
+      </section>
 
       {/* SECTION: Lookbook Preview */}
       <section className="py-24 sm:py-32 bg-black border-t border-zinc-900 text-white">
