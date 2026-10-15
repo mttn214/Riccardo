@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useRef } from 'react';
-import { ArrowUpRight, Trophy, Users, Sparkles, Check, Flame, Layers } from 'lucide-react';
+import { ArrowUpRight, Trophy, Users, Sparkles, Check, Flame, ChevronRight, Volume2 } from 'lucide-react';
 
 interface ShowcaseStep {
   id: string;
@@ -9,13 +9,14 @@ interface ShowcaseStep {
   tagline: string;
   description: string;
   keyPoints: string[];
-  image: string;
-  imageAlt: string;
-  photoBadge: {
-    icon: 'sparkles' | 'trophy' | 'users' | 'flame';
+  watermarkText: string;
+  statBadge: {
+    value: string;
     label: string;
-    sublabel: string;
   };
+  modelCutout: string;
+  modelAlt: string;
+  themeGlow: string;
 }
 
 const SHOWCASE_STEPS: ShowcaseStep[] = [
@@ -24,84 +25,88 @@ const SHOWCASE_STEPS: ShowcaseStep[] = [
     number: '01',
     pill: 'Dynamika tepla & Ťah',
     title: 'Architektúra fúkanej.',
-    tagline: 'Objem, ktorý drží bez lakovania helmy.',
+    tagline: '72-hodinový objem bez jedinej kvapky laku.',
     description:
-      'Správna fúkaná nie je o náhode, ale o geometrii a biomechanike. Richard Čonka učí presný uhol nadvihnutia od vlasovej cibuľky, kontrolované napätie na okrúhlej termokefe a uzamknutie kutikuly studeným vzduchom.',
+      'Správna fúkaná nie je o náhode, ale o aerodynamike a ergonómii. Richard Čonka učí presný uhol nadvihnutia od vlasovej cibuľky, kontrolované napätie na okrúhlej termokefe a okamžité uzamknutie kutikuly studeným vzduchom.',
     keyPoints: [
       'Presný sklon kefy pre 3D nadýchanie pri korienkoch',
       'Fixácia studeným vzduchom pre 72-hodinovú trvácnosť',
       'Zrkadlový lesk bez prepálenia vlasového vlákna',
     ],
-    image: '/images/riccardo/richard_conka_hda_1.jpg',
-    imageAlt: 'Richard Čonka — Umenie fúkanej, Look 1 Žitná Symfónia',
-    photoBadge: {
-      icon: 'sparkles',
-      label: 'Aerodynamika & Tvar',
-      sublabel: '72h trvácnosť bez krepovatenia',
+    watermarkText: 'ARCHITEKTÚRA',
+    statBadge: {
+      value: '72 HODÍN',
+      label: 'Garantovaný objem',
     },
+    modelCutout: '/images/riccardo/model_cutout_look1_isnet.webp',
+    modelAlt: 'Richard Čonka — Umenie fúkanej, Žitná Symfónia',
+    themeGlow: 'from-amber-500/25 via-orange-500/10 to-transparent',
   },
   {
     id: 'step-award',
     number: '02',
     pill: 'Remeslo overené v Prahe',
     title: 'Trofej z Fora Karlín.',
-    tagline: 'Víťaz Ceny verejnosti SR na HDA.',
+    tagline: 'Víťaz celonárodnej Ceny verejnosti SR na HDA.',
     description:
       'Na 17. ročníku najprestížnejšej kaderníckej súťaže v Česku a na Slovensku (Czech & Slovak Hairdressing Awards) získal Richard Čonka sošku víťaza celonárodného hlasovania za svoju autorskú 4-dielnu kolekciu.',
     keyPoints: [
       'Ocenenie tisíckami hlasov odbornej i laickej verejnosti',
       'Rovnaké postupy a tajomstvá odovzdávané na seminároch',
-      'Dôkaz, že svetový styling vzniká aj v srdci Novohradu',
+      'Dôkaz, že svetový styling vzniká aj v Lučenci',
     ],
-    image: '/images/riccardo/richard_conka_stage_award.jpg',
-    imageAlt: 'Richard Čonka preberá ocenenie Cena verejnosti SR v Prahe',
-    photoBadge: {
-      icon: 'trophy',
+    watermarkText: 'PRAHA VÍŤAZ',
+    statBadge: {
+      value: '1. MIESTO',
       label: 'Cena verejnosti SR',
-      sublabel: 'Czech & Slovak Hairdressing Awards',
     },
+    modelCutout: '/images/riccardo/model_cutout_look1_isnet.webp',
+    modelAlt: 'Richard Čonka s víťaznou kolekciou na HDA',
+    themeGlow: 'from-amber-400/30 via-yellow-500/10 to-transparent',
   },
   {
     id: 'step-academy',
     number: '03',
     pill: 'Komorný formát (Max 6 miest)',
     title: 'Osobný mentoring 1-na-1.',
-    tagline: 'Žiadna masovosť v sále.',
+    tagline: 'Žiadna masovosť. Iba intenzívna prax.',
     description:
-      'Zabudnite na prednášky pre 100 kaderníkov, kde nič nevidíte. Riccardo Academy striktne obmedzuje kapacitu na 6 účastníkov. Richard stojí priamo pri vašom kresle a opravuje každý pohyb zápästia.',
+      'Zabudnite na prednášky pre 100 ľudí v sále, kde nič nevidíte. Riccardo Academy striktne obmedzuje kapacitu na 6 účastníkov. Richard stojí priamo pri vašom kresle a koriguje každý pohyb zápästia.',
     keyPoints: [
       'Intenzívna hands-on prax na reálnych modelkách',
       'Individuálna analýza chýb a nastavenie správnej ergonómie',
-      'Termokefa Riccardo a skriptá pre každého účastníka',
+      'Termokefa Riccardo a skriptá v cene každého lístka',
     ],
-    image: '/images/riccardo/richard_conka_hda_2.jpg',
-    imageAlt: 'Kolekcia Avant-Garde Richard Čonka',
-    photoBadge: {
-      icon: 'users',
-      label: 'Limit: 6 kaderníkov',
-      sublabel: 'Garantovaný osobný prístup',
+    watermarkText: 'MAX 6 MIEST',
+    statBadge: {
+      value: '6 KADERNÍKOV',
+      label: 'Prísny komorný limit',
     },
+    modelCutout: '/images/riccardo/model_cutout_look2.webp',
+    modelAlt: 'Avant-Garde styling Riccardo',
+    themeGlow: 'from-emerald-500/20 via-teal-500/10 to-transparent',
   },
   {
     id: 'step-results',
     number: '04',
     pill: 'Výsledok pre váš salón',
     title: 'Okamžitý rast cien.',
-    tagline: 'Premeňte bežnú fúkanú na VIP zážitok.',
+    tagline: 'Premeňte bežnú fúkanú na najžiadanejšiu VIP službu.',
     description:
-      'Absolventi odchádzajú so zručnosťou, ktorú klientky okamžite spoznajú a za ktorú si radi priplatia. Fúkaná sa stane vašou najziskovejšou a najvyhľadávanejšou salónnou službou.',
+      'Absolventi odchádzajú so zručnosťou, ktorú klientky okamžite spoznajú a za ktorú si rady priplatia. Fúkaná sa stane vašou najziskovejšou salónnou službou, pre ktorú sa budú vracať každý týždeň.',
     keyPoints: [
       'Klientky sa vracajú každý týždeň na expresný styling',
       'Fotogenické výsledky pripravené na váš Instagram',
       'Akreditovaný certifikát a členstvo v komunite absolventov',
     ],
-    image: '/images/riccardo/richard_conka_hda_3.jpg',
-    imageAlt: 'Dark Elegance styling Riccardo',
-    photoBadge: {
-      icon: 'flame',
-      label: 'VIP Salónny štandard',
-      sublabel: 'Maximálna pridaná hodnota',
+    watermarkText: 'RICCARDO',
+    statBadge: {
+      value: '+150%',
+      label: 'Hodnota služby v salóne',
     },
+    modelCutout: '/images/riccardo/model_cutout_look2.webp',
+    modelAlt: 'Dark Elegance Riccardo',
+    themeGlow: 'from-zinc-400/25 via-zinc-600/10 to-transparent',
   },
 ];
 
@@ -110,291 +115,293 @@ interface AppleScrollShowcaseProps {
 }
 
 export const AppleScrollShowcase: React.FC<AppleScrollShowcaseProps> = ({ onOpenBooking }) => {
-  const containerRef = useRef<HTMLDivElement>(null);
-  const stepRefs = useRef<(HTMLDivElement | null)[]>([]);
-  const [activeStep, setActiveStep] = useState<number>(0);
-  const [scrollProgress, setScrollProgress] = useState<number>(0);
+  const sectionRef = useRef<HTMLDivElement>(null);
+  const [scrollProgress, setScrollProgress] = useState(0);
+  const [activeStep, setActiveStep] = useState(0);
+  const [mouseOffset, setMouseOffset] = useState({ x: 0, y: 0 });
+
+  // Mouse Parallax Effect on 3D layers
+  const handleMouseMove = (e: React.MouseEvent<HTMLDivElement>) => {
+    const rect = sectionRef.current?.getBoundingClientRect();
+    if (!rect) return;
+    const x = (e.clientX - rect.left) / rect.width - 0.5;
+    const y = (e.clientY - rect.top) / rect.height - 0.5;
+    setMouseOffset({ x, y });
+  };
 
   useEffect(() => {
     const handleScroll = () => {
-      if (!containerRef.current) return;
-
-      const rect = containerRef.current.getBoundingClientRect();
+      if (!sectionRef.current) return;
+      const rect = sectionRef.current.getBoundingClientRect();
       const viewportHeight = window.innerHeight;
       const totalScrollable = rect.height - viewportHeight;
 
       if (totalScrollable > 0) {
-        const scrolledInside = Math.max(0, -rect.top);
-        const progress = Math.min(1, Math.max(0, scrolledInside / totalScrollable));
+        const scrolled = Math.max(0, -rect.top);
+        const progress = Math.min(1, Math.max(0, scrolled / totalScrollable));
         setScrollProgress(progress);
+
+        // Map progress to steps [0, 1, 2, 3]
+        const stepIndex = Math.min(
+          SHOWCASE_STEPS.length - 1,
+          Math.floor(progress * SHOWCASE_STEPS.length)
+        );
+        setActiveStep(stepIndex);
       }
-
-      // Check which step card is closest to the middle of the viewport
-      const middleY = viewportHeight * 0.45;
-      let bestIndex = 0;
-      let minDistance = Infinity;
-
-      stepRefs.current.forEach((el, index) => {
-        if (!el) return;
-        const stepRect = el.getBoundingClientRect();
-        const stepCenter = stepRect.top + stepRect.height / 2;
-        const distance = Math.abs(stepCenter - middleY);
-
-        if (distance < minDistance) {
-          minDistance = distance;
-          bestIndex = index;
-        }
-      });
-
-      setActiveStep(bestIndex);
     };
 
     window.addEventListener('scroll', handleScroll, { passive: true });
     handleScroll();
-
     return () => window.removeEventListener('scroll', handleScroll);
   }, []);
 
-  const scrollToStep = (index: number) => {
-    const el = stepRefs.current[index];
-    if (el) {
-      el.scrollIntoView({ behavior: 'smooth', block: 'center' });
-    }
+  const jumpToStep = (index: number) => {
+    if (!sectionRef.current) return;
+    const rect = sectionRef.current.getBoundingClientRect();
+    const totalScrollable = rect.height - window.innerHeight;
+    const targetScroll = window.scrollY + rect.top + (index / SHOWCASE_STEPS.length) * totalScrollable + 50;
+    window.scrollTo({ top: targetScroll, behavior: 'smooth' });
   };
 
-  const currentStepData = SHOWCASE_STEPS[activeStep];
+  const currentStep = SHOWCASE_STEPS[activeStep];
+
+  // Dynamic 3D parallax shifts based on scroll
+  const backgroundTextOffset = (scrollProgress * -250).toFixed(1);
+  const cardFloatY = Math.sin(scrollProgress * Math.PI * 2) * 12;
 
   return (
     <section
-      ref={containerRef}
-      className="relative bg-black text-white py-20 sm:py-32 border-t border-zinc-900"
+      ref={sectionRef}
+      onMouseMove={handleMouseMove}
+      className="relative bg-black text-white min-h-[320vh] border-t border-zinc-900 select-none overflow-clip"
+      style={{ perspective: '1200px' }}
     >
-      {/* Background Ambient Glow */}
-      <div className="absolute top-1/4 left-1/4 w-96 h-96 bg-zinc-800/20 rounded-full blur-[140px] pointer-events-none" />
-      <div className="absolute bottom-1/4 right-1/4 w-96 h-96 bg-zinc-700/10 rounded-full blur-[140px] pointer-events-none" />
-
-      <div className="max-w-6xl mx-auto px-4 sm:px-6">
+      {/* STICKY FULLSCREEN 3D STAGE */}
+      <div className="sticky top-0 h-screen w-full flex flex-col justify-between overflow-hidden z-10 px-4 sm:px-8 py-6 sm:py-10">
         
-        {/* Section Header */}
-        <div className="text-center max-w-3xl mx-auto mb-16 sm:mb-24">
-          <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-zinc-900/90 border border-zinc-800 text-[11px] font-semibold tracking-widest uppercase text-zinc-300 mb-5 shadow-inner">
-            <Sparkles className="w-3.5 h-3.5 text-white" />
-            <span>Anatómia majstrovského stylingu</span>
-          </div>
+        {/* ========================================================================= */}
+        {/* TOP LAYER (z-40): Apple Pills & Step Indicator */}
+        {/* ========================================================================= */}
+        <div className="relative z-40 max-w-6xl mx-auto w-full pt-16 sm:pt-14">
+          <div className="flex flex-col sm:flex-row items-center justify-between gap-4">
+            
+            {/* Header Badge */}
+            <div className="flex items-center gap-2.5">
+              <span className="w-2 h-2 rounded-full bg-white animate-pulse" />
+              <span className="text-[11px] font-mono tracking-widest uppercase text-zinc-400">
+                3D SPATIAL SHOWCASE • KROK {currentStep.number} / 04
+              </span>
+            </div>
 
-          <h2 className="text-3xl sm:text-5xl md:text-6xl font-semibold tracking-[-0.035em] leading-[1.08] mb-6">
-            Ako vzniká fúkaná, <br />
-            <span className="text-zinc-500 font-normal">ktorá dobyla pódium v Prahe.</span>
-          </h2>
+            {/* Apple Segmented Chapter Pills */}
+            <div className="flex items-center gap-1.5 p-1 rounded-full bg-zinc-950/80 backdrop-blur-2xl border border-zinc-800 shadow-2xl">
+              {SHOWCASE_STEPS.map((step, idx) => (
+                <button
+                  key={step.id}
+                  onClick={() => jumpToStep(idx)}
+                  className={`px-3 sm:px-4 py-1.5 rounded-full text-xs font-medium transition-all duration-300 flex items-center gap-1.5 ${
+                    activeStep === idx
+                      ? 'bg-white text-black font-semibold shadow-md scale-105'
+                      : 'text-zinc-400 hover:text-white hover:bg-zinc-900'
+                  }`}
+                >
+                  <span className="font-mono text-[10px]">{step.number}</span>
+                  <span className="hidden md:inline">{step.pill}</span>
+                </button>
+              ))}
+            </div>
 
-          <p className="text-sm sm:text-base text-zinc-400 max-w-xl mx-auto leading-relaxed font-normal">
-            Prejdite si 4 kľúčové piliere techniky Richarda Čonku. Sledujte, ako sa každý detail pretavuje do nezameniteľného pohybu a lesku.
-          </p>
+            {/* Progress Gauge */}
+            <div className="hidden sm:flex items-center gap-2 text-xs font-mono text-zinc-500">
+              <div className="w-20 h-1.5 rounded-full bg-zinc-900 overflow-hidden border border-zinc-800">
+                <div
+                  className="h-full bg-white transition-all duration-300 rounded-full"
+                  style={{ width: `${Math.round(scrollProgress * 100)}%` }}
+                />
+              </div>
+              <span>{Math.round(scrollProgress * 100)}%</span>
+            </div>
 
-          {/* Apple-style Interactive Navigation Pills */}
-          <div className="flex items-center justify-center gap-2 mt-8">
-            {SHOWCASE_STEPS.map((step, idx) => (
-              <button
-                key={step.id}
-                onClick={() => scrollToStep(idx)}
-                className={`group px-3 sm:px-4 py-2 rounded-full text-xs font-medium transition-all duration-300 flex items-center gap-2 border ${
-                  activeStep === idx
-                    ? 'bg-white text-black border-white shadow-lg shadow-white/10 scale-105'
-                    : 'bg-zinc-900/80 text-zinc-400 border-zinc-800 hover:text-white hover:border-zinc-700'
-                }`}
-              >
-                <span className="font-mono text-[11px] opacity-75">{step.number}</span>
-                <span className="hidden md:inline">{step.pill}</span>
-              </button>
-            ))}
           </div>
         </div>
 
-        {/* Apple-style Two-Column Sticky Showcase Grid */}
-        <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 lg:gap-14 items-start relative">
-          
-          {/* LEFT: Pinned / Sticky Visual Stage (Sticky on Mobile and Desktop) */}
-          <div className="sticky top-16 sm:top-20 lg:top-28 z-20 mb-6 lg:mb-0 lg:col-span-6">
-            <div className="relative aspect-[16/10] sm:aspect-square lg:aspect-[4/5] w-full rounded-2xl sm:rounded-3xl overflow-hidden bg-zinc-950 border border-zinc-800 shadow-2xl group">
-              
-              {/* Stacked Images with Apple Crossfade & Subtle Zoom */}
-              {SHOWCASE_STEPS.map((step, idx) => {
-                const isCurrent = activeStep === idx;
-                return (
-                  <div
-                    key={step.id}
-                    className={`absolute inset-0 transition-all duration-700 ease-[cubic-bezier(0.16,1,0.3,1)] ${
-                      isCurrent
-                        ? 'opacity-100 scale-100 filter brightness-[0.95]'
-                        : 'opacity-0 scale-105 pointer-events-none filter brightness-50'
-                    }`}
-                  >
-                    <img
-                      src={step.image}
-                      alt={step.imageAlt}
-                      className="w-full h-full object-cover object-top"
-                    />
-                    {/* Cinematic Gradients */}
-                    <div className="absolute inset-0 bg-gradient-to-t from-black/85 via-black/20 to-black/30" />
-                  </div>
-                );
-              })}
 
-              {/* Top Glass Badge Indicator */}
-              <div className="absolute top-4 left-4 right-4 flex items-center justify-between z-10">
-                <div className="flex items-center gap-2 px-3 py-1.5 rounded-full bg-black/75 backdrop-blur-xl border border-white/15 text-xs text-white shadow-xl">
-                  <span className="w-2 h-2 rounded-full bg-white animate-pulse" />
-                  <span className="font-mono font-semibold tracking-wider text-[11px]">
-                    KROK {currentStepData.number} / 04
+        {/* ========================================================================= */}
+        {/* CENTER 3D COMPOSITION: Everything behind the woman + Woman in front */}
+        {/* ========================================================================= */}
+        <div className="relative w-full max-w-7xl mx-auto flex-1 flex items-center justify-center my-auto min-h-0">
+
+          {/* --------------------------------------------------------------------- */}
+          {/* LAYER 0 (z-0): Volumetric Stage Glow (Behind everything) */}
+          {/* --------------------------------------------------------------------- */}
+          <div
+            className={`absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[500px] sm:w-[800px] h-[500px] sm:h-[800px] rounded-full bg-gradient-to-tr ${currentStep.themeGlow} blur-[160px] pointer-events-none transition-all duration-1000 opacity-80`}
+          />
+
+          {/* --------------------------------------------------------------------- */}
+          {/* LAYER 1 (z-10): Giant 3D Watermark Typography (Travels BEHIND the woman) */}
+          {/* --------------------------------------------------------------------- */}
+          <div
+            className="absolute inset-0 flex items-center justify-center pointer-events-none select-none z-10 overflow-hidden"
+            style={{
+              transform: `translate3d(${mouseOffset.x * -25}px, ${mouseOffset.y * -25}px, 0)`,
+              transition: 'transform 0.2s cubic-bezier(0.16, 1, 0.3, 1)',
+            }}
+          >
+            <div
+              className="text-[14vw] sm:text-[18vw] lg:text-[20vw] font-black tracking-tighter uppercase whitespace-nowrap text-transparent transition-all duration-700 leading-none"
+              style={{
+                WebkitTextStroke: '1.5px rgba(255, 255, 255, 0.08)',
+                transform: `translateX(${backgroundTextOffset}px)`,
+              }}
+            >
+              {currentStep.watermarkText}
+            </div>
+          </div>
+
+          {/* --------------------------------------------------------------------- */}
+          {/* LAYER 2 (z-20): Floating 3D Narrative Cards (Positioned BEHIND the woman) */}
+          {/* --------------------------------------------------------------------- */}
+          <div
+            className="absolute inset-0 max-w-6xl mx-auto flex items-center justify-between pointer-events-none z-20 px-4"
+            style={{
+              transform: `translate3d(${mouseOffset.x * 20}px, ${mouseOffset.y * 20 + cardFloatY}px, 0)`,
+              transition: 'transform 0.3s cubic-bezier(0.16, 1, 0.3, 1)',
+            }}
+          >
+            {/* Left Narrative Glass Card */}
+            <div className="w-full sm:max-w-md lg:max-w-lg pointer-events-auto">
+              <div className="p-6 sm:p-9 rounded-3xl bg-zinc-950/85 backdrop-blur-2xl border border-zinc-800/90 shadow-[0_25px_60px_-15px_rgba(0,0,0,0.9)] space-y-4 transition-all duration-700 ring-1 ring-white/5">
+                
+                <div className="flex items-center justify-between">
+                  <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-zinc-900 border border-zinc-800 text-[10px] sm:text-xs uppercase tracking-wider text-zinc-300 font-semibold">
+                    <Sparkles className="w-3.5 h-3.5 text-white" />
+                    <span>Piliér {currentStep.number} / 04</span>
+                  </div>
+                  
+                  <span className="font-mono text-xs text-zinc-500 font-semibold">
+                    {currentStep.pill}
                   </span>
                 </div>
 
-                <div className="px-3 py-1.5 rounded-full bg-black/75 backdrop-blur-xl border border-white/10 text-[11px] font-mono text-zinc-300">
-                  {Math.round(scrollProgress * 100)}% PRESKÚMANÉ
+                <h3 className="text-2xl sm:text-4xl font-semibold text-white tracking-tight leading-tight">
+                  {currentStep.title}
+                </h3>
+
+                <p className="text-sm sm:text-base text-zinc-300 font-medium leading-snug">
+                  {currentStep.tagline}
+                </p>
+
+                <p className="text-xs sm:text-sm text-zinc-400 leading-relaxed font-normal">
+                  {currentStep.description}
+                </p>
+
+                <div className="space-y-2 pt-3 border-t border-zinc-850">
+                  {currentStep.keyPoints.map((point, i) => (
+                    <div key={i} className="flex items-start gap-2.5 text-xs sm:text-sm text-zinc-300">
+                      <div className="w-4 h-4 rounded-full bg-zinc-900 border border-zinc-800 flex items-center justify-center flex-shrink-0 mt-0.5 text-white">
+                        <Check className="w-2.5 h-2.5" />
+                      </div>
+                      <span>{point}</span>
+                    </div>
+                  ))}
                 </div>
+
+              </div>
+            </div>
+
+            {/* Right Floating Stat Badge (Floats in 3D depth behind her right side) */}
+            <div className="hidden lg:flex flex-col items-end gap-4 pointer-events-auto">
+              <div className="p-6 rounded-3xl bg-zinc-950/80 backdrop-blur-2xl border border-zinc-800 shadow-2xl text-right max-w-xs space-y-1.5 ring-1 ring-white/5">
+                <span className="text-[10px] uppercase font-mono tracking-widest text-zinc-500 block font-semibold">
+                  Výsledná metrika
+                </span>
+                <span className="text-3xl sm:text-4xl font-black text-white tracking-tight block">
+                  {currentStep.statBadge.value}
+                </span>
+                <span className="text-xs text-zinc-400 block">
+                  {currentStep.statBadge.label}
+                </span>
               </div>
 
-              {/* Bottom Floating Glass Card with Dynamic Metadata */}
-              <div className="absolute bottom-5 left-5 right-5 z-10">
-                <div className="p-4 sm:p-5 rounded-2xl bg-black/80 backdrop-blur-2xl border border-white/15 shadow-2xl transition-all duration-500">
-                  <div className="flex items-center gap-3.5">
-                    <div className="w-11 h-11 rounded-xl bg-white/10 border border-white/15 flex items-center justify-center text-white flex-shrink-0 shadow-inner">
-                      {currentStepData.photoBadge.icon === 'sparkles' && <Sparkles className="w-5 h-5 text-white" />}
-                      {currentStepData.photoBadge.icon === 'trophy' && <Trophy className="w-5 h-5 text-amber-400" />}
-                      {currentStepData.photoBadge.icon === 'users' && <Users className="w-5 h-5 text-white" />}
-                      {currentStepData.photoBadge.icon === 'flame' && <Flame className="w-5 h-5 text-emerald-400" />}
-                    </div>
-
-                    <div className="min-w-0 flex-1">
-                      <span className="text-[11px] font-bold uppercase tracking-wider text-white block truncate">
-                        {currentStepData.photoBadge.label}
-                      </span>
-                      <span className="text-xs text-zinc-400 block truncate">
-                        {currentStepData.photoBadge.sublabel}
-                      </span>
-                    </div>
-
-                    <div className="hidden sm:block text-right">
-                      <span className="text-[10px] font-mono text-zinc-500 block uppercase">
-                        Masterclass
-                      </span>
-                      <span className="text-xs text-zinc-300 font-medium">
-                        Riccardo
-                      </span>
-                    </div>
-                  </div>
-                </div>
+              <div className="p-4 rounded-2xl bg-zinc-950/60 backdrop-blur-xl border border-zinc-850/80 text-xs text-zinc-400 flex items-center gap-2.5 shadow-xl">
+                <span className="w-2 h-2 rounded-full bg-emerald-400 animate-pulse" />
+                <span>Atelier Riccardo • Lučenec</span>
               </div>
+            </div>
 
-              {/* Thin Vertical Apple Progress Bar on Card Edge */}
-              <div className="absolute right-2 top-20 bottom-24 w-1 bg-white/10 rounded-full overflow-hidden hidden sm:block z-10">
-                <div
-                  className="w-full bg-white transition-all duration-300 rounded-full"
-                  style={{ height: `${Math.max(15, ((activeStep + 1) / SHOWCASE_STEPS.length) * 100)}%` }}
-                />
+          </div>
+
+          {/* --------------------------------------------------------------------- */}
+          {/* LAYER 3 (z-30): THE CUTOUT WOMAN IN FOREGROUND (Everything travels BEHIND HER) */}
+          {/* --------------------------------------------------------------------- */}
+          <div
+            className="relative z-30 pointer-events-none flex items-end justify-center h-[70vh] sm:h-[78vh] max-h-[820px] transition-transform duration-300 ease-out"
+            style={{
+              transform: `translate3d(${mouseOffset.x * 12}px, ${mouseOffset.y * 12}px, 0) scale(${1 + scrollProgress * 0.04})`,
+            }}
+          >
+            {/* The Cutout Woman with Realistic Depth Shadow */}
+            <div className="relative h-full flex items-end justify-center">
+              
+              {/* Ground Shadow & Ambient Light Cast */}
+              <div className="absolute bottom-0 w-3/4 h-12 bg-black/90 blur-2xl rounded-full" />
+              
+              <img
+                src={currentStep.modelCutout}
+                alt={currentStep.modelAlt}
+                className="h-full w-auto object-contain object-bottom filter drop-shadow-[0_25px_40px_rgba(0,0,0,0.95)] transition-all duration-700 select-none"
+                style={{
+                  maxHeight: '100%',
+                }}
+              />
+
+              {/* 3D Depth Indicator Tag pinned to the woman's shoulder/waist */}
+              <div className="absolute top-1/4 -right-4 sm:-right-8 hidden md:flex items-center gap-2 px-3 py-1.5 rounded-full bg-black/85 backdrop-blur-xl border border-white/20 text-[11px] font-semibold text-white shadow-2xl animate-bounce">
+                <span className="w-2 h-2 rounded-full bg-amber-400" />
+                <span>Autorský styling Riccardo</span>
               </div>
 
             </div>
           </div>
 
-          {/* RIGHT: Scrolling Narrative Steps */}
-          <div className="lg:col-span-6 space-y-24 sm:space-y-40 py-8 lg:py-16">
-            {SHOWCASE_STEPS.map((step, idx) => {
-              const isActive = activeStep === idx;
-              return (
-                <div
-                  key={step.id}
-                  ref={(el) => (stepRefs.current[idx] = el)}
-                  className={`transition-all duration-500 transform ${
-                    isActive
-                      ? 'opacity-100 translate-y-0 scale-100'
-                      : 'opacity-35 translate-y-3 scale-[0.98]'
-                  }`}
-                >
-                  <div className="p-7 sm:p-10 rounded-3xl bg-zinc-950/80 border border-zinc-850 hover:border-zinc-700/80 transition-all shadow-xl">
-                    
-                    {/* Chapter Number & Pill */}
-                    <div className="flex items-center gap-3 mb-4">
-                      <span className="font-mono text-xs font-semibold px-2.5 py-1 rounded-md bg-zinc-900 border border-zinc-800 text-white">
-                        {step.number}
-                      </span>
-                      <span className="text-xs uppercase tracking-widest text-zinc-400 font-semibold">
-                        {step.pill}
-                      </span>
-                    </div>
-
-                    {/* Headline */}
-                    <h3 className="text-2xl sm:text-4xl font-semibold text-white tracking-tight leading-tight mb-2">
-                      {step.title}
-                    </h3>
-                    <p className="text-base sm:text-lg text-zinc-300 font-normal mb-5 leading-snug">
-                      {step.tagline}
-                    </p>
-
-                    {/* Body */}
-                    <p className="text-sm text-zinc-400 leading-relaxed font-normal mb-6">
-                      {step.description}
-                    </p>
-
-                    {/* Bullet Points with Clean Checkmarks */}
-                    <div className="space-y-2.5 pt-4 border-t border-zinc-850">
-                      {step.keyPoints.map((point, pIdx) => (
-                        <div key={pIdx} className="flex items-start gap-2.5 text-xs sm:text-sm text-zinc-300">
-                          <div className="w-4 h-4 rounded-full bg-zinc-900 border border-zinc-800 flex items-center justify-center flex-shrink-0 mt-0.5 text-white">
-                            <Check className="w-2.5 h-2.5" />
-                          </div>
-                          <span>{point}</span>
-                        </div>
-                      ))}
-                    </div>
-
-                    {/* Active Step Indicator Pill */}
-                    {isActive && (
-                      <div className="mt-6 pt-4 border-t border-zinc-900 flex items-center justify-between text-xs">
-                        <span className="text-white font-medium flex items-center gap-2">
-                          <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse" />
-                          Aktívne sledovaný krok
-                        </span>
-                        <button
-                          onClick={onOpenBooking}
-                          className="text-white hover:text-zinc-300 font-medium inline-flex items-center gap-1 transition-colors"
-                        >
-                          <span>Rezervovať účasť</span>
-                          <ArrowUpRight className="w-3.5 h-3.5" />
-                        </button>
-                      </div>
-                    )}
-
-                  </div>
-                </div>
-              );
-            })}
-          </div>
-
         </div>
 
-        {/* Bottom CTA Strip */}
-        <div className="mt-20 p-8 sm:p-10 rounded-3xl bg-zinc-950 border border-zinc-850 flex flex-col sm:flex-row items-center justify-between gap-6 shadow-2xl text-center sm:text-left">
-          <div>
-            <span className="text-[11px] uppercase tracking-widest text-zinc-500 font-semibold block mb-1">
-              Riccardo Academy • Lučenec & Turné
-            </span>
-            <h4 className="text-xl sm:text-2xl font-semibold text-white tracking-tight">
-              Chcete ovládnuť rovnakú techniku fúkanej?
-            </h4>
-            <p className="text-xs sm:text-sm text-zinc-400 mt-1">
-              Kapacita je prísne limitovaná na 6 kaderníkov pre garanciu intenzívnej spätnej väzby.
-            </p>
-          </div>
 
-          <div className="flex items-center gap-3 flex-shrink-0">
-            <button
-              onClick={onOpenBooking}
-              className="inline-flex items-center gap-2 px-6 py-3 rounded-full text-xs sm:text-sm font-semibold bg-white text-black hover:bg-zinc-200 transition-all active:scale-95 shadow-lg shadow-white/10"
-            >
-              <span>Rezervovať miesto na seminári</span>
-              <ArrowUpRight className="w-4 h-4" />
-            </button>
+        {/* ========================================================================= */}
+        {/* BOTTOM CONTROLS & CTA (z-40) */}
+        {/* ========================================================================= */}
+        <div className="relative z-40 max-w-6xl mx-auto w-full pb-2 sm:pb-4">
+          <div className="flex flex-col sm:flex-row items-center justify-between gap-4 p-4 sm:p-5 rounded-2xl bg-zinc-950/70 backdrop-blur-xl border border-zinc-850 shadow-2xl">
+            
+            <div className="flex items-center gap-3 text-center sm:text-left">
+              <div className="w-8 h-8 rounded-full bg-zinc-900 border border-zinc-800 flex items-center justify-center text-white flex-shrink-0">
+                <Sparkles className="w-4 h-4 text-white" />
+              </div>
+              <div>
+                <strong className="text-xs sm:text-sm text-white font-semibold block leading-tight">
+                  Najbližší autorský masterclass v Lučenci
+                </strong>
+                <span className="text-[11px] text-zinc-400 block">
+                  Komorná kapacita striktne 6 účastníkov • Termokefa v cene
+                </span>
+              </div>
+            </div>
+
+            <div className="flex items-center gap-3">
+              <span className="text-xs text-zinc-500 font-mono hidden md:inline">
+                Posúvajte nadol pre ďalší krok ↓
+              </span>
+
+              <button
+                onClick={onOpenBooking}
+                className="px-6 py-2.5 rounded-full bg-white text-black text-xs sm:text-sm font-semibold hover:bg-zinc-200 transition-all active:scale-95 shadow-xl flex items-center gap-2"
+              >
+                <span>Rezervovať miesto</span>
+                <ArrowUpRight className="w-4 h-4" />
+              </button>
+            </div>
+
           </div>
         </div>
 
