@@ -17,7 +17,7 @@ import { TermsPage } from './pages/TermsPage';
 import { PrivacyPage } from './pages/PrivacyPage';
 import { RefundCancellationPage } from './pages/RefundCancellationPage';
 import { Phone, Calendar } from 'lucide-react';
-import { verifyStripeSession } from './services/stripeService';
+import { verifyStripeSession, getStripe } from './services/stripeService';
 import { sendFormNotification } from './services/formService';
 
 export function App() {
@@ -31,13 +31,71 @@ export function App() {
   const [initialConfirmationCode, setInitialConfirmationCode] = useState<string>('');
   const [initialFormData, setInitialFormData] = useState<any>(null);
 
-  // Detect return from Stripe Checkout (Apple Pay / Express Checkout)
+  // Detect return from Stripe (Checkout or PaymentIntent redirect)
   useEffect(() => {
     const urlParams = new URLSearchParams(window.location.search);
     const paymentStatus = urlParams.get('payment');
     const sessionId = urlParams.get('session_id');
+    const paymentIntentClientSecret = urlParams.get('payment_intent_client_secret');
+    const redirectStatus = urlParams.get('redirect_status');
 
-    if (paymentStatus === 'success' && sessionId) {
+    if (redirectStatus === 'succeeded' && paymentIntentClientSecret) {
+      window.history.replaceState({}, document.title, window.location.pathname);
+      getStripe().then(async (stripe) => {
+        if (!stripe) return;
+        const { paymentIntent } = await stripe.retrievePaymentIntent(paymentIntentClientSecret);
+        if (paymentIntent && (paymentIntent.status === 'succeeded' || paymentIntent.status === 'processing')) {
+          const saved = localStorage.getItem('riccardo_pending_booking');
+          let bookingData: any = null;
+          if (saved) {
+            try {
+              bookingData = JSON.parse(saved);
+            } catch (e) {
+              console.error(e);
+            }
+          }
+
+          const seminar = bookingData?.seminar || SEMINARS_DATA[0];
+          const tier = bookingData?.tier || seminar.tiers[0];
+          const savedForm = bookingData?.formData || {};
+          const customerName = savedForm.fullName || 'Vážený zákazník';
+          const customerEmail = savedForm.email || '';
+          const customerPhone = savedForm.phone || '';
+          const ticketCode = bookingData?.randomTicketId || `RIC-${seminar.city.slice(0, 3).toUpperCase()}-${Math.floor(1000 + Math.random() * 9000)}`;
+
+          await sendFormNotification({
+            formType: 'Rezervácia seminára',
+            name: customerName,
+            email: customerEmail,
+            phone: customerPhone,
+            'Názov seminára': seminar.title,
+            'Termín konania': seminar.dates,
+            'Miesto konania': `${seminar.venue}, ${seminar.city}`,
+            'Zvolený balíček': `${tier.name} (${tier.priceEUR} €)`,
+            'Spôsob platby': 'Stripe Online Konzola',
+            'Stav platby': 'Autorizované a uhradené cez Stripe',
+            'Stripe Payment Intent ID': paymentIntent.id,
+            'Platobný režim': 'Celá suma vopred',
+            'Uhradená suma teraz': `${(paymentIntent.amount / 100) || tier.priceEUR} €`,
+            'Kód vstupenky': ticketCode,
+            'Prevádzkovateľ eshopu': 'ZETEREM s.r.o.'
+          });
+
+          localStorage.removeItem('riccardo_pending_booking');
+          setBookingSeminar(seminar);
+          setBookingTierId(tier.id);
+          setInitialBookingStep(4);
+          setInitialConfirmationCode(ticketCode);
+          setInitialFormData({
+            ...savedForm,
+            fullName: customerName,
+            email: customerEmail,
+            phone: customerPhone
+          });
+          setIsBookingOpen(true);
+        }
+      });
+    } else if (paymentStatus === 'success' && sessionId) {
       window.history.replaceState({}, document.title, window.location.pathname);
 
       verifyStripeSession(sessionId).then(async (res) => {

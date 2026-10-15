@@ -6,6 +6,13 @@ export default defineConfig({
   server: {
     port: 5173,
     host: true,
-    allowedHosts: true
+    allowedHosts: true,
+    proxy: {
+      '/api': {
+        target: 'https://riccardo-zednici.vercel.app',
+        changeOrigin: true,
+        secure: true
+      }
+    }
   }
 });

@@ -327,3 +327,31 @@ export async function verifyStripeSession(sessionId: string): Promise<{
   }
 }
 
+export interface CreatePaymentIntentParams {
+  amountEUR: number;
+  seminarTitle: string;
+  customerName: string;
+  customerEmail: string;
+  customerPhone: string;
+  ticketId?: string;
+}
+
+export async function createStripePaymentIntent(params: CreatePaymentIntentParams): Promise<{
+  success: boolean;
+  clientSecret?: string;
+  paymentIntentId?: string;
+  error?: string;
+}> {
+  try {
+    const res = await fetch('/api/pay', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(params)
+    });
+    const data = await res.json();
+    return data;
+  } catch (err: any) {
+    return { success: false, error: err.message || 'Nepodarilo sa vytvoriť platobnú reláciu Stripe.' };
+  }
+}
+

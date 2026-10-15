@@ -28,9 +28,7 @@ import { sendFormNotification } from '../services/formService';
 import { ApplePayLogo, GooglePayLogo, RevolutIcon, CreditCardBrandIcons } from './PaymentIcons';
 import {
   getStripe,
-  processStripeCardPayment,
-  createStripePaymentRequest,
-  createStripeCheckoutSession,
+  createStripePaymentIntent,
   STRIPE_TEST_CARD
 } from '../services/stripeService';
 
@@ -93,29 +91,25 @@ export const ReservationModal: React.FC<ReservationModalProps> = ({
 
   // Payment Options
   const [paymentOption, setPaymentOption] = useState<'full' | 'deposit'>('full');
-  const [paymentMethod, setPaymentMethod] = useState<'card' | 'apple_pay' | 'google_pay' | 'revolut_pay' | 'transfer'>('card');
-  
-  // Card details
-  const [cardNumber, setCardNumber] = useState('');
-  const [cardExpiry, setCardExpiry] = useState('');
-  const [cardCvc, setCardCvc] = useState('');
-  const [cardHolder, setCardHolder] = useState('');
+  const [paymentMethod, setPaymentMethod] = useState<'stripe' | 'transfer'>('stripe');
 
   // Payment Processing states
   const [isProcessingPayment, setIsProcessingPayment] = useState(false);
   const [paymentStatusText, setPaymentStatusText] = useState('');
   const [confirmationCode, setConfirmationCode] = useState('');
   const [stripeReceiptUrl, setStripeReceiptUrl] = useState<string | null>(null);
-  
-  // Stripe Gateway integration states
-  const [stripePaymentRequest, setStripePaymentRequest] = useState<any>(null);
-  const [canApplePay, setCanApplePay] = useState<boolean>(false);
-  const [canGooglePay, setCanGooglePay] = useState<boolean>(false);
+
+  // Stripe Elements integration states
+  const [stripeElements, setStripeElements] = useState<any>(null);
+  const [isStripeLoading, setIsStripeLoading] = useState<boolean>(true);
+  const [stripeLoadError, setStripeLoadError] = useState<string>('');
   const [stripeError, setStripeError] = useState<string>('');
-  const [isTestModeCardNotice, setIsTestModeCardNotice] = useState<boolean>(false);
   const [copiedIban, setCopiedIban] = useState<boolean>(false);
   const [copiedTicketCode, setCopiedTicketCode] = useState<boolean>(false);
+  const [copiedTestCard, setCopiedTestCard] = useState<boolean>(false);
 
+  const stripeMountRef = React.useRef<HTMLDivElement>(null);
+  const paymentElementRef = React.useRef<any>(null);
 
   // Reset or initialize on modal open
   useEffect(() => {
@@ -128,8 +122,8 @@ export const ReservationModal: React.FC<ReservationModalProps> = ({
         setFormData((prev) => ({ ...prev, ...initialFormData }));
       }
       setStripeError('');
+      setStripeLoadError('');
       setStripeReceiptUrl(null);
-      setIsTestModeCardNotice(false);
       setIsProcessingPayment(false);
       setFormErrors({});
       if (initialSeminar) {
@@ -230,122 +224,183 @@ export const ReservationModal: React.FC<ReservationModalProps> = ({
     setStep(4);
   };
 
-  // Initialize Stripe Payment Request (Apple Pay / Google Pay) on Step 3
+  // Save pending booking in case 3DS requires redirect
   useEffect(() => {
-    if (!isOpen || step !== 3) return;
-    setStripeError('');
-    let isMounted = true;
+    if (isOpen && step === 3) {
+      const randomTicketId = `RIC-${selectedSeminar.city.slice(0, 3).toUpperCase()}-${Math.floor(1000 + Math.random() * 9000)}`;
+      const pendingBooking = {
+        seminar: selectedSeminar,
+        tier: currentTier,
+        formData,
+        amountToPayNow,
+        totalPackagePriceEUR,
+        paymentOption,
+        addOnBrush,
+        addOnAudit,
+        randomTicketId,
+        currency
+      };
+      localStorage.setItem('riccardo_pending_booking', JSON.stringify(pendingBooking));
+    }
+  }, [isOpen, step, selectedSeminar, currentTier, formData, amountToPayNow, totalPackagePriceEUR, paymentOption, addOnBrush, addOnAudit, currency]);
 
-    createStripePaymentRequest({
-      amountEUR: amountToPayNow,
-      title: selectedSeminar.title,
-      customerName: formData.fullName,
-      customerEmail: formData.email,
-      customerPhone: formData.phone,
-      onPaymentSuccess: async ({ paymentMethodId, paymentIntentId, payerName, payerEmail, receiptUrl }) => {
-        await completeReservation({
-          methodTitle: 'Apple Pay (Priama autorizácia)',
-          paymentStatus: 'Autorizované / Uhradené cez Apple Pay',
-          stripeTokenId: paymentMethodId,
-          stripePaymentIntentId: paymentIntentId,
-          receiptUrl,
+  // Mount Stripe Elements directly in Step 3
+  useEffect(() => {
+    if (!isOpen || step !== 3 || paymentMethod !== 'stripe') return;
+
+    let isMounted = true;
+    setIsStripeLoading(true);
+    setStripeError('');
+    setStripeLoadError('');
+
+    let currentElement: any = null;
+
+    async function initStripeElements() {
+      try {
+        const stripe = await getStripe();
+        if (!stripe) {
+          if (isMounted) {
+            setStripeLoadError('Stripe bránu sa nepodarilo načítať.');
+            setIsStripeLoading(false);
+          }
+          return;
+        }
+
+        const res = await createStripePaymentIntent({
+          amountEUR: amountToPayNow,
+          seminarTitle: selectedSeminar.title,
+          customerName: formData.fullName,
+          customerEmail: formData.email,
+          customerPhone: formData.phone,
         });
-      },
-      onPaymentError: (err) => {
-        setIsProcessingPayment(false);
-        setStripeError(err);
+
+        if (!isMounted) return;
+
+        if (!res.success || !res.clientSecret) {
+          setStripeLoadError(res.error || 'Nepodarilo sa vytvoriť platobnú reláciu Stripe.');
+          setIsStripeLoading(false);
+          return;
+        }
+
+        const container = stripeMountRef.current;
+        if (!container) {
+          setIsStripeLoading(false);
+          return;
+        }
+
+        container.innerHTML = '';
+
+        const elements = stripe.elements({
+          clientSecret: res.clientSecret,
+          appearance: {
+            theme: 'night',
+            variables: {
+              colorPrimary: '#ffffff',
+              colorBackground: '#09090b',
+              colorText: '#f4f4f5',
+              colorDanger: '#ef4444',
+              fontFamily: 'Inter, system-ui, -apple-system, sans-serif',
+              borderRadius: '14px',
+              colorTextSecondary: '#a1a1aa',
+              colorTextPlaceholder: '#71717a',
+            },
+            rules: {
+              '.Tab': {
+                border: '1px solid #27272a',
+                backgroundColor: '#18181b',
+                color: '#a1a1aa',
+              },
+              '.Tab:hover': {
+                color: '#ffffff',
+                borderColor: '#3f3f46',
+              },
+              '.Tab--selected': {
+                borderColor: '#ffffff',
+                backgroundColor: '#27272a',
+                color: '#ffffff',
+                boxShadow: '0 0 0 1px #ffffff',
+              },
+              '.TabIcon--selected': {
+                fill: '#ffffff',
+              },
+              '.Input': {
+                border: '1px solid #27272a',
+                backgroundColor: '#09090b',
+                color: '#ffffff',
+              },
+              '.Input:focus': {
+                borderColor: '#71717a',
+                boxShadow: '0 0 0 1px #71717a',
+              },
+              '.Label': {
+                color: '#a1a1aa',
+                fontSize: '12px',
+                fontWeight: '500',
+                marginBottom: '6px',
+              }
+            }
+          }
+        });
+
+        const paymentElement = elements.create('payment', {
+          layout: {
+            type: 'tabs',
+            defaultCollapsed: false,
+          },
+          defaultValues: {
+            billingDetails: {
+              name: formData.fullName,
+              email: formData.email,
+              phone: formData.phone,
+              address: {
+                country: 'SK',
+                city: formData.city || undefined,
+                line1: formData.billingAddress || undefined,
+              }
+            }
+          }
+        });
+
+        paymentElement.on('ready', () => {
+          if (isMounted) {
+            setIsStripeLoading(false);
+          }
+        });
+
+        paymentElement.on('change', (event: any) => {
+          if (event.error) {
+            setStripeError(event.error.message);
+          } else {
+            setStripeError('');
+          }
+        });
+
+        paymentElement.mount(container);
+        currentElement = paymentElement;
+        paymentElementRef.current = paymentElement;
+        setStripeElements(elements);
+
+      } catch (err: any) {
+        if (isMounted) {
+          console.error('Stripe initialization error:', err);
+          setStripeLoadError(err.message || 'Chyba pripojenia k platobnej bráne.');
+          setIsStripeLoading(false);
+        }
       }
-    }).then(async (res) => {
-      if (!isMounted) return;
-      setStripePaymentRequest(res.paymentRequest);
-      setCanApplePay(res.canPayWithApplePay);
-      setCanGooglePay(res.canPayWithGooglePay);
-    });
+    }
+
+    initStripeElements();
 
     return () => {
       isMounted = false;
-    };
-  }, [isOpen, step, amountToPayNow, selectedSeminar, formData.fullName, formData.email, formData.phone]);
-
-  // Dedicated Mount Effect for native Apple Pay / Google Pay Stripe Elements Button
-  useEffect(() => {
-    if (!isOpen || step !== 3 || !stripePaymentRequest) return;
-    if (paymentMethod !== 'apple_pay' && paymentMethod !== 'google_pay') return;
-
-    let isCurrent = true;
-    let prButton: any = null;
-
-    const targetId = paymentMethod === 'apple_pay' ? 'native-apple-pay-element' : 'native-google-pay-element';
-    const isSupported = paymentMethod === 'apple_pay' ? canApplePay : canGooglePay;
-
-    if (!isSupported) return;
-
-    (async () => {
-      try {
-        const stripe = await getStripe();
-        if (!stripe || !isCurrent) return;
-
-        const mountEl = document.getElementById(targetId);
-        if (!mountEl) return;
-
-        mountEl.innerHTML = '';
-        const elements = stripe.elements();
-        prButton = elements.create('paymentRequestButton', {
-          paymentRequest: stripePaymentRequest,
-          style: {
-            paymentRequestButton: {
-              theme: 'dark',
-              height: '56px',
-              type: 'buy',
-            },
-          },
-        });
-        prButton.mount(`#${targetId}`);
-      } catch (mountErr) {
-        console.warn('Native PaymentRequestButton mount error:', mountErr);
-      }
-    })();
-
-    return () => {
-      isCurrent = false;
-      if (prButton) {
+      if (currentElement) {
         try {
-          prButton.unmount();
-          prButton.destroy();
+          currentElement.destroy();
+          paymentElementRef.current = null;
         } catch (_) {}
       }
     };
-  }, [isOpen, step, paymentMethod, stripePaymentRequest, canApplePay, canGooglePay]);
-
-
-  // Format Card Number (adds space every 4 digits)
-  const handleCardNumberChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const raw = e.target.value.replace(/\D/g, '').slice(0, 16);
-    const formatted = raw.match(/.{1,4}/g)?.join(' ') || raw;
-    setCardNumber(formatted);
-    if (stripeError) setStripeError('');
-  };
-
-  // Format Expiry (MM/RR)
-  const handleCardExpiryChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const raw = e.target.value.replace(/\D/g, '').slice(0, 4);
-    if (raw.length >= 3) {
-      setCardExpiry(`${raw.slice(0, 2)}/${raw.slice(2, 4)}`);
-    } else {
-      setCardExpiry(raw);
-    }
-    if (stripeError) setStripeError('');
-  };
-
-  // Pre-fill Test Card Details
-  const handleFillTestCard = () => {
-    setCardNumber(STRIPE_TEST_CARD.number);
-    setCardExpiry(STRIPE_TEST_CARD.expiry);
-    setCardCvc(STRIPE_TEST_CARD.cvc);
-    setCardHolder(formData.fullName || 'Michaela Kováčová');
-    setStripeError('');
-    setIsTestModeCardNotice(false);
-  };
+  }, [isOpen, step, paymentMethod, amountToPayNow, selectedSeminar.title, formData.fullName, formData.email, formData.phone, formData.city, formData.billingAddress]);
 
   // Copy IBAN helper
   const handleCopyIban = () => {
@@ -373,161 +428,78 @@ export const ReservationModal: React.FC<ReservationModalProps> = ({
     setStep((prev) => (prev + 1) as any);
   };
 
-  // Handle Payment Execution
-  const handleProcessPayment = async () => {
-    setStripeError('');
-    setIsTestModeCardNotice(false);
-
-    // 1. Platobná karta cez Stripe API
-    if (paymentMethod === 'card') {
-      if (!cardNumber || cardNumber.replace(/\s/g, '').length < 15 || !cardExpiry || !cardCvc) {
-        setStripeError('Prosím vyplňte platné údaje platobnej karty (16 číslic, platnosť MM/RR a 3-miestny CVC kód). Pre otestovanie môžete kliknúť na „Vložiť testovaciu kartu“.');
-        return;
-      }
-
-      setIsProcessingPayment(true);
-      setPaymentStatusText('Odosielam a autorizujem platbu cez Stripe...');
-
-      const stripeResult = await processStripeCardPayment({
-        amountEUR: amountToPayNow,
-        title: selectedSeminar.title,
-        name: formData.fullName,
-        email: formData.email,
-        phone: formData.phone,
-        city: formData.city,
-        address: formData.billingAddress,
-        cardNumber,
-        cardExpiry,
-        cardCvc,
-        cardHolder,
-      });
-
-      if (!stripeResult.success) {
-        setIsProcessingPayment(false);
-        if (stripeResult.isTestModeRealCard) {
-          setIsTestModeCardNotice(true);
-        }
-        setStripeError(stripeResult.error || 'Platobnú kartu sa nepodarilo autorizovať cez Stripe.');
-        return;
-      }
-
-      await completeReservation({
-        methodTitle: `Platobná karta (${stripeResult.cardBrand?.toUpperCase() || 'KARTA'} •••• ${stripeResult.last4 || cardNumber.slice(-4)}) cez Stripe`,
-        paymentStatus: 'Autorizované / Uhradené cez Stripe',
-        stripeTokenId: stripeResult.tokenId,
-        stripePaymentIntentId: stripeResult.paymentIntentId,
-        receiptUrl: stripeResult.receiptUrl,
-      });
+  // Handle Stripe Payment confirmation directly in-place
+  const handleConfirmStripePayment = async () => {
+    if (!stripeElements) {
+      setStripeError('Platobná konzola Stripe sa ešte načítava. Prosím počkajte malý moment.');
       return;
     }
 
-    // 2. Apple Pay
-    if (paymentMethod === 'apple_pay') {
-      await handleApplePayPayment();
+    const stripe = await getStripe();
+    if (!stripe) {
+      setStripeError('Stripe systém nie je dostupný.');
       return;
     }
 
-    // 3. Google Pay
-    if (paymentMethod === 'google_pay') {
-      await handleGooglePayPayment();
-      return;
-    }
-
-    // 4. Revolut Pay
-    if (paymentMethod === 'revolut_pay') {
-      await handleRevolutPayPayment();
-      return;
-    }
-
-    // 5. Faktúra / Prevod na účet (alebo úhrada na mieste)
-    if (paymentMethod === 'transfer') {
-      await completeReservation({
-        methodTitle: `Faktúra / Prevod na účet (${COMPANY_DETAILS.legalName})`,
-        paymentStatus: 'Záväzne rezervované — čaká na úhradu zálohovej faktúry',
-      });
-      return;
-    }
-  };
-
-  // Dedicated Apple Pay transaction handler
-  const handleApplePayPayment = () => {
-    // 1. MUST be synchronous in Safari to preserve user gesture activation!
-    if (stripePaymentRequest) {
-      try {
-        stripePaymentRequest.show();
-        return;
-      } catch (nativeErr) {
-        console.warn('Native Apple Pay show error, falling back:', nativeErr);
-      }
-    }
-
-    // 2. Fallback to Stripe Checkout session
-    executeCheckoutFallback('apple_pay');
-  };
-
-  // Dedicated Google Pay transaction handler
-  const handleGooglePayPayment = () => {
-    if (stripePaymentRequest) {
-      try {
-        stripePaymentRequest.show();
-        return;
-      } catch (nativeErr) {
-        console.warn('Native Google Pay show error, falling back:', nativeErr);
-      }
-    }
-
-    executeCheckoutFallback('google_pay');
-  };
-
-  // Dedicated Revolut Pay transaction handler
-  const handleRevolutPayPayment = () => {
-    executeCheckoutFallback('revolut_pay');
-  };
-
-  // Checkout fallback helper
-  const executeCheckoutFallback = async (method: 'apple_pay' | 'google_pay' | 'revolut_pay') => {
     setIsProcessingPayment(true);
-    setPaymentStatusText(`Pripravujem ${method === 'apple_pay' ? 'Apple Pay' : method === 'google_pay' ? 'Google Pay' : 'Revolut Pay'}...`);
+    setPaymentStatusText('Overujem a autorizujem platbu cez Stripe...');
     setStripeError('');
-
-    const randomTicketId = `RIC-${selectedSeminar.city.slice(0, 3).toUpperCase()}-${Math.floor(1000 + Math.random() * 9000)}`;
 
     try {
-      const pendingBooking = {
-        seminar: selectedSeminar,
-        tier: currentTier,
-        formData,
-        amountToPayNow,
-        totalPackagePriceEUR,
-        paymentOption,
-        addOnBrush,
-        addOnAudit,
-        randomTicketId,
-        currency
-      };
-      localStorage.setItem('riccardo_pending_booking', JSON.stringify(pendingBooking));
-
-      const checkoutRes = await createStripeCheckoutSession({
-        amountEUR: amountToPayNow,
-        seminarTitle: selectedSeminar.title,
-        customerName: formData.fullName || 'Vážený zákazník',
-        customerEmail: formData.email,
-        customerPhone: formData.phone,
-        ticketId: randomTicketId,
-        tierName: currentTier.name,
-        paymentMethod: method
+      const { error, paymentIntent } = await stripe.confirmPayment({
+        elements: stripeElements,
+        confirmParams: {
+          return_url: `${window.location.origin}/`,
+          payment_method_data: {
+            billing_details: {
+              name: formData.fullName,
+              email: formData.email,
+              phone: formData.phone,
+            }
+          }
+        },
+        redirect: 'if_required',
       });
 
-      if (checkoutRes.success && checkoutRes.url) {
-        window.location.href = checkoutRes.url;
-      } else {
+      if (error) {
         setIsProcessingPayment(false);
-        setStripeError(checkoutRes.error || 'Nepodarilo sa spustiť platobnú reláciu.');
+        setStripeError(error.message || 'Platba nebola úspešná. Skontrolujte prosím zadané údaje.');
+        return;
       }
+
+      if (paymentIntent && (paymentIntent.status === 'succeeded' || paymentIntent.status === 'processing')) {
+        await completeReservation({
+          methodTitle: 'Stripe Online Konzola',
+          paymentStatus: 'Autorizované a uhradené cez Stripe',
+          stripePaymentIntentId: paymentIntent.id,
+          receiptUrl: null,
+        });
+        return;
+      }
+
+      if (paymentIntent && paymentIntent.status === 'requires_action') {
+        setPaymentStatusText('Čakám na 3D Secure overenie vašou bankou...');
+        return;
+      }
+
+      await completeReservation({
+        methodTitle: 'Stripe Online Konzola',
+        paymentStatus: 'Autorizované a uhradené cez Stripe',
+        stripePaymentIntentId: paymentIntent?.id,
+        receiptUrl: null,
+      });
     } catch (err: any) {
       setIsProcessingPayment(false);
-      setStripeError(err.message || 'Chyba pri inicializácii platby.');
+      setStripeError(err.message || 'Nastala neočakávaná chyba pri spracovaní platby.');
     }
+  };
+
+  // Handle Bank Transfer confirmation
+  const handleProcessTransferPayment = async () => {
+    await completeReservation({
+      methodTitle: `Faktúra / Prevod na účet (${COMPANY_DETAILS.legalName})`,
+      paymentStatus: 'Záväzne rezervované — čaká na úhradu zálohovej faktúry',
+    });
   };
 
   // Copy Ticket Code helper
@@ -563,7 +535,7 @@ EMAIL: ${formData.email}
 TELEFÓN: ${formData.phone}
 ${formData.billingType === 'salon' && formData.companyName ? `FAKTURAČNÉ ÚDAJE:\nFirma: ${formData.companyName}\nIČO: ${formData.ico}\nDIČ: ${formData.dic}\nSídlo: ${formData.billingAddress}\n` : ''}
 BALÍČEK: ${currentTier.name} (${totalPackagePriceEUR} €)
-SPÔSOB PLATBY: ${paymentMethod.toUpperCase()}
+SPÔSOB PLATBY: ${paymentMethod === 'stripe' ? 'STRIPE ONLINE PLATBA (PRIAMA AUTORIZÁCIA)' : 'FAKTÚRA NA SALÓN / PREVOD NA ÚČET'}
 UHRADENÁ SUMA: ${amountToPayNow} € (${paymentOption === 'deposit' ? `Záloha 100 €, doplatok ${totalPackagePriceEUR - 100} € na mieste` : 'Uhradená celá suma vopred'})
 
 DODÁVATEĽ A PREVÁDZKOVATEĽ:
@@ -1042,6 +1014,7 @@ Orgán dozoru: ${COMPANY_DETAILS.supervisoryAuthority.name}, ${COMPANY_DETAILS.s
 
               {/* Statutory Legal Consent Box (Interactive Checkbox) */}
               <div
+                id="terms-checkbox"
                 role="checkbox"
                 aria-checked={termsAccepted}
                 tabIndex={0}
@@ -1261,326 +1234,192 @@ Orgán dozoru: ${COMPANY_DETAILS.supervisoryAuthority.name}, ${COMPANY_DETAILS.s
                   Vyberte spôsob platby
                 </label>
 
-                <div className="grid grid-cols-2 sm:grid-cols-5 gap-2">
-                  
-                  {/* 1. Credit / Debit Card (Default) */}
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                  {/* 1. Stripe Console (Default) */}
                   <button
                     type="button"
                     onClick={() => {
-                      setPaymentMethod('card');
+                      setPaymentMethod('stripe');
                       setStripeError('');
                     }}
-                    className={`p-3 rounded-2xl border flex flex-col items-center justify-center gap-2 transition-all ${
-                      paymentMethod === 'card'
+                    className={`p-4 rounded-2xl border text-left flex flex-col justify-between transition-all ${
+                      paymentMethod === 'stripe'
                         ? 'bg-zinc-850 border-white text-white shadow-lg ring-1 ring-white/10'
                         : 'bg-zinc-950 border-zinc-800 text-zinc-400 hover:text-white hover:border-zinc-700'
                     }`}
                   >
-                    <div className="h-6 flex items-center justify-center">
-                      <CreditCard className="w-5 h-5 text-white" />
+                    <div className="flex items-center justify-between w-full mb-2.5">
+                      <div className="flex items-center gap-2">
+                        <CreditCard className="w-4 h-4 text-white" />
+                        <span className="text-sm font-semibold text-white">Stripe Online Konzola</span>
+                      </div>
+                      <span className="text-[10px] font-mono uppercase px-2 py-0.5 rounded-full bg-emerald-500/10 text-emerald-400 border border-emerald-500/20">
+                        Priamo na stránke
+                      </span>
                     </div>
-                    <span className="text-[11px] font-semibold text-center">Platobná karta</span>
+
+                    <p className="text-[11px] text-zinc-400 mb-3 leading-relaxed">
+                      Karta (Visa, Mastercard), Apple Pay, Google Pay alebo Revolut priamo v zabezpečenej konzole.
+                    </p>
+
+                    <div className="flex items-center gap-2.5 pt-2 border-t border-zinc-800/80">
+                      <CreditCardBrandIcons />
+                      <ApplePayLogo className="h-3.5 w-auto text-zinc-300" />
+                      <GooglePayLogo className="h-3 w-auto" lightText={true} />
+                      <div className="flex items-center gap-1">
+                        <RevolutIcon className="h-3 w-3 text-zinc-300" />
+                        <span className="text-[9px] font-bold text-zinc-300">Pay</span>
+                      </div>
+                    </div>
                   </button>
 
-                  {/* 2. Apple Pay */}
-                  <button
-                    type="button"
-                    onClick={() => {
-                      setPaymentMethod('apple_pay');
-                      setStripeError('');
-                    }}
-                    className={`p-3 rounded-2xl border flex flex-col items-center justify-center gap-2 transition-all ${
-                      paymentMethod === 'apple_pay'
-                        ? 'bg-zinc-850 border-white text-white shadow-lg ring-1 ring-white/10'
-                        : 'bg-zinc-950 border-zinc-800 text-zinc-400 hover:text-white hover:border-zinc-700'
-                    }`}
-                  >
-                    <div className="h-6 flex items-center justify-center">
-                      <ApplePayLogo className="h-5 w-auto text-white" />
-                    </div>
-                    <span className="text-[11px] font-semibold text-center">Apple Pay</span>
-                  </button>
-
-                  {/* 3. Google Pay */}
-                  <button
-                    type="button"
-                    onClick={() => {
-                      setPaymentMethod('google_pay');
-                      setStripeError('');
-                    }}
-                    className={`p-3 rounded-2xl border flex flex-col items-center justify-center gap-2 transition-all ${
-                      paymentMethod === 'google_pay'
-                        ? 'bg-zinc-850 border-white text-white shadow-lg ring-1 ring-white/10'
-                        : 'bg-zinc-950 border-zinc-800 text-zinc-400 hover:text-white hover:border-zinc-700'
-                    }`}
-                  >
-                    <div className="h-6 flex items-center justify-center">
-                      <GooglePayLogo className="h-4 w-auto" lightText={true} />
-                    </div>
-                    <span className="text-[11px] font-semibold text-center">Google Pay</span>
-                  </button>
-
-                  {/* 4. Revolut Pay */}
-                  <button
-                    type="button"
-                    onClick={() => {
-                      setPaymentMethod('revolut_pay');
-                      setStripeError('');
-                    }}
-                    className={`p-3 rounded-2xl border flex flex-col items-center justify-center gap-2 transition-all ${
-                      paymentMethod === 'revolut_pay'
-                        ? 'bg-zinc-850 border-white text-white shadow-lg ring-1 ring-white/10'
-                        : 'bg-zinc-950 border-zinc-800 text-zinc-400 hover:text-white hover:border-zinc-700'
-                    }`}
-                  >
-                    <div className="h-6 flex items-center justify-center gap-1.5">
-                      <RevolutIcon className="h-4 w-4 text-white" />
-                      <span className="text-xs font-bold text-white tracking-tight">Pay</span>
-                    </div>
-                    <span className="text-[11px] font-semibold text-center">Revolut Pay</span>
-                  </button>
-
-                  {/* 5. Prevod / Faktúra */}
+                  {/* 2. Faktúra na salón / Prevod */}
                   <button
                     type="button"
                     onClick={() => {
                       setPaymentMethod('transfer');
                       setStripeError('');
                     }}
-                    className={`p-3 rounded-2xl border flex flex-col items-center justify-center gap-2 transition-all ${
+                    className={`p-4 rounded-2xl border text-left flex flex-col justify-between transition-all ${
                       paymentMethod === 'transfer'
                         ? 'bg-zinc-850 border-white text-white shadow-lg ring-1 ring-white/10'
                         : 'bg-zinc-950 border-zinc-800 text-zinc-400 hover:text-white hover:border-zinc-700'
                     }`}
                   >
-                    <div className="h-6 flex items-center justify-center">
-                      <Building2 className="w-5 h-5 text-white" />
+                    <div className="flex items-center justify-between w-full mb-2.5">
+                      <div className="flex items-center gap-2">
+                        <Building2 className="w-4 h-4 text-white" />
+                        <span className="text-sm font-semibold text-white">Faktúra na salón / Prevod</span>
+                      </div>
+                      <span className="text-[10px] font-mono uppercase px-2 py-0.5 rounded-full bg-zinc-800 text-zinc-400 border border-zinc-700">
+                        Záloha / Účet
+                      </span>
                     </div>
-                    <span className="text-[11px] font-semibold text-center">Faktúra / Účet</span>
-                  </button>
 
+                    <p className="text-[11px] text-zinc-400 mb-3 leading-relaxed">
+                      Vystavenie zálohovej faktúry na firmu/IČO a prevod na účet v Tatra banke s PAY by square.
+                    </p>
+
+                    <div className="flex items-center gap-2 text-[10px] text-zinc-400 pt-2 border-t border-zinc-800/80 font-mono">
+                      <span>Tatra banka</span>
+                      <span>•</span>
+                      <span>QR Pay by square</span>
+                    </div>
+                  </button>
                 </div>
               </div>
 
-              {/* 1. Platobná karta Tab */}
-              {paymentMethod === 'card' && (
+              {/* 1. Stripe Online Console Tab */}
+              {paymentMethod === 'stripe' && (
                 <div className="p-5 rounded-2xl bg-zinc-900/60 border border-zinc-850 space-y-4 animate-fadeIn">
                   <div className="flex items-center justify-between text-xs text-zinc-400">
-                    <span>Platba kartou online (Visa, Mastercard, Maestro)</span>
-                    <CreditCardBrandIcons />
+                    <span className="font-medium text-zinc-300">Oficiálna Stripe Platobná Konzola</span>
+                    <span className="text-[11px] text-emerald-400 font-mono flex items-center gap-1.5">
+                      <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse"></span>
+                      Priame zabezpečené spojenie
+                    </span>
                   </div>
 
-                  {/* One-click Test Card filler helper */}
-                  <div className="p-3 rounded-xl bg-zinc-950 border border-zinc-800 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-2 text-xs">
-                    <div className="text-zinc-400">
-                      <span className="text-zinc-300 font-medium">Testovacie prostredie Stripe:</span> Chcete otestovať platbu?
+                  {/* One-click Test Card helper */}
+                  <div className="p-3.5 rounded-xl bg-zinc-950 border border-zinc-800/80 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 text-xs">
+                    <div className="space-y-0.5">
+                      <div className="flex items-center gap-1.5 text-zinc-200 font-medium">
+                        <Sparkles className="w-3.5 h-3.5 text-amber-400" />
+                        <span>Testovacia karta pre overenie: <strong className="font-mono text-white">4242 4242 4242 4242</strong></span>
+                      </div>
+                      <p className="text-[11px] text-zinc-400">
+                        Platnosť: ľubovoľná v budúcnosti (napr. 12/28), CVC: 123.
+                      </p>
                     </div>
                     <button
                       type="button"
-                      onClick={handleFillTestCard}
-                      className="px-3 py-1.5 rounded-lg bg-zinc-800 hover:bg-zinc-700 border border-zinc-700 text-white font-medium text-[11px] flex items-center gap-1.5 transition-all shadow-sm"
+                      onClick={() => {
+                        navigator.clipboard.writeText('4242 4242 4242 4242');
+                        setCopiedTestCard(true);
+                        setTimeout(() => setCopiedTestCard(false), 2000);
+                      }}
+                      className="px-3 py-1.5 rounded-lg bg-zinc-850 hover:bg-zinc-800 border border-zinc-700 text-white font-medium text-[11px] flex items-center gap-1.5 transition-all flex-shrink-0 shadow-sm"
                     >
-                      <Sparkles className="w-3.5 h-3.5 text-amber-400" />
-                      <span>Vložiť testovaciu kartu (4242...)</span>
+                      {copiedTestCard ? (
+                        <>
+                          <Check className="w-3.5 h-3.5 text-emerald-400" />
+                          <span className="text-emerald-300 font-semibold">Skopírované!</span>
+                        </>
+                      ) : (
+                        <>
+                          <Copy className="w-3.5 h-3.5 text-zinc-400" />
+                          <span>Kopírovať test kartu</span>
+                        </>
+                      )}
                     </button>
                   </div>
 
-                  <div>
-                    <label className="text-[11px] text-zinc-400 block mb-1">Číslo karty *</label>
-                    <div className="relative">
-                      <input
-                        type="text"
-                        required
-                        placeholder="4532 •••• •••• ••••"
-                        value={cardNumber}
-                        onChange={handleCardNumberChange}
-                        className="w-full bg-zinc-950 border border-zinc-800 text-white p-3 rounded-xl text-sm font-mono tracking-wider focus:outline-none focus:border-zinc-500"
-                      />
-                      <div className="absolute right-3 top-1/2 -translate-y-1/2">
-                        <Lock className="w-4 h-4 text-zinc-500" />
+                  {/* Stripe Mount Container & Loading Skeleton */}
+                  <div className="relative min-h-[220px]">
+                    {isStripeLoading && (
+                      <div className="p-8 rounded-2xl bg-zinc-950/80 border border-zinc-800 flex flex-col items-center justify-center gap-3 text-center">
+                        <Loader2 className="w-6 h-6 animate-spin text-white" />
+                        <span className="text-xs text-zinc-400">Načítavam zabezpečenú Stripe konzolu...</span>
                       </div>
-                    </div>
-                  </div>
+                    )}
 
-                  <div className="grid grid-cols-2 gap-3">
-                    <div>
-                      <label className="text-[11px] text-zinc-400 block mb-1">Platnosť (MM/RR) *</label>
-                      <input
-                        type="text"
-                        required
-                        placeholder="MM/RR"
-                        value={cardExpiry}
-                        onChange={handleCardExpiryChange}
-                        className="w-full bg-zinc-950 border border-zinc-800 text-white p-3 rounded-xl text-sm font-mono text-center focus:outline-none focus:border-zinc-500"
-                      />
-                    </div>
-                    <div>
-                      <label className="text-[11px] text-zinc-400 block mb-1">Bezpečnostný kód (CVC/CVV) *</label>
-                      <input
-                        type="password"
-                        required
-                        maxLength={4}
-                        placeholder="•••"
-                        value={cardCvc}
-                        onChange={(e) => setCardCvc(e.target.value.replace(/\D/g, ''))}
-                        className="w-full bg-zinc-950 border border-zinc-800 text-white p-3 rounded-xl text-sm font-mono text-center focus:outline-none focus:border-zinc-500"
-                      />
-                    </div>
-                  </div>
+                    {stripeLoadError && (
+                      <div className="p-4 rounded-2xl bg-red-500/10 border border-red-500/30 text-red-300 text-xs flex items-start gap-3">
+                        <AlertCircle className="w-5 h-5 flex-shrink-0 text-red-400 mt-0.5" />
+                        <div className="space-y-1">
+                          <p className="font-semibold text-red-200">Konzolu Stripe sa nepodarilo spustiť:</p>
+                          <p className="text-zinc-300">{stripeLoadError}</p>
+                          <button
+                            type="button"
+                            onClick={() => setPaymentMethod('transfer')}
+                            className="mt-2 px-3 py-1.5 rounded-lg bg-zinc-850 hover:bg-zinc-800 text-white text-[11px] font-medium border border-zinc-700 flex items-center gap-1.5"
+                          >
+                            <Building2 className="w-3.5 h-3.5" />
+                            <span>Prepnúť na úhradu faktúrou / prevodom</span>
+                          </button>
+                        </div>
+                      </div>
+                    )}
 
-                  <div>
-                    <label className="text-[11px] text-zinc-400 block mb-1">Meno na karte</label>
-                    <input
-                      type="text"
-                      placeholder={formData.fullName || "Meno a priezvisko"}
-                      value={cardHolder}
-                      onChange={(e) => setCardHolder(e.target.value)}
-                      className="w-full bg-zinc-950 border border-zinc-800 text-white p-3 rounded-xl text-sm focus:outline-none focus:border-zinc-500"
+                    <div
+                      ref={stripeMountRef}
+                      id="stripe-console-mount"
+                      className={`${isStripeLoading ? 'hidden' : 'block'} p-4 sm:p-5 rounded-2xl bg-zinc-950 border border-zinc-800 shadow-inner`}
                     />
                   </div>
 
+                  {/* Confirm Payment Button */}
                   <button
                     type="button"
-                    onClick={handleProcessPayment}
-                    disabled={isProcessingPayment}
-                    className="w-full py-3.5 px-6 rounded-2xl bg-white text-black font-semibold text-sm hover:bg-zinc-200 transition-all active:scale-95 shadow-xl flex items-center justify-center gap-2"
-                  >
-                    <Lock className="w-4 h-4" />
-                    <span>Zaplatiť {amountToPayNow} € kartou</span>
-                  </button>
-
-                  <div className="flex items-center justify-center gap-1.5 text-[11px] text-zinc-500 pt-1">
-                    <ShieldCheck className="w-3.5 h-3.5 text-zinc-400" />
-                    <span>Zabezpečené cez Stripe 3D Secure • Prevádzkovateľ: {COMPANY_DETAILS.legalName}</span>
-                  </div>
-                </div>
-              )}
-
-              {/* 2. Apple Pay Tab */}
-              {paymentMethod === 'apple_pay' && (
-                <div className="p-6 rounded-2xl bg-zinc-900/60 border border-zinc-850 space-y-4 animate-fadeIn">
-                  <div className="flex items-center justify-between text-xs text-zinc-400">
-                    <span>Expresná autorizácia cez Apple Pay</span>
-                    <span className="text-white font-medium flex items-center gap-1.5">
-                      <span className="w-2 h-2 rounded-full bg-emerald-400 animate-pulse"></span>
-                      Touch ID / Face ID
-                    </span>
-                  </div>
-
-                  {/* Native Stripe Elements Mount Point (renders Apple's native WebKit button in Safari) */}
-                  {canApplePay ? (
-                    <div id="native-apple-pay-element" className="w-full min-h-[56px]" />
-                  ) : (
-                    /* Fallback Direct Apple Pay Button when not supported on this device/browser */
-                    <button
-                      type="button"
-                      onClick={handleApplePayPayment}
-                      disabled={isProcessingPayment}
-                      className="w-full py-4 px-6 rounded-2xl bg-black hover:bg-zinc-900 active:scale-[0.98] border border-zinc-700/80 text-white font-semibold text-base transition-all flex items-center justify-center gap-3 shadow-2xl cursor-pointer"
-                    >
-                      {isProcessingPayment ? (
-                        <div className="flex items-center gap-2 text-zinc-300 text-sm">
-                          <Loader2 className="w-5 h-5 animate-spin text-white" />
-                          <span>{paymentStatusText || 'Inicializujem Apple Pay...'}</span>
-                        </div>
-                      ) : (
-                        <div className="flex items-center justify-center gap-2.5">
-                          <ApplePayLogo className="h-6 w-auto fill-white text-white" />
-                          <span className="text-zinc-500 font-light text-lg">|</span>
-                          <span className="tracking-tight text-white font-semibold">Zaplatiť {amountToPayNow} €</span>
-                        </div>
-                      )}
-                    </button>
-                  )}
-
-                  <p className="text-[11px] text-zinc-500 text-center">
-                    Platba prebehne priamo cez Apple Wallet (Touch ID / Face ID) bez opustenia stránky • Prevádzkovateľ: {COMPANY_DETAILS.legalName}
-                  </p>
-                </div>
-              )}
-
-
-              {/* 3. Google Pay Tab */}
-              {paymentMethod === 'google_pay' && (
-                <div className="p-6 rounded-2xl bg-zinc-900/60 border border-zinc-850 space-y-4 animate-fadeIn">
-                  <div className="flex items-center justify-between text-xs text-zinc-400">
-                    <span>Expresná platba cez Google Pay</span>
-                    <span className="text-white font-medium flex items-center gap-1.5">
-                      <span className="w-2 h-2 rounded-full bg-emerald-400 animate-pulse"></span>
-                      Google Peňaženka
-                    </span>
-                  </div>
-
-                  {canGooglePay ? (
-                    <div id="native-google-pay-element" className="w-full min-h-[56px]" />
-                  ) : (
-                    <button
-                      type="button"
-                      onClick={handleGooglePayPayment}
-                      disabled={isProcessingPayment}
-                      className="w-full py-4 px-6 rounded-2xl bg-black hover:bg-zinc-900 active:scale-[0.98] border border-zinc-700/80 text-white font-semibold text-base transition-all flex items-center justify-center gap-3 shadow-2xl cursor-pointer"
-                    >
-                      {isProcessingPayment ? (
-                        <div className="flex items-center gap-2 text-zinc-300 text-sm">
-                          <Loader2 className="w-5 h-5 animate-spin text-white" />
-                          <span>{paymentStatusText || 'Inicializujem Google Pay...'}</span>
-                        </div>
-                      ) : (
-                        <div className="flex items-center justify-center gap-2.5">
-                          <GooglePayLogo className="h-5 w-auto" lightText={true} />
-                          <span className="text-zinc-500 font-light text-lg">|</span>
-                          <span className="tracking-tight text-white font-semibold">Zaplatiť {amountToPayNow} €</span>
-                        </div>
-                      )}
-                    </button>
-                  )}
-
-                  <p className="text-[11px] text-zinc-500 text-center">
-                    Bezpečné spracovanie platby cez účet Google • Prevádzkovateľ: {COMPANY_DETAILS.legalName}
-                  </p>
-                </div>
-              )}
-
-              {/* 4. Revolut Pay Tab */}
-              {paymentMethod === 'revolut_pay' && (
-                <div className="p-6 rounded-2xl bg-zinc-900/60 border border-zinc-850 space-y-4 animate-fadeIn">
-                  <div className="flex items-center justify-between text-xs text-zinc-400">
-                    <span>Okamžitá platba cez Revolut</span>
-                    <span className="text-white font-medium flex items-center gap-1.5">
-                      <span className="w-2 h-2 rounded-full bg-emerald-400 animate-pulse"></span>
-                      Revolut App
-                    </span>
-                  </div>
-
-                  <button
-                    type="button"
-                    onClick={handleRevolutPayPayment}
-                    disabled={isProcessingPayment}
-                    className="w-full py-4 px-6 rounded-2xl bg-black hover:bg-zinc-900 active:scale-[0.98] border border-zinc-700/80 text-white font-semibold text-base transition-all flex items-center justify-center gap-3 shadow-2xl cursor-pointer"
+                    onClick={handleConfirmStripePayment}
+                    disabled={isProcessingPayment || isStripeLoading || Boolean(stripeLoadError)}
+                    className="w-full py-4 px-6 rounded-2xl bg-white hover:bg-zinc-200 text-black font-semibold text-sm transition-all active:scale-[0.99] shadow-xl flex items-center justify-center gap-2 cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed"
                   >
                     {isProcessingPayment ? (
-                      <div className="flex items-center gap-2 text-zinc-300 text-sm">
-                        <Loader2 className="w-5 h-5 animate-spin text-white" />
-                        <span>{paymentStatusText || 'Inicializujem Revolut Pay...'}</span>
+                      <div className="flex items-center gap-2 text-zinc-900">
+                        <Loader2 className="w-4 h-4 animate-spin text-black" />
+                        <span>{paymentStatusText || 'Autorizujem platbu cez Stripe...'}</span>
                       </div>
                     ) : (
-                      <div className="flex items-center justify-center gap-2.5">
-                        <RevolutIcon className="h-5 w-5 text-white" />
-                        <span className="font-bold text-white text-base tracking-tight">Pay</span>
-                        <span className="text-zinc-500 font-light text-lg">|</span>
-                        <span className="tracking-tight text-white font-semibold">Zaplatiť {amountToPayNow} €</span>
-                      </div>
+                      <>
+                        <Lock className="w-4 h-4" />
+                        <span>Zaplatiť {amountToPayNow} € priamo cez Stripe</span>
+                      </>
                     )}
                   </button>
 
-                  <p className="text-[11px] text-zinc-500 text-center">
-                    Budete presmerovaný do aplikácie Revolut na 1-klikové potvrdenie • Prevádzkovateľ: {COMPANY_DETAILS.legalName}
-                  </p>
+                  <div className="flex flex-col sm:flex-row items-center justify-center gap-2 sm:gap-4 text-[11px] text-zinc-500 pt-1 text-center">
+                    <div className="flex items-center gap-1.5">
+                      <ShieldCheck className="w-3.5 h-3.5 text-emerald-400" />
+                      <span>Zabezpečené cez Stripe 3D Secure</span>
+                    </div>
+                    <span className="hidden sm:inline text-zinc-700">•</span>
+                    <span>Prevádzkovateľ: {COMPANY_DETAILS.legalName}</span>
+                  </div>
                 </div>
               )}
 
-
-              {/* 5. Prevod / Faktúra na účet */}
+              {/* 2. Prevod / Faktúra na účet */}
               {paymentMethod === 'transfer' && (
                 <div className="p-5 rounded-2xl bg-zinc-900/60 border border-zinc-850 space-y-4 animate-fadeIn">
                   <div className="flex items-center justify-between text-xs text-zinc-400">
@@ -1627,9 +1466,9 @@ Orgán dozoru: ${COMPANY_DETAILS.supervisoryAuthority.name}, ${COMPANY_DETAILS.s
 
                   <button
                     type="button"
-                    onClick={handleProcessPayment}
+                    onClick={handleProcessTransferPayment}
                     disabled={isProcessingPayment}
-                    className="w-full py-4 px-6 rounded-2xl bg-white text-black font-semibold text-sm hover:bg-zinc-200 transition-all flex items-center justify-center gap-2 active:scale-95 shadow-xl"
+                    className="w-full py-4 px-6 rounded-2xl bg-white text-black font-semibold text-sm hover:bg-zinc-200 transition-all flex items-center justify-center gap-2 active:scale-95 shadow-xl cursor-pointer"
                   >
                     <FileText className="w-4 h-4" />
                     <span>Záväzne rezervovať miesto ({amountToPayNow} €)</span>
@@ -1741,10 +1580,7 @@ Orgán dozoru: ${COMPANY_DETAILS.supervisoryAuthority.name}, ${COMPANY_DETAILS.s
                     <div>
                       <span className="text-[10px] uppercase text-zinc-500 block">Spôsob platby</span>
                       <span className="text-emerald-400 font-medium block">
-                        {paymentMethod === 'apple_pay' && 'Apple Pay (Uhradené)'}
-                        {paymentMethod === 'google_pay' && 'Google Pay (Uhradené)'}
-                        {paymentMethod === 'revolut_pay' && 'Revolut Pay (Uhradené)'}
-                        {paymentMethod === 'card' && 'Platobná karta (Uhradené)'}
+                        {paymentMethod === 'stripe' && 'Stripe Online Konzola (Uhradené)'}
                         {paymentMethod === 'transfer' && 'Faktúra / Účet (Rezervované)'}
                       </span>
                       <span className="text-[10px] text-zinc-400 block font-mono">Uhradená suma: {amountToPayNow} €</span>

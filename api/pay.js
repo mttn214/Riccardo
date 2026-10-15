@@ -69,7 +69,7 @@ export default async function handler(req, res) {
         description: `Hair Salon Riccardo — ${seminarTitle || 'Masterclass'} (${customerName || 'Zákazník'})`,
         receipt_email: customerEmail || undefined,
         metadata: {
-          prevadzkovatel: 'zeterem s.r.o.',
+          prevadzkovatel: 'ZETEREM s.r.o.',
           zakaznik: customerName || 'Neuvedené',
           email: customerEmail || 'Neuvedené',
           telefon: customerPhone || 'Neuvedené',
@@ -92,7 +92,7 @@ export default async function handler(req, res) {
         description: `Hair Salon Riccardo — ${seminarTitle || 'Masterclass'} (${customerName || 'Zákazník'})`,
         receipt_email: customerEmail || undefined,
         metadata: {
-          prevadzkovatel: 'zeterem s.r.o.',
+          prevadzkovatel: 'ZETEREM s.r.o.',
           zakaznik: customerName || 'Neuvedené',
           email: customerEmail || 'Neuvedené',
           telefon: customerPhone || 'Neuvedené',
@@ -110,7 +110,7 @@ export default async function handler(req, res) {
         description: `Hair Salon Riccardo — ${seminarTitle || 'Masterclass'} (${customerName || 'Zákazník'})`,
         receipt_email: customerEmail || undefined,
         metadata: {
-          prevadzkovatel: 'zeterem s.r.o.',
+          prevadzkovatel: 'ZETEREM s.r.o.',
           zakaznik: customerName || 'Neuvedené',
           email: customerEmail || 'Neuvedené',
           telefon: customerPhone || 'Neuvedené',
