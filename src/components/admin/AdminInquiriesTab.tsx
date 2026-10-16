@@ -58,8 +58,8 @@ export const AdminInquiriesTab: React.FC = () => {
 
   return (
     <div className="space-y-6 animate-fadeIn">
-      {/* Top Header */}
-      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 pb-2 border-b border-zinc-850">
+      {/* Top Header - Borderless & Seamless */}
+      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 pb-1">
         <div>
           <h1 className="text-2xl font-semibold text-white tracking-tight">
             Dopyty & Kontaktné správy
@@ -76,14 +76,14 @@ export const AdminInquiriesTab: React.FC = () => {
         </div>
       </div>
 
-      {/* Filter and Search Bar */}
-      <div className="grid grid-cols-1 sm:grid-cols-12 gap-3 bg-zinc-950 p-4 rounded-2xl border border-zinc-850">
+      {/* Filter and Search Bar - Borderless */}
+      <div className="grid grid-cols-1 sm:grid-cols-12 gap-3 bg-zinc-900/40 p-4 rounded-3xl">
         <div className="sm:col-span-4">
           <label className="text-[10px] font-mono uppercase text-zinc-500 block mb-1">Typ správy</label>
           <select
             value={filterType}
             onChange={(e) => setFilterType(e.target.value)}
-            className="w-full bg-zinc-900 border border-zinc-800 text-zinc-200 text-xs rounded-xl p-2.5 focus:outline-none cursor-pointer"
+            className="w-full bg-zinc-950/80 text-zinc-200 text-xs rounded-xl p-2.5 focus:outline-none cursor-pointer border-0"
           >
             <option value="all">Všetky typy ({inquiries.length})</option>
             <option value="contact">Kontaktný formulár salónu</option>
@@ -96,7 +96,7 @@ export const AdminInquiriesTab: React.FC = () => {
           <select
             value={filterStatus}
             onChange={(e) => setFilterStatus(e.target.value)}
-            className="w-full bg-zinc-900 border border-zinc-800 text-zinc-200 text-xs rounded-xl p-2.5 focus:outline-none cursor-pointer"
+            className="w-full bg-zinc-950/80 text-zinc-200 text-xs rounded-xl p-2.5 focus:outline-none cursor-pointer border-0"
           >
             <option value="all">Všetky stavy</option>
             <option value="unread">Neprečítané</option>
@@ -116,16 +116,16 @@ export const AdminInquiriesTab: React.FC = () => {
               placeholder="Meno, email, text..."
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
-              className="w-full bg-zinc-900 border border-zinc-800 focus:border-zinc-500 text-white pl-9 pr-3 py-2.5 rounded-xl text-xs focus:outline-none"
+              className="w-full bg-zinc-950/80 text-white pl-9 pr-3 py-2.5 rounded-xl text-xs focus:ring-1 focus:ring-white/20 outline-none border-0"
             />
           </div>
         </div>
       </div>
 
-      {/* Inquiries List */}
+      {/* Inquiries List - Borderless Cards */}
       <div className="grid grid-cols-1 gap-3">
         {filteredInquiries.length === 0 ? (
-          <div className="p-12 text-center text-xs text-zinc-500 font-mono bg-zinc-950 rounded-2xl border border-zinc-850">
+          <div className="p-12 text-center text-xs text-zinc-500 font-mono bg-zinc-900/40 rounded-3xl">
             Žiadne správy nevyhovujú zvoleným kritériám.
           </div>
         ) : (
@@ -138,19 +138,19 @@ export const AdminInquiriesTab: React.FC = () => {
                   store.updateInquiryStatus(inq.id, 'read');
                 }
               }}
-              className={`p-5 rounded-2xl border transition-all cursor-pointer flex flex-col sm:flex-row sm:items-center justify-between gap-4 ${
+              className={`p-5 rounded-3xl transition-all cursor-pointer flex flex-col sm:flex-row sm:items-center justify-between gap-4 ${
                 inq.status === 'unread'
-                  ? 'bg-zinc-900/90 border-purple-500/40 shadow-lg ring-1 ring-purple-500/10'
-                  : 'bg-zinc-950 border-zinc-850 hover:border-zinc-700'
+                  ? 'bg-zinc-900/70 shadow-lg ring-1 ring-purple-500/20'
+                  : 'bg-zinc-900/40 hover:bg-zinc-900/60'
               }`}
             >
               <div className="space-y-1.5 min-w-0 flex-1">
                 <div className="flex items-center gap-2.5 flex-wrap">
                   <span
-                    className={`text-[10px] font-mono uppercase px-2 py-0.5 rounded-full ${
+                    className={`text-[10px] font-mono uppercase px-2.5 py-0.5 rounded-full ${
                       inq.type === 'waitlist'
-                        ? 'bg-purple-500/20 text-purple-300 border border-purple-500/30'
-                        : 'bg-blue-500/20 text-blue-300 border border-blue-500/30'
+                        ? 'bg-purple-500/20 text-purple-300'
+                        : 'bg-blue-500/20 text-blue-300'
                     }`}
                   >
                     {inq.type === 'waitlist' ? 'VIP Waitlist' : 'Kontakt'}
@@ -190,7 +190,7 @@ export const AdminInquiriesTab: React.FC = () => {
               <div className="flex items-center gap-2 shrink-0" onClick={(e) => e.stopPropagation()}>
                 <a
                   href={`mailto:${inq.email}?subject=Re: ${encodeURIComponent(inq.subject || 'Odpoveď od Hair Salon Riccardo')}`}
-                  className="px-3 py-1.5 rounded-xl bg-zinc-850 hover:bg-zinc-800 text-zinc-300 text-xs font-medium flex items-center gap-1.5 transition-colors"
+                  className="px-3.5 py-2 rounded-xl bg-zinc-800/80 hover:bg-zinc-750 text-zinc-200 text-xs font-medium flex items-center gap-1.5 transition-colors"
                 >
                   <Mail className="w-3.5 h-3.5" />
                   <span>Odpovedať</span>
@@ -199,10 +199,10 @@ export const AdminInquiriesTab: React.FC = () => {
                 <button
                   type="button"
                   onClick={() => handleStatusChange(inq.id, inq.status === 'resolved' ? 'read' : 'resolved')}
-                  className={`p-2 rounded-xl border transition-colors ${
+                  className={`p-2 rounded-xl transition-colors cursor-pointer ${
                     inq.status === 'resolved'
-                      ? 'bg-emerald-950/60 border-emerald-500/40 text-emerald-400'
-                      : 'bg-zinc-850 border-zinc-800 text-zinc-400 hover:text-white'
+                      ? 'bg-emerald-950/60 text-emerald-400'
+                      : 'bg-zinc-800/80 text-zinc-400 hover:text-white'
                   }`}
                   title={inq.status === 'resolved' ? 'Označiť ako nevybavené' : 'Označiť za vybavené'}
                 >
@@ -212,7 +212,7 @@ export const AdminInquiriesTab: React.FC = () => {
                 <button
                   type="button"
                   onClick={() => handleDelete(inq.id)}
-                  className="p-2 rounded-xl bg-zinc-850 hover:bg-red-950/60 text-zinc-400 hover:text-red-400 transition-colors"
+                  className="p-2 rounded-xl bg-zinc-800/80 hover:bg-red-950/60 text-zinc-400 hover:text-red-400 transition-colors cursor-pointer"
                   title="Vymazať správu"
                 >
                   <Trash2 className="w-3.5 h-3.5" />
@@ -223,13 +223,13 @@ export const AdminInquiriesTab: React.FC = () => {
         )}
       </div>
 
-      {/* Message Detail Modal */}
+      {/* Message Detail Modal - Borderless */}
       {selectedInquiry && (
-        <div className="fixed inset-0 z-50 bg-black/80 backdrop-blur-sm flex items-center justify-center p-4">
-          <div className="w-full max-w-lg rounded-3xl bg-zinc-950 border border-zinc-800 p-6 space-y-5 shadow-2xl">
-            <div className="flex items-start justify-between border-b border-zinc-850 pb-4">
+        <div className="fixed inset-0 z-50 bg-black/80 backdrop-blur-md flex items-center justify-center p-4">
+          <div className="w-full max-w-lg rounded-3xl bg-zinc-950 p-6 space-y-5 shadow-2xl">
+            <div className="flex items-start justify-between">
               <div>
-                <span className="text-[10px] font-mono uppercase px-2 py-0.5 rounded-md bg-zinc-900 border border-zinc-800 text-zinc-400">
+                <span className="text-[10px] font-mono uppercase px-2 py-0.5 rounded-md bg-zinc-900 text-zinc-400">
                   {selectedInquiry.type === 'waitlist' ? 'VIP Waitlist dopyt' : 'Kontaktná správa'}
                 </span>
                 <h3 className="text-lg font-bold text-white mt-1">{selectedInquiry.name}</h3>
@@ -239,14 +239,14 @@ export const AdminInquiriesTab: React.FC = () => {
               <button
                 type="button"
                 onClick={() => setSelectedInquiry(null)}
-                className="p-2 rounded-xl bg-zinc-900 text-zinc-400 hover:text-white"
+                className="p-2 rounded-xl bg-zinc-900 text-zinc-400 hover:text-white cursor-pointer"
               >
                 <X className="w-4 h-4" />
               </button>
             </div>
 
             <div className="space-y-3 text-xs">
-              <div className="p-3.5 rounded-xl bg-zinc-900/60 border border-zinc-850 space-y-1.5 font-mono">
+              <div className="p-4 rounded-2xl bg-zinc-900/60 space-y-1.5 font-mono">
                 <div className="flex justify-between">
                   <span className="text-zinc-500">Email:</span>
                   <a href={`mailto:${selectedInquiry.email}`} className="text-white hover:underline">
@@ -262,7 +262,7 @@ export const AdminInquiriesTab: React.FC = () => {
                   </div>
                 )}
                 {selectedInquiry.seminarTitle && (
-                  <div className="flex justify-between pt-1 border-t border-zinc-800">
+                  <div className="flex justify-between pt-1">
                     <span className="text-zinc-500">Požadovaný seminár:</span>
                     <span className="text-zinc-200">{selectedInquiry.seminarTitle}</span>
                   </div>
@@ -271,13 +271,13 @@ export const AdminInquiriesTab: React.FC = () => {
 
               <div className="space-y-1">
                 <span className="text-zinc-400 font-medium block">Text správy:</span>
-                <div className="p-4 rounded-xl bg-zinc-900 text-zinc-200 leading-relaxed whitespace-pre-wrap">
+                <div className="p-4 rounded-2xl bg-zinc-900/60 text-zinc-200 leading-relaxed whitespace-pre-wrap">
                   {selectedInquiry.message || 'Záujem o termín kurzu.'}
                 </div>
               </div>
             </div>
 
-            <div className="pt-2 border-t border-zinc-850 flex items-center justify-between gap-3">
+            <div className="pt-2 flex items-center justify-between gap-3">
               <button
                 type="button"
                 onClick={() => handleStatusChange(selectedInquiry.id, selectedInquiry.status === 'resolved' ? 'read' : 'resolved')}
@@ -294,7 +294,7 @@ export const AdminInquiriesTab: React.FC = () => {
               <button
                 type="button"
                 onClick={() => setSelectedInquiry(null)}
-                className="px-4 py-2.5 rounded-xl bg-zinc-850 text-zinc-300 text-xs hover:bg-zinc-800"
+                className="px-4 py-2.5 rounded-xl bg-zinc-900 text-zinc-300 text-xs hover:bg-zinc-800 cursor-pointer"
               >
                 Zavrieť
               </button>

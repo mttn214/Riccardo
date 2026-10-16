@@ -66,11 +66,20 @@ export interface AuditLogEntry {
   user: string;
 }
 
+export interface StripeGatewayConfig {
+  mode: 'test' | 'live';
+  publishableKey: string;
+  secretKey: string;
+}
+
 export interface AdminSecuritySettings {
   sessionTimeoutMinutes: number;
   maxFailedAttempts: number;
   lockoutDurationMinutes: number;
   requireTwoFactorDemo: boolean;
+  stripeMode?: 'test' | 'live';
+  stripePublishableKey?: string;
+  stripeSecretKey?: string;
 }
 
 const STORAGE_KEYS = {
@@ -822,6 +831,32 @@ class AdminStore {
     localStorage.setItem(STORAGE_KEYS.SETTINGS, JSON.stringify(settings));
     this.addAuditLog('settings', 'Aktualizácia bezpečnostných nastavení', `Časový limit relácie: ${settings.sessionTimeoutMinutes} minút, Max pokusov: ${settings.maxFailedAttempts}.`, 'Admin');
     this.notify();
+  }
+
+  public getStripeConfig(): { mode: 'test' | 'live'; publishableKey: string; secretKey: string } {
+    const s = this.getSettings();
+    return {
+      mode: s.stripeMode || 'test',
+      publishableKey: s.stripePublishableKey || '',
+      secretKey: s.stripeSecretKey || ''
+    };
+  }
+
+  public saveStripeConfig(config: { mode: 'test' | 'live'; publishableKey: string; secretKey: string }) {
+    const s = this.getSettings();
+    const updated: AdminSecuritySettings = {
+      ...s,
+      stripeMode: config.mode,
+      stripePublishableKey: config.publishableKey.trim(),
+      stripeSecretKey: config.secretKey.trim()
+    };
+    this.saveSettings(updated);
+    this.addAuditLog(
+      'settings',
+      'Konfigurácia Stripe platobnej brány',
+      `Režim: ${config.mode.toUpperCase()}, Publishable Key: ${config.publishableKey ? config.publishableKey.slice(0, 12) + '...' : 'predvolený'}.`,
+      'Admin'
+    );
   }
 
   // Export full JSON backup

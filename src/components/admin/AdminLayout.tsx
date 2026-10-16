@@ -98,11 +98,11 @@ export const AdminLayout: React.FC = () => {
   return (
     <div className="min-h-screen bg-black text-zinc-100 flex font-sans selection:bg-white selection:text-black">
       {/* Sidebar for Desktop */}
-      <aside className="hidden lg:flex flex-col justify-between w-64 bg-zinc-950 border-r border-zinc-850 p-5 shrink-0 h-screen sticky top-0">
+      <aside className="hidden lg:flex flex-col justify-between w-64 bg-zinc-950/90 p-5 shrink-0 h-screen sticky top-0">
         <div className="space-y-6">
           {/* Logo & Brand */}
           <div className="space-y-1">
-            <div className="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full bg-zinc-900 border border-zinc-800 text-[10px] font-mono uppercase text-emerald-400">
+            <div className="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full bg-white/[0.06] text-[10px] font-mono uppercase text-emerald-400">
               <ShieldCheck className="w-3 h-3" />
               <span>Admin Portál</span>
             </div>
@@ -132,8 +132,8 @@ export const AdminLayout: React.FC = () => {
                   }}
                   className={`w-full py-2.5 px-3 rounded-xl text-xs font-medium flex items-center justify-between transition-all cursor-pointer ${
                     isActive
-                      ? 'bg-zinc-850 text-white font-semibold shadow-md ring-1 ring-white/10'
-                      : 'text-zinc-400 hover:text-white hover:bg-zinc-900'
+                      ? 'bg-white/10 text-white font-semibold shadow-sm'
+                      : 'text-zinc-400 hover:text-white hover:bg-white/[0.04]'
                   }`}
                 >
                   <div className="flex items-center gap-2.5">
@@ -142,7 +142,7 @@ export const AdminLayout: React.FC = () => {
                   </div>
 
                   {item.badge !== undefined && (
-                    <span className="text-[10px] font-mono px-2 py-0.5 rounded-full bg-purple-900/60 border border-purple-500/40 text-purple-300">
+                    <span className="text-[10px] font-mono px-2 py-0.5 rounded-full bg-purple-900/60 text-purple-300">
                       {item.badge}
                     </span>
                   )}
@@ -159,11 +159,11 @@ export const AdminLayout: React.FC = () => {
         </div>
 
         {/* Sidebar Footer */}
-        <div className="pt-4 border-t border-zinc-850/80 space-y-2">
+        <div className="pt-4 space-y-2">
           <Link
             to="/"
             target="_blank"
-            className="w-full py-2 px-3 rounded-xl bg-zinc-900 hover:bg-zinc-850 text-zinc-300 hover:text-white text-xs font-medium flex items-center justify-between transition-colors"
+            className="w-full py-2.5 px-3 rounded-xl bg-zinc-900/60 hover:bg-zinc-800 text-zinc-300 hover:text-white text-xs font-medium flex items-center justify-between transition-colors"
           >
             <span className="flex items-center gap-2">
               <ExternalLink className="w-3.5 h-3.5 text-zinc-400" />
@@ -175,7 +175,7 @@ export const AdminLayout: React.FC = () => {
           <button
             type="button"
             onClick={handleLogout}
-            className="w-full py-2 px-3 rounded-xl bg-zinc-900/50 hover:bg-red-950/40 border border-zinc-850 hover:border-red-500/30 text-zinc-400 hover:text-red-300 text-xs font-medium flex items-center gap-2 transition-colors cursor-pointer"
+            className="w-full py-2.5 px-3 rounded-xl bg-zinc-900/40 hover:bg-red-950/40 text-zinc-400 hover:text-red-300 text-xs font-medium flex items-center gap-2 transition-colors cursor-pointer"
           >
             <LogOut className="w-3.5 h-3.5" />
             <span>Odhlásiť sa</span>
@@ -186,13 +186,13 @@ export const AdminLayout: React.FC = () => {
       {/* Main Content Area */}
       <div className="flex-1 flex flex-col min-w-0">
         {/* Top Navbar */}
-        <header className="h-16 bg-zinc-950/90 border-b border-zinc-850 px-4 sm:px-8 flex items-center justify-between sticky top-0 z-30 backdrop-blur-xl">
+        <header className="h-16 bg-zinc-950/70 px-4 sm:px-8 flex items-center justify-between sticky top-0 z-30 backdrop-blur-xl">
           <div className="flex items-center gap-3">
             {/* Mobile menu trigger */}
             <button
               type="button"
               onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
-              className="lg:hidden p-2 rounded-xl bg-zinc-900 border border-zinc-850 text-zinc-300 hover:text-white"
+              className="lg:hidden p-2 rounded-xl bg-zinc-900 text-zinc-300 hover:text-white"
             >
               {isMobileMenuOpen ? <X className="w-4 h-4" /> : <Menu className="w-4 h-4" />}
             </button>
@@ -203,14 +203,14 @@ export const AdminLayout: React.FC = () => {
           </div>
 
           <div className="flex items-center gap-3">
-            <span className="text-[11px] font-mono text-emerald-400 bg-emerald-950/50 border border-emerald-500/30 px-2.5 py-1 rounded-full flex items-center gap-1.5">
+            <span className="text-[11px] font-mono text-emerald-400 bg-emerald-950/50 px-2.5 py-1 rounded-full flex items-center gap-1.5">
               <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse" />
               <span>Relácia aktívna</span>
             </span>
 
             <Link
               to="/"
-              className="hidden sm:inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-zinc-900 hover:bg-zinc-850 text-zinc-300 hover:text-white text-xs font-medium transition-colors"
+              className="hidden sm:inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-zinc-900 hover:bg-zinc-800 text-zinc-300 hover:text-white text-xs font-medium transition-colors"
             >
               <ExternalLink className="w-3.5 h-3.5" />
               <span>Verejný web</span>
@@ -219,7 +219,7 @@ export const AdminLayout: React.FC = () => {
             <button
               type="button"
               onClick={handleLogout}
-              className="p-2 rounded-xl bg-zinc-900 hover:bg-zinc-850 text-zinc-400 hover:text-white transition-colors cursor-pointer"
+              className="p-2 rounded-xl bg-zinc-900 hover:bg-zinc-800 text-zinc-400 hover:text-white transition-colors cursor-pointer"
               title="Odhlásiť sa"
             >
               <LogOut className="w-4 h-4" />
@@ -229,7 +229,7 @@ export const AdminLayout: React.FC = () => {
 
         {/* Mobile Dropdown Navigation */}
         {isMobileMenuOpen && (
-          <div className="lg:hidden bg-zinc-950 border-b border-zinc-850 p-4 space-y-2">
+          <div className="lg:hidden bg-zinc-950 p-4 space-y-2">
             {navItems.map((item) => {
               const Icon = item.icon;
               const isActive = activeTab === item.id;

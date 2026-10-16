@@ -40,8 +40,12 @@ export const SeminarDetailModal: React.FC<SeminarDetailModalProps> = ({
       >
         {/* Top Floating Close Button */}
         <button
-          onClick={onClose}
-          className="absolute top-4 right-4 z-30 p-2.5 rounded-full bg-black/80 hover:bg-black text-zinc-400 hover:text-white border border-zinc-700/80 backdrop-blur-xl transition-all shadow-2xl cursor-pointer"
+          type="button"
+          onClick={(e) => {
+            e.stopPropagation();
+            onClose();
+          }}
+          className="absolute top-3.5 right-3.5 z-50 p-2.5 rounded-full bg-black/90 hover:bg-black text-zinc-300 hover:text-white border border-zinc-700/80 backdrop-blur-xl transition-all shadow-2xl cursor-pointer"
           aria-label="Zavrieť"
         >
           <X className="w-4 h-4" />

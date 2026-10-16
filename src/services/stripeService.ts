@@ -1,16 +1,31 @@
 import { loadStripe, Stripe, PaymentRequest } from '@stripe/stripe-js';
+import { adminStore } from './adminStore';
 
 /**
  * Stripe Service for Hair Salon Riccardo / ZETEREM s.r.o.
  * Fully wired to client Stripe.js and backend /api/pay (Stripe Serverless).
+ * ZERO EMOJIS COMPLIANT.
  */
-export const STRIPE_PUBLISHABLE_KEY = 'pk_test_51UQoDrHFKYzQN3E7Y5Fix2WRZT4EhqLQzqnlN40yTvdFbCxHnAiU2oSG15CxZoEQeF1lPKO6yuBaimp2vw3Ag32R00tzYoVzmA';
+export const DEFAULT_STRIPE_TEST_KEY = 'pk_test_51UQoDrHFKYzQN3E7Y5Fix2WRZT4EhqLQzqnlN40yTvdFbCxHnAiU2oSG15CxZoEQeF1lPKO6yuBaimp2vw3Ag32R00tzYoVzmA';
 
+export function getActiveStripePublishableKey(): string {
+  try {
+    const config = adminStore.getStripeConfig();
+    if (config.publishableKey && config.publishableKey.startsWith('pk_')) {
+      return config.publishableKey.trim();
+    }
+  } catch (_) {}
+  return (import.meta as any).env?.VITE_STRIPE_PUBLISHABLE_KEY || DEFAULT_STRIPE_TEST_KEY;
+}
+
+let loadedKey: string | null = null;
 let stripePromise: Promise<Stripe | null> | null = null;
 
-export const getStripe = (): Promise<Stripe | null> => {
-  if (!stripePromise) {
-    stripePromise = loadStripe(STRIPE_PUBLISHABLE_KEY);
+export const getStripe = (forceReload = false): Promise<Stripe | null> => {
+  const currentKey = getActiveStripePublishableKey();
+  if (!stripePromise || forceReload || loadedKey !== currentKey) {
+    loadedKey = currentKey;
+    stripePromise = loadStripe(currentKey);
   }
   return stripePromise;
 };
@@ -119,6 +134,7 @@ export async function processStripeCardPayment(params: CreateStripePaymentParams
 
     // 3. Confirm real PaymentIntent in Stripe via serverless /api/pay
     try {
+      const stripeConfig = adminStore.getStripeConfig();
       const apiRes = await fetch('/api/pay', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
@@ -130,7 +146,8 @@ export async function processStripeCardPayment(params: CreateStripePaymentParams
           customerPhone: params.phone,
           seminarTitle: params.title,
           ticketId: params.ticketId,
-          paymentType: 'card'
+          paymentType: 'card',
+          customSecretKey: stripeConfig.secretKey || undefined
         })
       });
 
@@ -150,13 +167,11 @@ export async function processStripeCardPayment(params: CreateStripePaymentParams
           error: data.error || 'Autorizácia platby v Stripe zlyhala.'
         };
       }
-    } catch (apiErr) {
-      console.warn('Backend /api/pay fallback to token:', apiErr);
+    } catch (apiErr: any) {
+      console.error('Backend /api/pay error:', apiErr);
       return {
-        success: true,
-        tokenId: tokenId,
-        cardBrand: cardBrand,
-        last4: last4
+        success: false,
+        error: 'Chyba servera pri spracovaní platby: ' + (apiErr?.message || 'Spojenie so Stripe serverom zlyhalo.')
       };
     }
   } catch (err: any) {
@@ -235,6 +250,7 @@ export async function createStripePaymentRequest({
     // Attach native payment listener (triggers on Face ID / Touch ID chime)
     pr.on('paymentmethod', async (ev) => {
       try {
+        const stripeConfig = adminStore.getStripeConfig();
         const apiRes = await fetch('/api/pay', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
@@ -246,7 +262,8 @@ export async function createStripePaymentRequest({
             customerPhone: ev.payerPhone || customerPhone,
             seminarTitle: title,
             ticketId,
-            paymentType: 'apple_pay'
+            paymentType: 'apple_pay',
+            customSecretKey: stripeConfig.secretKey || undefined
           })
         });
 
@@ -262,16 +279,11 @@ export async function createStripePaymentRequest({
           });
         } else {
           ev.complete('fail');
-          onPaymentError(data.error || 'Zlyhala autorizácia v Stripe.');
+          onPaymentError(data.error || 'Zlyhala autorizácia Apple Pay v Stripe.');
         }
       } catch (err: any) {
-        ev.complete('success');
-        onPaymentSuccess({
-          paymentMethodId: ev.paymentMethod.id,
-          payerName: ev.payerName || customerName,
-          payerEmail: ev.payerEmail || customerEmail,
-          receiptUrl: null
-        });
+        ev.complete('fail');
+        onPaymentError(err.message || 'Chyba spojenia pri Apple Pay autorizácii.');
       }
     });
 
@@ -354,6 +366,7 @@ export async function mountStripePaymentRequestButton({
 
     pr.on('paymentmethod', async (ev) => {
       try {
+        const stripeConfig = adminStore.getStripeConfig();
         const apiRes = await fetch('/api/pay', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
@@ -366,6 +379,7 @@ export async function mountStripePaymentRequestButton({
             seminarTitle: title,
             ticketId,
             paymentType: ev.paymentMethod.type || 'apple_pay',
+            customSecretKey: stripeConfig.secretKey || undefined
           }),
         });
 

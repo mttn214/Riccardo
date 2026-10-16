@@ -202,20 +202,37 @@ export async function generateLuxuryTicketPDF(data: TicketData): Promise<void> {
   ctx.letterSpacing = '1.5px';
   ctx.fillText('KATEGÓRIA & BALÍČEK', 880, colY);
 
-  ctx.fillStyle = '#c5a059';
-  ctx.font = 'bold 22px -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif';
-  ctx.fillText(data.tierName, 880, colY + 32);
+  // Split tierName if it contains subtitle in parens so it never overlaps the stub line
+  if (data.tierName.includes('(')) {
+    const [tierTitle, ...rest] = data.tierName.split('(');
+    const subText = `(${rest.join('(')}`;
+    ctx.fillStyle = '#c5a059';
+    ctx.font = 'bold 20px -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif';
+    ctx.fillText(tierTitle.trim(), 880, colY + 28, 360);
 
-  ctx.fillStyle = '#ffffff';
-  ctx.font = '600 18px -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif';
-  ctx.fillText(`Uhradené: ${data.amountPaidEUR} €`, 880, colY + 60);
+    ctx.fillStyle = '#d4af37';
+    ctx.font = '500 13px -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif';
+    ctx.fillText(subText.trim(), 880, colY + 48, 360);
+
+    ctx.fillStyle = '#ffffff';
+    ctx.font = '600 16px -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif';
+    ctx.fillText(`Uhradené: ${data.amountPaidEUR} €`, 880, colY + 74, 360);
+  } else {
+    ctx.fillStyle = '#c5a059';
+    ctx.font = 'bold 21px -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif';
+    ctx.fillText(data.tierName, 880, colY + 32, 360);
+
+    ctx.fillStyle = '#ffffff';
+    ctx.font = '600 18px -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif';
+    ctx.fillText(`Uhradené: ${data.amountPaidEUR} €`, 880, colY + 62, 360);
+  }
 
   // Lower Divider
   ctx.strokeStyle = 'rgba(255, 255, 255, 0.1)';
   ctx.lineWidth = 1;
   ctx.beginPath();
-  ctx.moveTo(75, 425);
-  ctx.lineTo(1220, 425);
+  ctx.moveTo(75, 435);
+  ctx.lineTo(1220, 435);
   ctx.stroke();
 
   // 5. Účastník Information Strip

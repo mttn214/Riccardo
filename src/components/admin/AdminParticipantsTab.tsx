@@ -215,8 +215,8 @@ export const AdminParticipantsTab: React.FC<AdminParticipantsTabProps> = ({
         </div>
       </div>
 
-      {/* Filter and Search Bar */}
-      <div className="grid grid-cols-1 sm:grid-cols-12 gap-3 bg-zinc-950 p-4 rounded-2xl border border-zinc-850">
+      {/* Filter and Search Bar - Borderless & Seamless */}
+      <div className="grid grid-cols-1 sm:grid-cols-12 gap-3 bg-zinc-900/40 p-4 rounded-3xl">
         {/* Seminar Select */}
         <div className="sm:col-span-5 relative">
           <label className="text-[10px] font-mono uppercase text-zinc-500 block mb-1">
@@ -226,7 +226,7 @@ export const AdminParticipantsTab: React.FC<AdminParticipantsTabProps> = ({
             <select
               value={selectedSeminarId}
               onChange={(e) => setSelectedSeminarId(e.target.value)}
-              className="w-full bg-zinc-900 border border-zinc-800 text-zinc-200 text-xs rounded-xl p-2.5 pr-8 focus:outline-none focus:border-zinc-500 appearance-none cursor-pointer font-medium"
+              className="w-full bg-zinc-950/80 text-zinc-200 text-xs rounded-xl p-2.5 pr-8 focus:outline-none appearance-none cursor-pointer font-medium border-0"
             >
               <option value="all">Všetky semináre ({participants.length} účastníkov)</option>
               {seminars.map((s) => {
@@ -250,7 +250,7 @@ export const AdminParticipantsTab: React.FC<AdminParticipantsTabProps> = ({
           <select
             value={statusFilter}
             onChange={(e) => setStatusFilter(e.target.value)}
-            className="w-full bg-zinc-900 border border-zinc-800 text-zinc-200 text-xs rounded-xl p-2.5 focus:outline-none focus:border-zinc-500 cursor-pointer"
+            className="w-full bg-zinc-950/80 text-zinc-200 text-xs rounded-xl p-2.5 focus:outline-none cursor-pointer border-0"
           >
             <option value="all">Všetky stavy ({filteredParticipants.length})</option>
             <option value="full">Plne uhradené</option>
@@ -274,7 +274,7 @@ export const AdminParticipantsTab: React.FC<AdminParticipantsTabProps> = ({
               placeholder="Meno, email, salón, kód..."
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
-              className="w-full bg-zinc-900 border border-zinc-800 focus:border-zinc-500 text-white pl-9 pr-3 py-2.5 rounded-xl text-xs focus:outline-none transition-colors"
+              className="w-full bg-zinc-950/80 text-white pl-9 pr-3 py-2.5 rounded-xl text-xs focus:ring-1 focus:ring-white/20 outline-none transition-colors border-0"
             />
             {searchQuery && (
               <button
@@ -290,7 +290,7 @@ export const AdminParticipantsTab: React.FC<AdminParticipantsTabProps> = ({
       </div>
 
       {/* Summary Metrics Bar for Selected Seminar / Filter */}
-      <div className="p-4 rounded-2xl bg-zinc-900/40 border border-zinc-850 flex flex-wrap items-center justify-between gap-4 text-xs font-mono">
+      <div className="p-4 rounded-3xl bg-zinc-900/40 flex flex-wrap items-center justify-between gap-4 text-xs font-mono">
         <div className="flex items-center gap-6 flex-wrap">
           <div>
             <span className="text-zinc-500 block text-[10px]">Vybraných:</span>
@@ -320,10 +320,10 @@ export const AdminParticipantsTab: React.FC<AdminParticipantsTabProps> = ({
       </div>
 
       {/* Participants Table */}
-      <div className="rounded-3xl bg-zinc-950 border border-zinc-850 overflow-hidden shadow-2xl">
+      <div className="rounded-3xl bg-zinc-900/40 overflow-hidden shadow-2xl">
         <div className="overflow-x-auto">
           <table className="w-full text-left text-xs">
-            <thead className="bg-zinc-900/80 text-zinc-400 font-mono uppercase text-[10px] tracking-wider border-b border-zinc-800">
+            <thead className="bg-zinc-950/70 text-zinc-400 font-mono uppercase text-[10px] tracking-wider">
               <tr>
                 <th className="py-3.5 px-4">Účasť</th>
                 <th className="py-3.5 px-4">Kód / Dátum</th>
@@ -336,7 +336,7 @@ export const AdminParticipantsTab: React.FC<AdminParticipantsTabProps> = ({
               </tr>
             </thead>
 
-            <tbody className="divide-y divide-zinc-850/60">
+            <tbody className="divide-y divide-white/[0.03]">
               {filteredParticipants.length === 0 ? (
                 <tr>
                   <td colSpan={8} className="py-12 text-center text-zinc-500 font-mono">
@@ -502,7 +502,7 @@ export const AdminParticipantsTab: React.FC<AdminParticipantsTabProps> = ({
             {/* Grid of Details */}
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 text-xs">
               {/* Contact Information */}
-              <div className="p-4 rounded-2xl bg-zinc-900/60 border border-zinc-850 space-y-2.5">
+              <div className="p-4 rounded-2xl bg-zinc-900/60 space-y-2.5">
                 <span className="text-[10px] font-mono uppercase text-zinc-500 block font-semibold">
                   Kontaktné údaje
                 </span>
@@ -534,7 +534,7 @@ export const AdminParticipantsTab: React.FC<AdminParticipantsTabProps> = ({
               </div>
 
               {/* Payment & Billing */}
-              <div className="p-4 rounded-2xl bg-zinc-900/60 border border-zinc-850 space-y-2.5">
+              <div className="p-4 rounded-2xl bg-zinc-900/60 space-y-2.5">
                 <span className="text-[10px] font-mono uppercase text-zinc-500 block font-semibold">
                   Platba & Finančné vysporiadanie
                 </span>
@@ -556,7 +556,7 @@ export const AdminParticipantsTab: React.FC<AdminParticipantsTabProps> = ({
                     <span className="text-zinc-200">{selectedParticipant.paymentMethod}</span>
                   </div>
                   {selectedParticipant.stripePaymentIntentId && (
-                    <div className="text-[10px] text-zinc-500 truncate pt-1 border-t border-zinc-800">
+                    <div className="text-[10px] text-zinc-500 truncate pt-1">
                       Stripe ID: {selectedParticipant.stripePaymentIntentId}
                     </div>
                   )}
@@ -566,7 +566,7 @@ export const AdminParticipantsTab: React.FC<AdminParticipantsTabProps> = ({
 
             {/* Invoicing / Company details if applicable */}
             {selectedParticipant.companyName && (
-              <div className="p-4 rounded-2xl bg-zinc-900/60 border border-zinc-850 space-y-2 text-xs">
+              <div className="p-4 rounded-2xl bg-zinc-900/60 space-y-2 text-xs">
                 <span className="text-[10px] font-mono uppercase text-zinc-500 block font-semibold">
                   Fakturačné údaje firmy
                 </span>
@@ -594,7 +594,7 @@ export const AdminParticipantsTab: React.FC<AdminParticipantsTabProps> = ({
 
             {/* Customer Notes */}
             {selectedParticipant.notes && (
-              <div className="p-3.5 rounded-xl bg-zinc-900/40 border border-zinc-850 text-xs">
+              <div className="p-3.5 rounded-2xl bg-zinc-900/40 text-xs">
                 <span className="text-[10px] font-mono uppercase text-zinc-500 block mb-1">
                   Poznámka od účastníka:
                 </span>
@@ -603,7 +603,7 @@ export const AdminParticipantsTab: React.FC<AdminParticipantsTabProps> = ({
             )}
 
             {/* Internal Admin Notes */}
-            <div className="p-4 rounded-2xl bg-zinc-900/80 border border-zinc-800 space-y-2 text-xs">
+            <div className="p-4 rounded-2xl bg-zinc-900/60 space-y-2 text-xs">
               <div className="flex items-center justify-between">
                 <span className="text-[10px] font-mono uppercase text-zinc-400 font-semibold">
                   Interné poznámky tímu Riccardo (Neverejné)
@@ -626,7 +626,7 @@ export const AdminParticipantsTab: React.FC<AdminParticipantsTabProps> = ({
                     value={editingNotes}
                     onChange={(e) => setEditingNotes(e.target.value)}
                     placeholder="Sem zadajte internú poznámku (napr. alergie, špeciálne požiadavky na modelku, certifikát)..."
-                    className="w-full bg-zinc-950 border border-zinc-700 text-white p-2.5 rounded-xl text-xs focus:outline-none"
+                    className="w-full bg-zinc-950 text-white p-2.5 rounded-xl text-xs focus:outline-none border-0"
                   />
                   <div className="flex justify-end gap-2">
                     <button

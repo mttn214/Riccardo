@@ -26,30 +26,31 @@ export default async function handler(req, res) {
     return res.status(405).json({ success: false, error: 'Metóda nepovolená' });
   }
 
-  const STRIPE_SECRET = process.env.STRIPE_SECRET_KEY;
+  const {
+    amountEUR,
+    tokenId,
+    paymentMethodId,
+    customerName,
+    customerEmail,
+    customerPhone,
+    seminarTitle,
+    ticketId,
+    paymentType,
+    customSecretKey
+  } = req.body || {};
+
+  const STRIPE_SECRET = customSecretKey?.trim() || process.env.STRIPE_SECRET_KEY;
   if (!STRIPE_SECRET) {
     return res.status(200).json({
       success: false,
       needsConfig: true,
-      error: 'STRIPE_SECRET_KEY zatiaľ nie je nastavený vo Vercel Environment Variables.'
+      error: 'STRIPE_SECRET_KEY zatiaľ nie je nastavený vo Vercel Environment Variables ani v administrácii.'
     });
   }
 
   const stripe = new Stripe(STRIPE_SECRET);
 
   try {
-    const {
-      amountEUR,
-      tokenId,
-      paymentMethodId,
-      customerName,
-      customerEmail,
-      customerPhone,
-      seminarTitle,
-      ticketId,
-      paymentType
-    } = req.body || {};
-
     if (!amountEUR || amountEUR <= 0) {
       return res.status(400).json({ success: false, error: 'Neplatná suma platby.' });
     }
@@ -117,6 +118,13 @@ export default async function handler(req, res) {
           seminar: seminarTitle || 'Neuvedené',
           vstupenka_kod: ticketId || 'Neuvedené'
         }
+      });
+    }
+
+    if (paymentIntent.status !== 'succeeded' && paymentIntent.status !== 'requires_action') {
+      return res.status(400).json({
+        success: false,
+        error: `Platba nebola úspešne autorizovaná (stav: ${paymentIntent.status}). Skontrolujte zostatok na karte alebo platobné údaje.`
       });
     }
 

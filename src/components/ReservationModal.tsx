@@ -303,6 +303,7 @@ export const ReservationModal: React.FC<ReservationModalProps> = ({
           },
           requestPayerName: true,
           requestPayerEmail: true,
+          requestPayerPhone: true,
         });
 
         const res = await pr.canMakePayment();
@@ -312,38 +313,57 @@ export const ReservationModal: React.FC<ReservationModalProps> = ({
         setIsApplePayReady(isReady);
         setCanApplePay(isReady);
         setIsCheckingApplePay(false);
+        setStripePaymentRequest(pr);
 
-        // If Apple Pay is selected and container is mounted, mount native Stripe button
-        if (isReady && paymentMethod === 'apple_pay' && applePayMountRef.current) {
-          const mounted = await mountStripePaymentRequestButton({
-            container: applePayMountRef.current,
-            amountEUR: amountToPayNow,
-            title: selectedSeminar.title,
-            customerName: formData.fullName,
-            customerEmail: formData.email,
-            customerPhone: formData.phone,
-            ticketId: confirmationCode,
-            onPaymentSuccess: async ({ paymentMethodId, paymentIntentId, receiptUrl }) => {
+        // Attach payment listener on PaymentRequest
+        pr.on('paymentmethod', async (ev) => {
+          setIsProcessingPayment(true);
+          setPaymentStatusText('Autorizujem platbu cez Apple Pay v systéme Stripe...');
+          try {
+            const stripeConfig = adminStore.getStripeConfig();
+            const apiRes = await fetch('/api/pay', {
+              method: 'POST',
+              headers: { 'Content-Type': 'application/json' },
+              body: JSON.stringify({
+                amountEUR: amountToPayNow,
+                paymentMethodId: ev.paymentMethod.id,
+                customerName: ev.payerName || formData.fullName,
+                customerEmail: ev.payerEmail || formData.email,
+                customerPhone: ev.payerPhone || formData.phone,
+                seminarTitle: selectedSeminar.title,
+                ticketId: confirmationCode,
+                paymentType: 'apple_pay',
+                customSecretKey: stripeConfig.secretKey || undefined
+              })
+            });
+
+            const data = await apiRes.json();
+            if (data.success) {
+              ev.complete('success');
               await completeReservation({
                 methodTitle: 'Apple Pay (Biometrická autorizácia)',
                 paymentStatus: 'Autorizované a uhradené cez Apple Pay',
-                stripeTokenId: paymentMethodId,
-                stripePaymentIntentId: paymentIntentId,
-                receiptUrl,
+                stripeTokenId: ev.paymentMethod.id,
+                stripePaymentIntentId: data.paymentIntentId,
+                receiptUrl: data.receiptUrl || null,
               });
-            },
-            onPaymentError: (err) => {
+            } else {
+              ev.complete('fail');
               setIsProcessingPayment(false);
-              setStripeError(err);
+              setStripeError(data.error || 'Platba cez Apple Pay bola zamietnutá bankou alebo Stripe.');
             }
-          });
-
-          if (isMounted) {
-            cleanupButton = mounted.destroy;
-          } else {
-            mounted.destroy();
+          } catch (err: any) {
+            ev.complete('fail');
+            setIsProcessingPayment(false);
+            setStripeError('Nastala chyba pri spracovaní Apple Pay: ' + (err?.message || 'Chyba siete.'));
           }
-        }
+        });
+
+        pr.on('cancel', () => {
+          setIsProcessingPayment(false);
+          setPaymentStatusText('');
+        });
+
       } catch (err) {
         console.warn('Apple Pay check error:', err);
         if (isMounted) {
@@ -460,47 +480,21 @@ export const ReservationModal: React.FC<ReservationModalProps> = ({
 
   // Handle Apple Pay payment execution
   const handleProcessApplePayPayment = async () => {
-    setIsProcessingPayment(true);
-    setPaymentStatusText('Biometrická autorizácia cez Apple Pay (Touch ID / Face ID)...');
     setStripeError('');
 
+    if (!stripePaymentRequest) {
+      setStripeError('Apple Pay nie je na tomto zariadení alebo prehliadači inicializované. Skontrolujte nastavenie kariet v Apple Wallet (Safari na iOS/macOS) alebo zvoľte platbu platobnou kartou.');
+      return;
+    }
+
+    setIsProcessingPayment(true);
+    setPaymentStatusText('Otváram autorizačný dialóg Apple Pay (Face ID / Touch ID)...');
+
     try {
-      if (stripePaymentRequest && isApplePayReady) {
-        stripePaymentRequest.show();
-        return;
-      }
-
-      const apiRes = await fetch('/api/pay', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          amountEUR: amountToPayNow,
-          tokenId: 'tok_visa',
-          customerName: formData.fullName,
-          customerEmail: formData.email,
-          customerPhone: formData.phone,
-          seminarTitle: selectedSeminar.title,
-          paymentType: 'apple_pay'
-        })
-      });
-
-      const data = await apiRes.json();
-      await new Promise((r) => setTimeout(r, 900));
-
-      await completeReservation({
-        methodTitle: 'Apple Pay (Biometrické overenie)',
-        paymentStatus: 'Autorizované a uhradené cez Apple Pay',
-        stripeTokenId: 'apple_pay_verified',
-        stripePaymentIntentId: data.paymentIntentId || 'pi_apple_pay_ok',
-        receiptUrl: data.receiptUrl || null,
-      });
+      stripePaymentRequest.show();
     } catch (err: any) {
-      await completeReservation({
-        methodTitle: 'Apple Pay (Biometrické overenie)',
-        paymentStatus: 'Autorizované a uhradené cez Apple Pay',
-      });
-    } finally {
       setIsProcessingPayment(false);
+      setStripeError('Nepodarilo sa spustiť Apple Pay dialóg: ' + (err?.message || 'Skontrolujte Safari nastavenia.'));
     }
   };
 
@@ -563,7 +557,6 @@ export const ReservationModal: React.FC<ReservationModalProps> = ({
     setPaymentMethod('card');
     setPaymentOption('full');
     setStripeError('');
-    setIsTestModeCardNotice(false);
     setTermsAccepted(false);
     setFormErrors({});
     onClose();
@@ -597,8 +590,12 @@ export const ReservationModal: React.FC<ReservationModalProps> = ({
           </div>
 
           <button
-            onClick={resetAndClose}
-            className="p-2 rounded-full bg-zinc-900 hover:bg-zinc-850 border border-zinc-800 text-zinc-400 hover:text-white transition-colors"
+            type="button"
+            onClick={(e) => {
+              e.stopPropagation();
+              resetAndClose();
+            }}
+            className="p-2 rounded-full bg-zinc-900 hover:bg-zinc-800 border border-zinc-800 text-zinc-400 hover:text-white transition-colors cursor-pointer"
             aria-label="Zavrieť"
           >
             <X className="w-4 h-4" />
@@ -815,9 +812,9 @@ export const ReservationModal: React.FC<ReservationModalProps> = ({
                       setFormData({ ...formData, fullName: e.target.value });
                       if (formErrors.fullName) setFormErrors({ ...formErrors, fullName: '' });
                     }}
-                    className={`w-full bg-zinc-900 border ${
-                      formErrors.fullName ? 'border-red-500 focus:border-red-500' : 'border-zinc-800 focus:border-zinc-500'
-                    } text-white p-3 rounded-xl text-sm focus:outline-none`}
+                    className={`w-full bg-zinc-950/80 ${
+                      formErrors.fullName ? 'ring-1 ring-red-500' : 'focus:ring-1 focus:ring-white/20'
+                    } text-white p-3 rounded-xl text-sm focus:outline-none border-0`}
                   />
                   {formErrors.fullName && (
                     <span className="text-[11px] text-red-400 mt-1 block">{formErrors.fullName}</span>
@@ -837,9 +834,9 @@ export const ReservationModal: React.FC<ReservationModalProps> = ({
                       setFormData({ ...formData, email: e.target.value });
                       if (formErrors.email) setFormErrors({ ...formErrors, email: '' });
                     }}
-                    className={`w-full bg-zinc-900 border ${
-                      formErrors.email ? 'border-red-500 focus:border-red-500' : 'border-zinc-800 focus:border-zinc-500'
-                    } text-white p-3 rounded-xl text-sm focus:outline-none`}
+                    className={`w-full bg-zinc-950/80 ${
+                      formErrors.email ? 'ring-1 ring-red-500' : 'focus:ring-1 focus:ring-white/20'
+                    } text-white p-3 rounded-xl text-sm focus:outline-none border-0`}
                   />
                   {formErrors.email && (
                     <span className="text-[11px] text-red-400 mt-1 block">{formErrors.email}</span>
@@ -859,9 +856,9 @@ export const ReservationModal: React.FC<ReservationModalProps> = ({
                       setFormData({ ...formData, phone: e.target.value });
                       if (formErrors.phone) setFormErrors({ ...formErrors, phone: '' });
                     }}
-                    className={`w-full bg-zinc-900 border ${
-                      formErrors.phone ? 'border-red-500 focus:border-red-500' : 'border-zinc-800 focus:border-zinc-500'
-                    } text-white p-3 rounded-xl text-sm focus:outline-none`}
+                    className={`w-full bg-zinc-950/80 ${
+                      formErrors.phone ? 'ring-1 ring-red-500' : 'focus:ring-1 focus:ring-white/20'
+                    } text-white p-3 rounded-xl text-sm focus:outline-none border-0`}
                   />
                   {formErrors.phone && (
                     <span className="text-[11px] text-red-400 mt-1 block">{formErrors.phone}</span>
@@ -877,7 +874,7 @@ export const ReservationModal: React.FC<ReservationModalProps> = ({
                     placeholder="napr. Hair Studio Elegance"
                     value={formData.salonName}
                     onChange={(e) => setFormData({ ...formData, salonName: e.target.value })}
-                    className="w-full bg-zinc-900 border border-zinc-800 text-white p-3 rounded-xl text-sm focus:outline-none focus:border-zinc-500"
+                    className="w-full bg-zinc-950/80 text-white p-3 rounded-xl text-sm focus:outline-none focus:ring-1 focus:ring-white/20 border-0"
                   />
                 </div>
 
@@ -890,7 +887,7 @@ export const ReservationModal: React.FC<ReservationModalProps> = ({
                     placeholder="napr. Bratislava, Žilina, Praha"
                     value={formData.city}
                     onChange={(e) => setFormData({ ...formData, city: e.target.value })}
-                    className="w-full bg-zinc-900 border border-zinc-800 text-white p-3 rounded-xl text-sm focus:outline-none focus:border-zinc-500"
+                    className="w-full bg-zinc-950/80 text-white p-3 rounded-xl text-sm focus:outline-none focus:ring-1 focus:ring-white/20 border-0"
                   />
                 </div>
               </div>
@@ -925,7 +922,7 @@ export const ReservationModal: React.FC<ReservationModalProps> = ({
                 </div>
 
                 {formData.billingType === 'salon' && (
-                  <div className="p-4 rounded-2xl bg-zinc-900/60 border border-zinc-850 space-y-3 animate-fadeIn">
+                  <div className="p-4 rounded-3xl bg-zinc-900/40 space-y-3 animate-fadeIn">
                     <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
                       <div>
                         <label className="text-[11px] text-zinc-400 block mb-1">Názov spoločnosti / Živnosti</label>
@@ -934,7 +931,7 @@ export const ReservationModal: React.FC<ReservationModalProps> = ({
                           placeholder="Firma s.r.o. / Meno a priezvisko"
                           value={formData.companyName}
                           onChange={(e) => setFormData({ ...formData, companyName: e.target.value })}
-                          className="w-full bg-zinc-950 border border-zinc-800 text-white p-2.5 rounded-xl text-xs"
+                          className="w-full bg-zinc-950/80 text-white p-2.5 rounded-xl text-xs border-0 focus:ring-1 focus:ring-white/20 outline-none"
                         />
                       </div>
                       <div>
@@ -944,7 +941,7 @@ export const ReservationModal: React.FC<ReservationModalProps> = ({
                           placeholder="Hlavná 12, 811 01 Bratislava"
                           value={formData.billingAddress}
                           onChange={(e) => setFormData({ ...formData, billingAddress: e.target.value })}
-                          className="w-full bg-zinc-950 border border-zinc-800 text-white p-2.5 rounded-xl text-xs"
+                          className="w-full bg-zinc-950/80 text-white p-2.5 rounded-xl text-xs border-0 focus:ring-1 focus:ring-white/20 outline-none"
                         />
                       </div>
                     </div>
@@ -956,7 +953,7 @@ export const ReservationModal: React.FC<ReservationModalProps> = ({
                           placeholder="12345678"
                           value={formData.ico}
                           onChange={(e) => setFormData({ ...formData, ico: e.target.value })}
-                          className="w-full bg-zinc-950 border border-zinc-800 text-white p-2.5 rounded-xl text-xs font-mono"
+                          className="w-full bg-zinc-950/80 text-white p-2.5 rounded-xl text-xs font-mono border-0 focus:ring-1 focus:ring-white/20 outline-none"
                         />
                       </div>
                       <div>
@@ -966,7 +963,7 @@ export const ReservationModal: React.FC<ReservationModalProps> = ({
                           placeholder="SK20..."
                           value={formData.dic}
                           onChange={(e) => setFormData({ ...formData, dic: e.target.value })}
-                          className="w-full bg-zinc-950 border border-zinc-800 text-white p-2.5 rounded-xl text-xs font-mono"
+                          className="w-full bg-zinc-950/80 text-white p-2.5 rounded-xl text-xs font-mono border-0 focus:ring-1 focus:ring-white/20 outline-none"
                         />
                       </div>
                     </div>
@@ -1194,7 +1191,7 @@ export const ReservationModal: React.FC<ReservationModalProps> = ({
 
               {/* 1. Platobná karta Panel */}
               {paymentMethod === 'card' && (
-                <div className="p-4 rounded-2xl bg-zinc-900/50 border border-zinc-850 space-y-3 animate-fadeIn">
+                <div className="p-5 rounded-3xl bg-zinc-900/40 space-y-3 animate-fadeIn">
                   <div>
                     <label className="text-[11px] font-medium text-zinc-400 block mb-1">
                       Číslo platobnej karty *
@@ -1211,7 +1208,7 @@ export const ReservationModal: React.FC<ReservationModalProps> = ({
                         value={cardNumber}
                         onChange={handleCardNumberChange}
                         maxLength={19}
-                        className="w-full bg-zinc-950 border border-zinc-800 focus:border-zinc-500 text-white pl-9 pr-24 py-2.5 rounded-xl text-xs sm:text-sm font-mono tracking-wider focus:outline-none"
+                        className="w-full bg-zinc-950 text-white pl-9 pr-24 py-3 rounded-xl text-xs sm:text-sm font-mono tracking-wider focus:outline-none focus:ring-1 focus:ring-white/20 border-0"
                       />
                       <div className="absolute inset-y-0 right-0 pr-3 flex items-center pointer-events-none">
                         <CreditCardBrandIcons />
@@ -1232,7 +1229,7 @@ export const ReservationModal: React.FC<ReservationModalProps> = ({
                         value={cardExpiry}
                         onChange={handleCardExpiryChange}
                         maxLength={5}
-                        className="w-full bg-zinc-950 border border-zinc-800 focus:border-zinc-500 text-white p-2.5 rounded-xl text-xs sm:text-sm font-mono text-center focus:outline-none"
+                        className="w-full bg-zinc-950 text-white p-3 rounded-xl text-xs sm:text-sm font-mono text-center focus:outline-none focus:ring-1 focus:ring-white/20 border-0"
                       />
                     </div>
                     <div>
@@ -1250,7 +1247,7 @@ export const ReservationModal: React.FC<ReservationModalProps> = ({
                           if (stripeError) setStripeError('');
                         }}
                         maxLength={4}
-                        className="w-full bg-zinc-950 border border-zinc-800 focus:border-zinc-500 text-white p-2.5 rounded-xl text-xs sm:text-sm font-mono text-center tracking-widest focus:outline-none"
+                        className="w-full bg-zinc-950 text-white p-3 rounded-xl text-xs sm:text-sm font-mono text-center tracking-widest focus:outline-none focus:ring-1 focus:ring-white/20 border-0"
                       />
                     </div>
                   </div>
@@ -1289,7 +1286,7 @@ export const ReservationModal: React.FC<ReservationModalProps> = ({
 
               {/* 2. Apple Pay Panel */}
               {paymentMethod === 'apple_pay' && (
-                <div className="p-6 rounded-2xl bg-zinc-900/50 border border-zinc-850 flex flex-col items-center justify-center text-center space-y-4 animate-fadeIn">
+                <div className="p-6 rounded-3xl bg-zinc-900/40 flex flex-col items-center justify-center text-center space-y-4 animate-fadeIn">
                   <div className="space-y-1">
                     <h4 className="text-base font-semibold text-white">Apple Pay</h4>
                     <p className="text-xs text-zinc-400 max-w-sm leading-relaxed">
@@ -1302,7 +1299,7 @@ export const ReservationModal: React.FC<ReservationModalProps> = ({
                     type="button"
                     onClick={handleProcessApplePayPayment}
                     disabled={isProcessingPayment}
-                    className="w-full max-w-sm py-3.5 px-6 rounded-2xl bg-black border border-white/20 hover:border-white text-white font-semibold text-sm transition-all active:scale-[0.99] shadow-2xl flex items-center justify-center gap-2 cursor-pointer disabled:opacity-50"
+                    className="w-full max-w-sm py-3.5 px-6 rounded-2xl bg-black text-white font-semibold text-sm transition-all active:scale-[0.99] shadow-2xl flex items-center justify-center gap-2 cursor-pointer disabled:opacity-50 ring-1 ring-white/15 hover:ring-white/40"
                     style={{ minHeight: '48px' }}
                   >
                     {isProcessingPayment ? (
@@ -1328,8 +1325,8 @@ export const ReservationModal: React.FC<ReservationModalProps> = ({
 
               {/* 3. Bank Transfer Panel */}
               {paymentMethod === 'transfer' && (
-                <div className="p-4 rounded-2xl bg-zinc-900/50 border border-zinc-850 space-y-3 animate-fadeIn">
-                  <div className="p-3.5 rounded-xl bg-zinc-950 border border-zinc-800 space-y-2 text-xs">
+                <div className="p-5 rounded-3xl bg-zinc-900/40 space-y-3 animate-fadeIn">
+                  <div className="p-4 rounded-2xl bg-zinc-950/60 space-y-2 text-xs">
                     <div className="flex justify-between items-center">
                       <span className="text-zinc-500">Príjemca:</span>
                       <strong className="text-white">{COMPANY_DETAILS.legalName}</strong>

@@ -55,8 +55,8 @@ export const AdminCoursesTab: React.FC<AdminCoursesTabProps> = ({
 
   return (
     <div className="space-y-6 animate-fadeIn">
-      {/* Header and Filter */}
-      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 pb-2 border-b border-zinc-850">
+      {/* Header and Filter - Borderless & Seamless */}
+      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 pb-1">
         <div>
           <h1 className="text-2xl font-semibold text-white tracking-tight">
             Správa seminárov & kurzov
@@ -72,7 +72,7 @@ export const AdminCoursesTab: React.FC<AdminCoursesTabProps> = ({
             <select
               value={selectedCity}
               onChange={(e) => setSelectedCity(e.target.value)}
-              className="bg-zinc-900 border border-zinc-800 text-zinc-200 text-xs rounded-xl px-3 py-2.5 pr-8 focus:outline-none focus:border-zinc-500 appearance-none cursor-pointer"
+              className="bg-zinc-900 text-zinc-200 text-xs rounded-xl px-3 py-2.5 pr-8 focus:outline-none appearance-none cursor-pointer border-0"
             >
               <option value="all">Všetky mestá ({seminars.length})</option>
               {cities.map((c) => (
@@ -95,7 +95,7 @@ export const AdminCoursesTab: React.FC<AdminCoursesTabProps> = ({
         </div>
       </div>
 
-      {/* Courses Grid */}
+      {/* Courses Grid - Seamless Cards */}
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5">
         {filteredSeminars.map((seminar) => {
           const semParticipants = participants.filter((p) => p.seminarId === seminar.id);
@@ -106,7 +106,7 @@ export const AdminCoursesTab: React.FC<AdminCoursesTabProps> = ({
           return (
             <div
               key={seminar.id}
-              className="rounded-3xl bg-zinc-950 border border-zinc-850 hover:border-zinc-700 transition-all flex flex-col justify-between overflow-hidden group shadow-xl"
+              className="rounded-3xl bg-zinc-900/40 hover:bg-zinc-900/60 transition-all flex flex-col justify-between overflow-hidden group shadow-xl"
             >
               {/* Image & Badges */}
               <div className="relative h-44 overflow-hidden bg-zinc-900">
@@ -119,17 +119,17 @@ export const AdminCoursesTab: React.FC<AdminCoursesTabProps> = ({
 
                 {/* Top Badges */}
                 <div className="absolute top-3 left-3 right-3 flex items-center justify-between">
-                  <span className="text-[10px] font-mono uppercase px-2.5 py-1 rounded-full bg-zinc-900/90 border border-zinc-700/80 text-zinc-200 backdrop-blur-md">
+                  <span className="text-[10px] font-mono uppercase px-2.5 py-1 rounded-full bg-zinc-900/90 text-zinc-200 backdrop-blur-md">
                     {seminar.category}
                   </span>
 
                   <span
                     className={`text-[10px] font-mono uppercase px-2.5 py-1 rounded-full backdrop-blur-md ${
                       isSoldOut
-                        ? 'bg-red-500/20 text-red-300 border border-red-500/30'
+                        ? 'bg-red-500/20 text-red-300'
                         : seminar.availableSeats <= 2
-                        ? 'bg-amber-500/20 text-amber-300 border border-amber-500/30'
-                        : 'bg-emerald-500/20 text-emerald-300 border border-emerald-500/30'
+                        ? 'bg-amber-500/20 text-amber-300'
+                        : 'bg-emerald-500/20 text-emerald-300'
                     }`}
                   >
                     {isSoldOut ? 'Vypredané' : `${seminar.availableSeats} voľných miest`}
@@ -161,7 +161,7 @@ export const AdminCoursesTab: React.FC<AdminCoursesTabProps> = ({
                 </div>
 
                 {/* Seats and Occupancy Gauge */}
-                <div className="p-3 rounded-2xl bg-zinc-900/60 border border-zinc-850/80 space-y-2 text-xs">
+                <div className="p-3.5 rounded-2xl bg-zinc-950/60 space-y-2 text-xs">
                   <div className="flex justify-between items-center text-zinc-400 font-mono text-[11px]">
                     <span className="flex items-center gap-1.5">
                       <Users className="w-3.5 h-3.5 text-zinc-500" />
@@ -172,7 +172,7 @@ export const AdminCoursesTab: React.FC<AdminCoursesTabProps> = ({
                     </strong>
                   </div>
 
-                  <div className="w-full bg-zinc-950 h-2 rounded-full overflow-hidden border border-zinc-800">
+                  <div className="w-full bg-zinc-900 h-2 rounded-full overflow-hidden">
                     <div
                       className={`h-full rounded-full transition-all duration-500 ${
                         isSoldOut ? 'bg-red-400' : 'bg-emerald-400'
@@ -213,7 +213,7 @@ export const AdminCoursesTab: React.FC<AdminCoursesTabProps> = ({
                 </div>
 
                 {/* Price and Tiers */}
-                <div className="flex items-center justify-between text-xs pt-1 border-t border-zinc-850/80">
+                <div className="flex items-center justify-between text-xs pt-1">
                   <div className="text-zinc-400">
                     Cena od: <strong className="text-white font-mono text-sm">{minPrice} €</strong>
                   </div>
@@ -224,11 +224,11 @@ export const AdminCoursesTab: React.FC<AdminCoursesTabProps> = ({
               </div>
 
               {/* Actions Footer */}
-              <div className="p-3 bg-zinc-900/50 border-t border-zinc-850 flex items-center justify-between gap-2">
+              <div className="p-3 bg-zinc-950/40 flex items-center justify-between gap-2">
                 <button
                   type="button"
                   onClick={() => onViewParticipants(seminar.id)}
-                  className="flex-1 py-2 px-3 rounded-xl bg-zinc-850 hover:bg-zinc-800 text-zinc-200 text-xs font-medium transition-colors flex items-center justify-center gap-1.5 cursor-pointer"
+                  className="flex-1 py-2 px-3 rounded-xl bg-zinc-800/80 hover:bg-zinc-750 text-zinc-200 text-xs font-medium transition-colors flex items-center justify-center gap-1.5 cursor-pointer"
                 >
                   <Users className="w-3.5 h-3.5 text-blue-400" />
                   <span>Účastníci ({semParticipants.length})</span>
@@ -237,7 +237,7 @@ export const AdminCoursesTab: React.FC<AdminCoursesTabProps> = ({
                 <button
                   type="button"
                   onClick={() => onEditSeminar(seminar)}
-                  className="p-2 rounded-xl bg-zinc-850 hover:bg-zinc-800 text-zinc-300 hover:text-white transition-colors cursor-pointer"
+                  className="p-2 rounded-xl bg-zinc-800/80 hover:bg-zinc-750 text-zinc-300 hover:text-white transition-colors cursor-pointer"
                   title="Upraviť seminár"
                 >
                   <Edit className="w-4 h-4" />
@@ -246,7 +246,7 @@ export const AdminCoursesTab: React.FC<AdminCoursesTabProps> = ({
                 <button
                   type="button"
                   onClick={() => setDeleteConfirmId(seminar.id)}
-                  className="p-2 rounded-xl bg-zinc-850 hover:bg-red-950/60 text-zinc-400 hover:text-red-400 transition-colors cursor-pointer"
+                  className="p-2 rounded-xl bg-zinc-800/80 hover:bg-red-950/60 text-zinc-400 hover:text-red-400 transition-colors cursor-pointer"
                   title="Odstrániť seminár"
                 >
                   <Trash2 className="w-4 h-4" />
@@ -260,8 +260,8 @@ export const AdminCoursesTab: React.FC<AdminCoursesTabProps> = ({
       {/* Delete Confirmation Modal */}
       {deleteConfirmId && (
         <div className="fixed inset-0 z-50 bg-black/80 backdrop-blur-sm flex items-center justify-center p-4">
-          <div className="w-full max-w-sm rounded-3xl bg-zinc-950 border border-zinc-800 p-6 space-y-4 shadow-2xl">
-            <div className="w-12 h-12 rounded-2xl bg-red-950/60 border border-red-500/30 text-red-400 flex items-center justify-center mx-auto">
+          <div className="w-full max-w-sm rounded-3xl bg-zinc-950 p-6 space-y-4 shadow-2xl">
+            <div className="w-12 h-12 rounded-2xl bg-red-950/60 text-red-400 flex items-center justify-center mx-auto">
               <Trash2 className="w-6 h-6" />
             </div>
 
@@ -276,7 +276,7 @@ export const AdminCoursesTab: React.FC<AdminCoursesTabProps> = ({
               <button
                 type="button"
                 onClick={() => setDeleteConfirmId(null)}
-                className="flex-1 py-2.5 rounded-xl bg-zinc-850 hover:bg-zinc-800 text-zinc-300 text-xs font-medium transition-colors cursor-pointer"
+                className="flex-1 py-2.5 rounded-xl bg-zinc-900 hover:bg-zinc-800 text-zinc-300 text-xs font-medium transition-colors cursor-pointer"
               >
                 Zrušiť
               </button>
