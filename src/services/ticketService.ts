@@ -243,12 +243,12 @@ export async function generateLuxuryTicketPDF(data: TicketData): Promise<void> {
 
   ctx.fillStyle = '#ffffff';
   ctx.font = 'bold 26px -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif';
-  ctx.fillText(data.attendeeName, 75, 502);
+  ctx.fillText(data.attendeeName, 75, 502, 380);
 
   if (data.salonName) {
     ctx.fillStyle = '#c5a059';
     ctx.font = '500 17px -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif';
-    ctx.fillText(data.salonName, 75, 532);
+    ctx.fillText(data.salonName, 75, 532, 380);
   }
 
   // Spôsob platby & Overenie
@@ -259,11 +259,11 @@ export async function generateLuxuryTicketPDF(data: TicketData): Promise<void> {
 
   ctx.fillStyle = '#e4e4e7';
   ctx.font = '500 19px -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif';
-  ctx.fillText(data.paymentMethod, 480, 502);
+  ctx.fillText(data.paymentMethod, 480, 502, 360);
 
   ctx.fillStyle = 'rgba(255, 255, 255, 0.55)';
   ctx.font = '400 15px -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif';
-  ctx.fillText('Stripe 256-bit SSL Secure Auth', 480, 530);
+  ctx.fillText('Stripe 256-bit SSL Secure Auth', 480, 530, 360);
 
   // Kontaktný email
   ctx.fillStyle = 'rgba(255, 255, 255, 0.4)';
@@ -273,7 +273,7 @@ export async function generateLuxuryTicketPDF(data: TicketData): Promise<void> {
 
   ctx.fillStyle = '#e4e4e7';
   ctx.font = '500 19px -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif';
-  ctx.fillText(data.email, 880, 502);
+  ctx.fillText(data.email, 880, 502, 350);
 
   // 6. Bottom Legal & Operator Bar (ZETEREM s.r.o.)
   ctx.fillStyle = 'rgba(255, 255, 255, 0.05)';

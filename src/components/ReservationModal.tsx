@@ -567,14 +567,14 @@ export const ReservationModal: React.FC<ReservationModalProps> = ({
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center p-3 sm:p-6 bg-black/90 backdrop-blur-2xl text-white animate-fadeIn">
       <div
-        className="relative w-full max-w-2xl bg-zinc-950 border border-zinc-800 rounded-3xl shadow-2xl overflow-hidden my-4 flex flex-col max-h-[94vh]"
+        className="relative w-full max-w-2xl bg-zinc-950 rounded-3xl shadow-[0_30px_90px_rgba(0,0,0,0.95)] overflow-hidden my-4 flex flex-col max-h-[94vh]"
         onClick={(e) => e.stopPropagation()}
       >
         {/* Sticky Header with Progress */}
-        <div className="p-5 sm:p-6 border-b border-zinc-850 flex items-center justify-between bg-zinc-950/80 backdrop-blur-md sticky top-0 z-10">
+        <div className="p-5 sm:p-6 flex items-center justify-between bg-zinc-950/90 backdrop-blur-md sticky top-0 z-10">
           <div>
             <div className="flex items-center gap-2 mb-1">
-              <span className="text-[10px] uppercase tracking-wider font-semibold px-2 py-0.5 rounded-full bg-zinc-900 border border-zinc-800 text-zinc-300">
+              <span className="text-[10px] uppercase tracking-wider font-semibold px-2.5 py-0.5 rounded-full bg-zinc-900/80 text-zinc-300">
                 Krok {step} zo 4
               </span>
               <span className="text-[11px] text-zinc-500 font-medium">
@@ -595,7 +595,7 @@ export const ReservationModal: React.FC<ReservationModalProps> = ({
               e.stopPropagation();
               resetAndClose();
             }}
-            className="p-2 rounded-full bg-zinc-900 hover:bg-zinc-800 border border-zinc-800 text-zinc-400 hover:text-white transition-colors cursor-pointer"
+            className="p-2.5 rounded-full bg-zinc-900/90 hover:bg-zinc-800 text-zinc-300 hover:text-white transition-colors cursor-pointer"
             aria-label="Zavrieť"
           >
             <X className="w-4 h-4" />
@@ -618,7 +618,7 @@ export const ReservationModal: React.FC<ReservationModalProps> = ({
             <div className="space-y-6 animate-fadeIn">
               
               {/* Seminar Header Card */}
-              <div className="p-4 sm:p-5 rounded-2xl bg-zinc-900/60 border border-zinc-850 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
+              <div className="p-4 sm:p-5 rounded-2xl bg-zinc-900/40 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
                 <div className="space-y-1">
                   <div className="flex items-center gap-2 text-xs text-zinc-400">
                     <span className="font-medium text-white">{selectedSeminar.dates}</span>
@@ -630,7 +630,7 @@ export const ReservationModal: React.FC<ReservationModalProps> = ({
                   </h3>
                 </div>
                 <div className="flex-shrink-0">
-                  <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-zinc-900 border border-zinc-800 text-[11px] font-medium text-emerald-400">
+                  <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-zinc-900/80 text-[11px] font-medium text-emerald-400">
                     <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse" />
                     Iba 6 miest v ateliéri
                   </span>
@@ -649,10 +649,10 @@ export const ReservationModal: React.FC<ReservationModalProps> = ({
                       <div
                         key={tier.id}
                         onClick={() => setSelectedTierId(tier.id)}
-                        className={`p-5 rounded-2xl border cursor-pointer transition-all flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 ${
+                        className={`p-5 rounded-2xl cursor-pointer transition-all flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 ${
                           isSelected
-                            ? 'bg-zinc-900 border-white shadow-xl ring-1 ring-white/10'
-                            : 'bg-zinc-950 border-zinc-850 hover:border-zinc-750'
+                            ? 'bg-zinc-900 ring-1 ring-white/20 shadow-xl'
+                            : 'bg-zinc-900/30 hover:bg-zinc-900/50'
                         }`}
                       >
                         <div className="space-y-1">
@@ -676,8 +676,8 @@ export const ReservationModal: React.FC<ReservationModalProps> = ({
                             {formatPrice(tier.priceEUR, currency)}
                           </span>
                           <div
-                            className={`w-5 h-5 rounded-full border flex items-center justify-center ${
-                              isSelected ? 'border-white bg-white text-black' : 'border-zinc-700'
+                            className={`w-5 h-5 rounded-full flex items-center justify-center ${
+                              isSelected ? 'bg-white text-black' : 'bg-zinc-800/80 text-transparent'
                             }`}
                           >
                             {isSelected && <Check className="w-3.5 h-3.5" />}
@@ -697,15 +697,15 @@ export const ReservationModal: React.FC<ReservationModalProps> = ({
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
                   <div
                     onClick={() => setAddOnBrush(!addOnBrush)}
-                    className={`p-4 rounded-2xl border cursor-pointer transition-all flex items-start gap-3 ${
+                    className={`p-4 rounded-2xl cursor-pointer transition-all flex items-start gap-3 ${
                       addOnBrush
-                        ? 'bg-zinc-900 border-white'
-                        : 'bg-zinc-950 border-zinc-850 hover:border-zinc-750'
+                        ? 'bg-zinc-900 ring-1 ring-white/20'
+                        : 'bg-zinc-900/30 hover:bg-zinc-900/50'
                     }`}
                   >
                     <div
-                      className={`w-4 h-4 rounded border mt-0.5 flex items-center justify-center flex-shrink-0 ${
-                        addOnBrush ? 'bg-white border-white text-black' : 'border-zinc-700'
+                      className={`w-4 h-4 rounded mt-0.5 flex items-center justify-center flex-shrink-0 ${
+                        addOnBrush ? 'bg-white text-black' : 'bg-zinc-800'
                       }`}
                     >
                       {addOnBrush && <Check className="w-3 h-3" />}
@@ -725,15 +725,15 @@ export const ReservationModal: React.FC<ReservationModalProps> = ({
 
                   <div
                     onClick={() => setAddOnAudit(!addOnAudit)}
-                    className={`p-4 rounded-2xl border cursor-pointer transition-all flex items-start gap-3 ${
+                    className={`p-4 rounded-2xl cursor-pointer transition-all flex items-start gap-3 ${
                       addOnAudit
-                        ? 'bg-zinc-900 border-white'
-                        : 'bg-zinc-950 border-zinc-850 hover:border-zinc-750'
+                        ? 'bg-zinc-900 ring-1 ring-white/20'
+                        : 'bg-zinc-900/30 hover:bg-zinc-900/50'
                     }`}
                   >
                     <div
-                      className={`w-4 h-4 rounded border mt-0.5 flex items-center justify-center flex-shrink-0 ${
-                        addOnAudit ? 'bg-white border-white text-black' : 'border-zinc-700'
+                      className={`w-4 h-4 rounded mt-0.5 flex items-center justify-center flex-shrink-0 ${
+                        addOnAudit ? 'bg-white text-black' : 'bg-zinc-800'
                       }`}
                     >
                       {addOnAudit && <Check className="w-3 h-3" />}
@@ -754,17 +754,17 @@ export const ReservationModal: React.FC<ReservationModalProps> = ({
               </div>
 
               {/* Payment Mode (Full vs Deposit) */}
-              <div className="p-5 rounded-2xl bg-zinc-900/60 border border-zinc-850 space-y-3">
+              <div className="p-5 rounded-2xl bg-zinc-900/40 space-y-3">
                 <span className="text-xs uppercase tracking-wider text-zinc-400 font-semibold block">
                   Ako si želáte uhradiť kurz?
                 </span>
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
                   <div
                     onClick={() => setPaymentOption('full')}
-                    className={`p-3.5 rounded-xl border cursor-pointer transition-all flex items-start justify-between ${
+                    className={`p-3.5 rounded-xl cursor-pointer transition-all flex items-start justify-between ${
                       paymentOption === 'full'
-                        ? 'bg-zinc-850 border-white text-white'
-                        : 'bg-zinc-950 border-zinc-800 text-zinc-400 hover:text-white'
+                        ? 'bg-zinc-850 ring-1 ring-white/20 text-white shadow'
+                        : 'bg-zinc-950/70 text-zinc-400 hover:text-white hover:bg-zinc-900/50'
                     }`}
                   >
                     <div>
@@ -776,10 +776,10 @@ export const ReservationModal: React.FC<ReservationModalProps> = ({
 
                   <div
                     onClick={() => setPaymentOption('deposit')}
-                    className={`p-3.5 rounded-xl border cursor-pointer transition-all flex items-start justify-between ${
+                    className={`p-3.5 rounded-xl cursor-pointer transition-all flex items-start justify-between ${
                       paymentOption === 'deposit'
-                        ? 'bg-zinc-850 border-white text-white'
-                        : 'bg-zinc-950 border-zinc-800 text-zinc-400 hover:text-white'
+                        ? 'bg-zinc-850 ring-1 ring-white/20 text-white shadow'
+                        : 'bg-zinc-950/70 text-zinc-400 hover:text-white hover:bg-zinc-900/50'
                     }`}
                   >
                     <div>
@@ -983,7 +983,7 @@ export const ReservationModal: React.FC<ReservationModalProps> = ({
                   placeholder="Máte špecifické techniky, na ktoré sa chcete počas praktickej časti zamerať?"
                   value={formData.notes}
                   onChange={(e) => setFormData({ ...formData, notes: e.target.value })}
-                  className="w-full bg-zinc-900 border border-zinc-800 text-white p-3 rounded-xl text-xs sm:text-sm focus:outline-none focus:border-zinc-500"
+                  className="w-full bg-zinc-950/80 text-white p-3 rounded-xl text-xs sm:text-sm focus:outline-none focus:ring-1 focus:ring-white/20 border-0"
                 />
               </div>
 
@@ -1022,22 +1022,22 @@ export const ReservationModal: React.FC<ReservationModalProps> = ({
                     return next;
                   });
                 }}
-                className={`p-4 rounded-2xl border transition-all cursor-pointer select-none space-y-2.5 text-xs focus:outline-none focus:ring-2 focus:ring-white/40 ${
+                className={`p-4 rounded-2xl transition-all cursor-pointer select-none space-y-2.5 text-xs focus:outline-none focus:ring-1 focus:ring-white/30 ${
                   formErrors.terms
-                    ? 'bg-red-950/25 border-red-500 ring-1 ring-red-500/40 shadow-lg'
+                    ? 'bg-red-950/30 ring-1 ring-red-500/50 shadow-lg'
                     : termsAccepted
-                    ? 'bg-zinc-900 border-white shadow-md ring-1 ring-white/20'
-                    : 'bg-zinc-900/60 border-zinc-700 hover:border-zinc-500 hover:bg-zinc-900'
+                    ? 'bg-zinc-900/90 ring-1 ring-white/20 shadow-md'
+                    : 'bg-zinc-900/40 hover:bg-zinc-900/70'
                 }`}
               >
                 <div className="flex items-start gap-3">
                   <div
-                    className={`mt-0.5 w-5 h-5 rounded-md border flex items-center justify-center transition-all flex-shrink-0 ${
+                    className={`mt-0.5 w-5 h-5 rounded-md flex items-center justify-center transition-all flex-shrink-0 ${
                       termsAccepted
-                        ? 'bg-white border-white text-black shadow'
+                        ? 'bg-white text-black shadow'
                         : formErrors.terms
-                        ? 'bg-zinc-950 border-red-400'
-                        : 'bg-zinc-950 border-zinc-500 hover:border-zinc-300'
+                        ? 'bg-red-950/80 ring-1 ring-red-400'
+                        : 'bg-zinc-950/80 ring-1 ring-zinc-700 hover:ring-zinc-500'
                     }`}
                   >
                     {termsAccepted && (
@@ -1399,7 +1399,7 @@ export const ReservationModal: React.FC<ReservationModalProps> = ({
               </div>
 
               {/* Prominent High-Contrast Reservation Code Box */}
-              <div className="max-w-md mx-auto p-4 sm:p-5 rounded-2xl bg-zinc-950 border-2 border-[#c5a059]/60 space-y-2 text-center shadow-2xl">
+              <div className="max-w-md mx-auto p-4 sm:p-5 rounded-2xl bg-zinc-900/60 ring-1 ring-[#c5a059]/40 space-y-2 text-center shadow-2xl">
                 <span className="text-[10px] sm:text-xs uppercase font-extrabold tracking-widest text-[#c5a059] block">
                   Váš oficiálny kód vstupenky
                 </span>
@@ -1425,16 +1425,16 @@ export const ReservationModal: React.FC<ReservationModalProps> = ({
               {/* Minimal Luxury Ticket Card */}
               <div
                 id="printable-ticket"
-                className="max-w-md mx-auto p-6 rounded-3xl bg-zinc-950 border border-[#c5a059]/40 text-left space-y-4 shadow-2xl relative overflow-hidden"
+                className="max-w-md mx-auto p-6 rounded-3xl bg-zinc-950/90 ring-1 ring-[#c5a059]/30 text-left space-y-4 shadow-2xl relative overflow-hidden"
               >
-                <div className="flex justify-between items-baseline border-b border-zinc-800 pb-3">
+                <div className="flex justify-between items-baseline pb-3">
                   <div>
                     <span className="text-xs font-bold tracking-wider text-[#c5a059] uppercase block">
                       RICCARDO ACADEMY • VIP VSTUPENKA
                     </span>
                     <span className="text-[11px] text-zinc-500">Prevádzkovateľ: {COMPANY_DETAILS.legalName}</span>
                   </div>
-                  <span className="font-mono text-xs text-[#c5a059] bg-[#c5a059]/10 border border-[#c5a059]/30 px-2.5 py-1 rounded-lg font-bold">
+                  <span className="font-mono text-xs text-[#c5a059] bg-[#c5a059]/15 px-2.5 py-1 rounded-lg font-bold">
                     {confirmationCode}
                   </span>
                 </div>
@@ -1458,7 +1458,7 @@ export const ReservationModal: React.FC<ReservationModalProps> = ({
                     </div>
                   </div>
 
-                  <div className="pt-2 border-t border-zinc-800/80 grid grid-cols-2 gap-3">
+                  <div className="pt-2 bg-zinc-900/40 p-3 rounded-xl grid grid-cols-2 gap-3">
                     <div>
                       <span className="text-[10px] uppercase text-zinc-500 block">Účastník</span>
                       <span className="font-medium text-white text-sm">{formData.fullName}</span>
@@ -1476,7 +1476,7 @@ export const ReservationModal: React.FC<ReservationModalProps> = ({
                   </div>
 
                   {/* Scannable Crisp QR Code */}
-                  <div className="pt-3 border-t border-zinc-800 flex flex-col items-center justify-center gap-2">
+                  <div className="pt-3 flex flex-col items-center justify-center gap-2">
                     <div className="p-2.5 bg-white rounded-2xl shadow-md">
                       <img
                         src={`https://api.qrserver.com/v1/create-qr-code/?size=160x160&data=${encodeURIComponent(confirmationCode || 'RIC-VIP')}&color=000000&bgcolor=ffffff`}
@@ -1491,7 +1491,7 @@ export const ReservationModal: React.FC<ReservationModalProps> = ({
                 </div>
 
                 {/* Official Supplier & Tax Notice for Salons / Accounting */}
-                <div className="pt-3 border-t border-zinc-800 text-[10px] text-zinc-500 font-mono space-y-1">
+                <div className="pt-3 bg-zinc-900/40 p-3 rounded-xl text-[10px] text-zinc-500 font-mono space-y-1">
                   <div className="flex justify-between items-baseline">
                     <span className="text-zinc-300 font-sans font-semibold">{COMPANY_DETAILS.legalName}</span>
                     <span>IČO: {COMPANY_DETAILS.ico} | DIČ: {COMPANY_DETAILS.dic}</span>
@@ -1501,7 +1501,7 @@ export const ReservationModal: React.FC<ReservationModalProps> = ({
                   <div className="text-[9px] text-zinc-600 font-sans leading-relaxed">{COMPANY_DETAILS.courtRegistration} • {COMPANY_DETAILS.vatStatus}</div>
                 </div>
 
-                <div className="pt-3 border-t border-zinc-800 flex items-center justify-between text-xs text-zinc-400">
+                <div className="pt-2 flex items-center justify-between text-xs text-zinc-400">
                   <span>Platná elektronická vstupenka</span>
                   <span className="font-semibold text-white">Balíček: {currentTier.name} ({totalPackagePriceEUR} €)</span>
                 </div>
@@ -1578,7 +1578,7 @@ export const ReservationModal: React.FC<ReservationModalProps> = ({
 
         {/* Modal Bottom Footer Navigation (Steps 1 & 2) */}
         {step < 3 && (
-          <div className="p-4 sm:p-5 border-t border-zinc-850 flex items-center justify-between bg-zinc-950/80 backdrop-blur-md">
+          <div className="p-4 sm:p-5 flex items-center justify-between bg-zinc-950/90 backdrop-blur-md">
             {step > 1 ? (
               <button
                 type="button"
@@ -1599,7 +1599,7 @@ export const ReservationModal: React.FC<ReservationModalProps> = ({
               onClick={handleNextStep}
               className={`px-6 py-2.5 rounded-full text-xs sm:text-sm font-semibold transition-all active:scale-95 flex items-center gap-1.5 shadow-lg cursor-pointer ${
                 step === 2 && !termsAccepted
-                  ? 'bg-zinc-850 text-zinc-400 border border-zinc-750 hover:bg-zinc-800 hover:text-white'
+                  ? 'bg-zinc-850 text-zinc-400 hover:bg-zinc-800 hover:text-white'
                   : 'bg-white text-black hover:bg-zinc-200'
               }`}
             >
@@ -1611,7 +1611,7 @@ export const ReservationModal: React.FC<ReservationModalProps> = ({
 
         {/* Step 3 back button */}
         {step === 3 && (
-          <div className="p-4 sm:p-5 border-t border-zinc-850 flex items-center justify-between bg-zinc-950/80 backdrop-blur-md">
+          <div className="p-4 sm:p-5 flex items-center justify-between bg-zinc-950/90 backdrop-blur-md">
             <button
               type="button"
               onClick={() => {
@@ -1631,7 +1631,7 @@ export const ReservationModal: React.FC<ReservationModalProps> = ({
 
         {/* Step 4 close */}
         {step === 4 && (
-          <div className="p-4 sm:p-5 border-t border-zinc-850 flex items-center justify-center bg-zinc-950/80 backdrop-blur-md">
+          <div className="p-4 sm:p-5 flex items-center justify-center bg-zinc-950/90 backdrop-blur-md">
             <button
               type="button"
               onClick={resetAndClose}

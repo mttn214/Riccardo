@@ -106,7 +106,7 @@ export const HomePage: React.FC<HomePageProps> = ({ onOpenBooking, onSelectPortf
 
           {/* Spotlight Card */}
           {featuredSeminar && (
-            <div className="rounded-3xl bg-zinc-950 border border-zinc-800/90 overflow-hidden shadow-2xl">
+            <div className="rounded-3xl bg-zinc-950 overflow-hidden shadow-2xl">
               <div className="grid grid-cols-1 lg:grid-cols-12">
                 <div className="lg:col-span-5 relative min-h-[320px] bg-zinc-900 overflow-hidden">
                   <img
@@ -115,7 +115,7 @@ export const HomePage: React.FC<HomePageProps> = ({ onOpenBooking, onSelectPortf
                     className="w-full h-full object-cover object-top filter brightness-[0.85] contrast-[1.05]"
                   />
                   <div className="absolute top-4 left-4">
-                    <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-black/80 backdrop-blur-md border border-white/15 text-[11px] font-medium text-white shadow-lg">
+                    <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-black/80 backdrop-blur-md text-[11px] font-medium text-white shadow-lg">
                       <span className="w-1.5 h-1.5 rounded-full bg-amber-400" />
                       Zostávajú posledné {featuredSeminar.availableSeats} miesta z 6
                     </span>
@@ -138,7 +138,7 @@ export const HomePage: React.FC<HomePageProps> = ({ onOpenBooking, onSelectPortf
                       {featuredSeminar.description}
                     </p>
 
-                    <div className="space-y-2 py-4 border-y border-zinc-850 text-xs sm:text-sm text-zinc-300">
+                    <div className="space-y-2.5 py-4 text-xs sm:text-sm text-zinc-300">
                       <div className="flex items-center gap-2">
                         <span className="w-1.5 h-1.5 rounded-full bg-white flex-shrink-0" />
                         <span>Prísna kapacita 6 kaderníkov pre garanciu osobnej spätnej väzby</span>
@@ -167,7 +167,7 @@ export const HomePage: React.FC<HomePageProps> = ({ onOpenBooking, onSelectPortf
                     <div className="flex flex-wrap items-center gap-3">
                       <button
                         onClick={() => setIsWaitlistOpen(true)}
-                        className="inline-flex items-center gap-1.5 px-4 py-2.5 rounded-full text-xs font-medium bg-zinc-900 hover:bg-zinc-800 text-zinc-300 hover:text-white transition-colors border border-zinc-800 cursor-pointer"
+                        className="inline-flex items-center gap-1.5 px-4 py-2.5 rounded-full text-xs font-medium bg-zinc-900 hover:bg-zinc-800 text-zinc-300 hover:text-white transition-colors cursor-pointer"
                       >
                         <Bell className="w-3.5 h-3.5 text-amber-400" />
                         <span>VIP Waitlist</span>
@@ -224,7 +224,7 @@ export const HomePage: React.FC<HomePageProps> = ({ onOpenBooking, onSelectPortf
                 onClick={() => onSelectPortfolioItem(item)}
                 className="group cursor-pointer flex flex-col"
               >
-                <div className="relative aspect-[4/5] w-full rounded-2xl overflow-hidden bg-zinc-900 border border-zinc-850 group-hover:border-zinc-700 transition-all mb-3">
+                <div className="relative aspect-[4/5] w-full rounded-2xl overflow-hidden bg-zinc-900 mb-3">
                   <img
                     src={item.image}
                     alt={item.title}
@@ -232,7 +232,7 @@ export const HomePage: React.FC<HomePageProps> = ({ onOpenBooking, onSelectPortf
                   />
                   {item.hasBeforeAfter && (
                     <div className="absolute top-3 left-3">
-                      <span className="px-2.5 py-1 rounded-full text-[10px] font-semibold bg-black/80 backdrop-blur-md text-white border border-white/10">
+                      <span className="px-2.5 py-1 rounded-full text-[10px] font-semibold bg-black/80 backdrop-blur-md text-white">
                         Pred / Po
                       </span>
                     </div>
@@ -259,9 +259,9 @@ export const HomePage: React.FC<HomePageProps> = ({ onOpenBooking, onSelectPortf
       </section>
 
       {/* SECTION: Awards Highlight */}
-      <section className="py-24 sm:py-32 bg-black border-t border-zinc-900 text-white">
+      <section className="py-24 sm:py-32 bg-black text-white">
         <div className="max-w-6xl mx-auto px-4 sm:px-6">
-          <div className="rounded-3xl bg-zinc-950 border border-zinc-850 overflow-hidden shadow-2xl">
+          <div className="rounded-3xl bg-zinc-950 overflow-hidden shadow-2xl">
             <div className="p-8 sm:p-12">
               <div className="flex flex-col lg:flex-row items-start lg:items-center justify-between gap-8 mb-8">
                 <div className="max-w-2xl">
@@ -294,14 +294,14 @@ export const HomePage: React.FC<HomePageProps> = ({ onOpenBooking, onSelectPortf
               </div>
 
               {/* Real Photo Strip */}
-              <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 sm:gap-4 pt-4 border-t border-zinc-850">
+              <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 sm:gap-4 pt-4">
                 {[
                   { img: '/images/riccardo/richard_conka_hda_1.jpg', label: 'Žitná Symfónia • Look 1' },
                   { img: '/images/riccardo/richard_conka_hda_2.jpg', label: 'Avant-Garde • Look 2' },
                   { img: '/images/riccardo/richard_conka_hda_3.jpg', label: 'Dark Elegance • Look 3' },
                   { img: '/images/riccardo/richard_conka_hda_4.jpg', label: 'Pocta Tradícii • Look 4' },
                 ].map((item, idx) => (
-                  <div key={idx} className="relative aspect-[3/4] rounded-xl overflow-hidden bg-zinc-900 border border-zinc-800 group">
+                  <div key={idx} className="relative aspect-[3/4] rounded-xl overflow-hidden bg-zinc-900 group">
                     <img
                       src={item.img}
                       alt={item.label}
@@ -324,7 +324,7 @@ export const HomePage: React.FC<HomePageProps> = ({ onOpenBooking, onSelectPortf
         <div className="max-w-6xl mx-auto px-4 sm:px-6">
           <div className="flex flex-col md:flex-row md:items-end justify-between gap-6 mb-10">
             <div>
-              <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-zinc-900 border border-zinc-800 text-[11px] font-medium text-zinc-300 mb-3">
+              <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-zinc-900/80 text-[11px] font-medium text-zinc-300 mb-3">
                 <CheckCircle2 className="w-3.5 h-3.5 text-emerald-400" />
                 <span>Overené hodnotenia Google Maps & Facebook (Hodnotenie 5.0)</span>
               </div>
@@ -350,10 +350,10 @@ export const HomePage: React.FC<HomePageProps> = ({ onOpenBooking, onSelectPortf
                 <button
                   onClick={() => slideReviews('left')}
                   disabled={!canScrollLeft}
-                  className={`w-9 h-9 rounded-full flex items-center justify-center border transition-all ${
+                  className={`w-9 h-9 rounded-full flex items-center justify-center transition-all ${
                     canScrollLeft
-                      ? 'bg-zinc-900 hover:bg-white hover:text-black border-zinc-750 text-white shadow-md active:scale-95'
-                      : 'bg-zinc-950 border-zinc-850 text-zinc-600 cursor-not-allowed opacity-40'
+                      ? 'bg-zinc-900 hover:bg-white hover:text-black text-white shadow-md active:scale-95'
+                      : 'bg-zinc-950 text-zinc-600 cursor-not-allowed opacity-40'
                   }`}
                   aria-label="Posunúť doľava"
                 >
@@ -362,10 +362,10 @@ export const HomePage: React.FC<HomePageProps> = ({ onOpenBooking, onSelectPortf
                 <button
                   onClick={() => slideReviews('right')}
                   disabled={!canScrollRight}
-                  className={`w-9 h-9 rounded-full flex items-center justify-center border transition-all ${
+                  className={`w-9 h-9 rounded-full flex items-center justify-center transition-all ${
                     canScrollRight
-                      ? 'bg-zinc-900 hover:bg-white hover:text-black border-zinc-750 text-white shadow-md active:scale-95'
-                      : 'bg-zinc-950 border-zinc-850 text-zinc-600 cursor-not-allowed opacity-40'
+                      ? 'bg-zinc-900 hover:bg-white hover:text-black text-white shadow-md active:scale-95'
+                      : 'bg-zinc-950 text-zinc-600 cursor-not-allowed opacity-40'
                   }`}
                   aria-label="Posunúť doprava"
                 >
@@ -394,12 +394,12 @@ export const HomePage: React.FC<HomePageProps> = ({ onOpenBooking, onSelectPortf
             {TESTIMONIALS_DATA.map((rev) => (
               <div
                 key={rev.id}
-                className="w-[300px] sm:w-[380px] md:w-[410px] flex-shrink-0 snap-start p-7 sm:p-8 rounded-3xl bg-zinc-950 border border-zinc-850 flex flex-col justify-between hover:border-zinc-700/80 transition-all hover:shadow-2xl"
+                className="w-[300px] sm:w-[380px] md:w-[410px] flex-shrink-0 snap-start p-7 sm:p-8 rounded-3xl bg-zinc-950/70 hover:bg-zinc-900/60 flex flex-col justify-between transition-all hover:shadow-2xl"
               >
                 <div>
                   <div className="flex items-center justify-between gap-2 mb-4">
                     <div className="flex items-center gap-2">
-                      <span className="w-6 h-6 rounded-full bg-zinc-900 border border-zinc-800 flex items-center justify-center text-white">
+                      <span className="w-6 h-6 rounded-full bg-zinc-900 flex items-center justify-center text-white">
                         {rev.source === 'Google' ? (
                           <GoogleIcon className="w-3 h-3 text-white" />
                         ) : (
@@ -419,7 +419,7 @@ export const HomePage: React.FC<HomePageProps> = ({ onOpenBooking, onSelectPortf
                   </div>
 
                   {rev.service && (
-                    <span className="inline-block px-2.5 py-0.5 rounded-md bg-zinc-900 border border-zinc-800 text-[10px] text-zinc-400 font-medium mb-3">
+                    <span className="inline-block px-2.5 py-0.5 rounded-md bg-zinc-900/80 text-[10px] text-zinc-400 font-medium mb-3">
                       {rev.service}
                     </span>
                   )}
@@ -429,7 +429,7 @@ export const HomePage: React.FC<HomePageProps> = ({ onOpenBooking, onSelectPortf
                   </p>
                 </div>
 
-                <div className="pt-4 border-t border-zinc-900 flex items-center justify-between">
+                <div className="pt-4 flex items-center justify-between">
                   <div>
                     <strong className="text-xs sm:text-sm text-white font-medium block">
                       {rev.name}
@@ -460,7 +460,7 @@ export const HomePage: React.FC<HomePageProps> = ({ onOpenBooking, onSelectPortf
       </section>
 
       {/* SECTION: Atelier Lučenec Callout */}
-      <section className="py-24 bg-black border-t border-zinc-900 text-white">
+      <section className="py-24 bg-black text-white">
         <div className="max-w-6xl mx-auto px-4 sm:px-6">
           <div className="flex flex-col md:flex-row items-start md:items-center justify-between gap-8">
             <div className="max-w-xl">
@@ -476,7 +476,7 @@ export const HomePage: React.FC<HomePageProps> = ({ onOpenBooking, onSelectPortf
             </div>
             <Link
               to="/salon"
-              className="inline-flex items-center gap-2 px-6 py-3 rounded-full text-xs sm:text-sm font-semibold bg-zinc-900 hover:bg-zinc-850 border border-zinc-800 text-white transition-all whitespace-nowrap shadow-sm"
+              className="inline-flex items-center gap-2 px-6 py-3 rounded-full text-xs sm:text-sm font-semibold bg-zinc-900 hover:bg-zinc-800 text-white transition-all whitespace-nowrap shadow-sm"
             >
               <span>Viac o salóne & Navigácia</span>
               <ArrowUpRight className="w-4 h-4" />

@@ -60,7 +60,7 @@ export const SeminarsSection: React.FC<SeminarsSectionProps> = ({
 
         {/* FEATURED IMMINENT MASTERCLASS (Editorial Spotlight Card) */}
         {featuredSeminar && (
-          <div className="mb-16 rounded-3xl bg-zinc-950 border border-zinc-800/90 overflow-hidden shadow-2xl relative">
+          <div className="mb-16 rounded-3xl bg-zinc-950 overflow-hidden shadow-2xl relative">
             <div className="grid grid-cols-1 lg:grid-cols-12">
               
               {/* Photo Side (5 cols) */}
@@ -74,7 +74,7 @@ export const SeminarsSection: React.FC<SeminarsSectionProps> = ({
                 
                 {/* Live urgency chip */}
                 <div className="absolute top-4 left-4">
-                  <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-black/80 backdrop-blur-md border border-white/15 text-[11px] font-medium text-white shadow-lg">
+                  <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-black/80 backdrop-blur-md text-[11px] font-medium text-white shadow-lg">
                     <span className="w-1.5 h-1.5 rounded-full bg-amber-400" />
                     Zostávajú posledné {featuredSeminar.availableSeats} miesta
                   </span>
@@ -101,7 +101,7 @@ export const SeminarsSection: React.FC<SeminarsSectionProps> = ({
                   </p>
 
                   {/* Highlights list */}
-                  <div className="space-y-2 py-4 border-y border-zinc-850 text-xs sm:text-sm text-zinc-300">
+                  <div className="space-y-2.5 py-4 text-xs sm:text-sm text-zinc-300">
                     <div className="flex items-center gap-2">
                       <span className="w-1.5 h-1.5 rounded-full bg-white flex-shrink-0" />
                       <span><strong>Prísna kapacita:</strong> Iba 6 kaderníkov pre 100% individuálny prístup</span>
@@ -154,7 +154,7 @@ export const SeminarsSection: React.FC<SeminarsSectionProps> = ({
 
         {/* UPCOMING DATES SCHEDULE (Quiet Minimalist List) */}
         <div className="mb-16">
-          <div className="flex items-center justify-between mb-6 pb-2 border-b border-zinc-850">
+          <div className="flex items-center justify-between mb-6 pb-2">
             <h4 className="text-sm uppercase tracking-wider text-zinc-400 font-semibold">
               Harmonogram nasledujúcich turnusov (2027)
             </h4>
@@ -163,11 +163,11 @@ export const SeminarsSection: React.FC<SeminarsSectionProps> = ({
             </span>
           </div>
 
-          <div className="divide-y divide-zinc-850 border-b border-zinc-850">
+          <div className="space-y-3">
             {upcomingSeminars.map((seminar) => (
               <div
                 key={seminar.id}
-                className="py-6 flex flex-col md:flex-row md:items-center justify-between gap-4 group"
+                className="p-5 rounded-2xl bg-zinc-950/60 hover:bg-zinc-900/50 flex flex-col md:flex-row md:items-center justify-between gap-4 group transition-colors"
               >
                 {/* Date & Location */}
                 <div className="md:w-1/4">
@@ -191,13 +191,13 @@ export const SeminarsSection: React.FC<SeminarsSectionProps> = ({
 
                 {/* Status & CTA */}
                 <div className="md:w-1/4 flex items-center justify-between md:justify-end gap-3">
-                  <span className="inline-block px-2.5 py-1 rounded-full text-[11px] font-medium bg-zinc-900 border border-zinc-800 text-zinc-300">
+                  <span className="inline-block px-2.5 py-1 rounded-full text-[11px] font-medium bg-zinc-900/80 text-zinc-300">
                     {seminar.availableSeats <= 1 ? 'Posledné 1 miesto' : `Zostávajú ${seminar.availableSeats} miesta`}
                   </span>
 
                   <button
                     onClick={() => onBookSeminar(seminar)}
-                    className="inline-flex items-center gap-1 px-3.5 py-1.5 rounded-full text-xs font-semibold bg-zinc-850 hover:bg-white hover:text-black text-white transition-all active:scale-95 border border-zinc-750"
+                    className="inline-flex items-center gap-1 px-3.5 py-1.5 rounded-full text-xs font-semibold bg-zinc-800 hover:bg-white hover:text-black text-white transition-all active:scale-95 cursor-pointer"
                   >
                     <span>Rezervovať</span>
                     <ArrowUpRight className="w-3.5 h-3.5" />
@@ -209,7 +209,7 @@ export const SeminarsSection: React.FC<SeminarsSectionProps> = ({
         </div>
 
         {/* SCARCITY WAITLIST / PRIORITY DROP ALERTS */}
-        <div className="p-8 sm:p-10 rounded-3xl bg-zinc-950 border border-zinc-850">
+        <div className="p-8 sm:p-10 rounded-3xl bg-zinc-950/80 shadow-xl">
           <div className="flex flex-col md:flex-row items-start md:items-center justify-between gap-6">
             <div className="max-w-md">
               <span className="text-[11px] uppercase tracking-wider text-zinc-500 font-medium block mb-1">

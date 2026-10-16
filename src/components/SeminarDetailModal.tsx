@@ -35,7 +35,7 @@ export const SeminarDetailModal: React.FC<SeminarDetailModalProps> = ({
       onClick={onClose}
     >
       <div
-        className="relative w-full max-w-4xl bg-zinc-950 border border-zinc-800/90 rounded-3xl shadow-[0_30px_90px_rgba(0,0,0,0.95)] overflow-hidden my-4 flex flex-col max-h-[94vh] ring-1 ring-white/10"
+        className="relative w-full max-w-4xl bg-zinc-950 rounded-3xl shadow-[0_30px_90px_rgba(0,0,0,0.95)] overflow-hidden my-4 flex flex-col max-h-[94vh]"
         onClick={(e) => e.stopPropagation()}
       >
         {/* Top Floating Close Button */}
@@ -45,7 +45,7 @@ export const SeminarDetailModal: React.FC<SeminarDetailModalProps> = ({
             e.stopPropagation();
             onClose();
           }}
-          className="absolute top-3.5 right-3.5 z-50 p-2.5 rounded-full bg-black/90 hover:bg-black text-zinc-300 hover:text-white border border-zinc-700/80 backdrop-blur-xl transition-all shadow-2xl cursor-pointer"
+          className="absolute top-3.5 right-3.5 z-50 p-2.5 rounded-full bg-zinc-900/90 hover:bg-zinc-800 text-zinc-300 hover:text-white backdrop-blur-xl transition-all shadow-2xl cursor-pointer"
           aria-label="Zavrieť"
         >
           <X className="w-4 h-4" />
@@ -54,7 +54,7 @@ export const SeminarDetailModal: React.FC<SeminarDetailModalProps> = ({
         {/* ========================================================================= */}
         {/* URGENCY TOP BAR: Live Scarcity & High-Stakes Banner */}
         {/* ========================================================================= */}
-        <div className="bg-gradient-to-r from-amber-950 via-zinc-950 to-amber-950 border-b border-amber-500/40 px-6 py-2.5 flex flex-wrap items-center justify-between gap-3 text-xs z-20">
+        <div className="bg-gradient-to-r from-amber-950/80 via-zinc-950 to-amber-950/80 px-6 py-2.5 flex flex-wrap items-center justify-between gap-3 text-xs z-20">
           <div className="flex items-center gap-2">
             <span className="w-2.5 h-2.5 rounded-full bg-amber-400 animate-pulse" />
             <strong className="text-amber-300 font-bold tracking-wide uppercase">
@@ -84,12 +84,12 @@ export const SeminarDetailModal: React.FC<SeminarDetailModalProps> = ({
           <div className="absolute inset-0 bg-gradient-to-t from-zinc-950 via-zinc-950/40 to-transparent" />
           
           <div className="absolute top-4 left-6 z-10 flex flex-wrap items-center gap-2">
-            <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-black/80 backdrop-blur-xl border border-amber-500/40 text-amber-300 text-[11px] font-semibold shadow-xl">
+            <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-black/80 backdrop-blur-xl text-amber-300 text-[11px] font-semibold shadow-xl">
               <Trophy className="w-3.5 h-3.5 text-amber-400" />
               <span>Víťaz Czech & Slovak Hairdressing Awards (Praha)</span>
             </span>
 
-            <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-black/80 backdrop-blur-xl border border-white/10 text-white text-[11px] font-medium shadow-xl">
+            <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-black/80 backdrop-blur-xl text-white text-[11px] font-medium shadow-xl">
               <Users className="w-3.5 h-3.5 text-white" />
               <span>Striktný limit: 6 účastníkov</span>
             </span>
@@ -116,11 +116,11 @@ export const SeminarDetailModal: React.FC<SeminarDetailModalProps> = ({
           {/* ========================================================================= */}
           {/* 6-CHAIR STUDIO MAP: VISUAL PROOF OF HIGH-STAKES SCARCITY */}
           {/* ========================================================================= */}
-          <div className="p-6 sm:p-7 rounded-3xl bg-gradient-to-br from-zinc-900 via-zinc-950 to-black border-2 border-amber-500/40 shadow-2xl relative overflow-hidden">
+          <div className="p-6 sm:p-7 rounded-3xl bg-zinc-900/50 shadow-2xl relative overflow-hidden">
             <div className="absolute top-0 right-0 w-72 h-72 bg-amber-500/10 rounded-full blur-3xl pointer-events-none" />
 
             <div className="relative z-10 space-y-4">
-              <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 border-b border-zinc-800 pb-3">
+              <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 pb-2">
                 <div className="flex items-center gap-2">
                   <span className="w-2.5 h-2.5 rounded-full bg-amber-400 animate-pulse" />
                   <h3 className="text-xs sm:text-sm font-bold uppercase tracking-wider text-amber-300">
@@ -148,10 +148,10 @@ export const SeminarDetailModal: React.FC<SeminarDetailModalProps> = ({
                   return (
                     <div
                       key={chair.seat}
-                      className={`p-3 rounded-2xl border flex flex-col justify-between transition-all text-left ${
+                      className={`p-3.5 rounded-2xl flex flex-col justify-between transition-all text-left ${
                         isTaken
-                          ? 'bg-zinc-950/80 border-zinc-850/90 text-zinc-500 opacity-80'
-                          : 'bg-amber-950/40 border-2 border-amber-400 text-white shadow-[0_0_25px_rgba(251,191,36,0.25)] hover:scale-105 cursor-pointer group'
+                          ? 'bg-zinc-950/80 text-zinc-500 opacity-80'
+                          : 'bg-amber-950/40 ring-1 ring-amber-400/50 text-white shadow-lg hover:scale-105 cursor-pointer group'
                       }`}
                       onClick={() => {
                         if (!isTaken) {
@@ -169,7 +169,7 @@ export const SeminarDetailModal: React.FC<SeminarDetailModalProps> = ({
                             Obsadené
                           </span>
                         ) : (
-                          <span className="inline-flex items-center gap-1 text-[9px] font-mono text-amber-300 bg-amber-400/20 border border-amber-400/50 px-1.5 py-0.5 rounded font-bold animate-pulse">
+                          <span className="inline-flex items-center gap-1 text-[9px] font-mono text-amber-300 bg-amber-400/20 px-1.5 py-0.5 rounded font-bold animate-pulse">
                             <Flame className="w-2.5 h-2.5 fill-amber-400" />
                             VOĽNÉ
                           </span>
@@ -185,7 +185,7 @@ export const SeminarDetailModal: React.FC<SeminarDetailModalProps> = ({
                         </span>
                       </div>
 
-                      <div className="mt-2 pt-1.5 border-t border-zinc-800/80 text-[9px] font-mono">
+                      <div className="mt-2 pt-1.5 text-[9px] font-mono">
                         {isTaken ? (
                           <span className="text-zinc-400">{chair.timeAgo}</span>
                         ) : (
@@ -200,7 +200,7 @@ export const SeminarDetailModal: React.FC<SeminarDetailModalProps> = ({
               </div>
 
               {/* Direct Fast-Action Callout */}
-              <div className="pt-2 flex flex-col sm:flex-row items-center justify-between gap-3 bg-zinc-950/70 p-4 rounded-2xl border border-zinc-850">
+              <div className="pt-2 flex flex-col sm:flex-row items-center justify-between gap-3 bg-zinc-950/70 p-4 rounded-2xl">
                 <div className="text-xs text-zinc-300 flex items-center gap-2">
                   <span className="w-2 h-2 rounded-full bg-emerald-400 animate-pulse flex-shrink-0" />
                   <span>Práve si tento termín prezerajú ďalší stylisti • Možnosť zaistenia zálohou 100 €</span>
@@ -220,7 +220,7 @@ export const SeminarDetailModal: React.FC<SeminarDetailModalProps> = ({
           </div>
 
           {/* Proposition & Philosophy */}
-          <div className="p-6 rounded-3xl bg-zinc-900/60 border border-zinc-800 space-y-3">
+          <div className="p-6 rounded-3xl bg-zinc-900/40 space-y-3">
             <div className="flex items-center justify-between">
               <span className="text-[11px] uppercase tracking-widest text-amber-400 font-bold block">
                 Filozofia vzdelávania Riccardo
@@ -238,10 +238,10 @@ export const SeminarDetailModal: React.FC<SeminarDetailModalProps> = ({
               {seminar.description}
             </p>
 
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-2.5 pt-3 border-t border-zinc-800 text-xs text-zinc-200 font-medium">
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-2.5 pt-3 text-xs text-zinc-200 font-medium">
               {seminar.learningOutcomes.map((outcome, idx) => (
                 <div key={idx} className="flex items-start gap-2">
-                  <div className="w-4 h-4 rounded-full bg-zinc-800 border border-zinc-700 flex items-center justify-center flex-shrink-0 mt-0.5 text-white">
+                  <div className="w-4 h-4 rounded-full bg-zinc-800 flex items-center justify-center flex-shrink-0 mt-0.5 text-white">
                     <Check className="w-2.5 h-2.5 text-emerald-400" />
                   </div>
                   <span>{outcome}</span>
@@ -261,7 +261,7 @@ export const SeminarDetailModal: React.FC<SeminarDetailModalProps> = ({
 
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
               {seminar.schedule.map((dayItem, idx) => (
-                <div key={idx} className="p-5 rounded-2xl bg-zinc-900/80 border border-zinc-850 space-y-2">
+                <div key={idx} className="p-5 rounded-2xl bg-zinc-900/50 space-y-2">
                   <div className="flex items-center justify-between">
                     <h4 className="text-sm font-bold text-white tracking-tight">
                       {dayItem.day}
@@ -287,7 +287,7 @@ export const SeminarDetailModal: React.FC<SeminarDetailModalProps> = ({
           </div>
 
           {/* Included Kit & Perks */}
-          <div className="p-6 rounded-2xl bg-zinc-950 border border-zinc-850 space-y-3">
+          <div className="p-6 rounded-2xl bg-zinc-900/40 space-y-3">
             <div className="flex items-center justify-between">
               <span className="text-[11px] uppercase tracking-wider text-zinc-400 font-bold block">
                 Čo získate v cene vstupenky
@@ -308,7 +308,7 @@ export const SeminarDetailModal: React.FC<SeminarDetailModalProps> = ({
           {/* ========================================================================= */}
           {/* TIER SELECTION CARDS — "BITKA O MIESTA" */}
           {/* ========================================================================= */}
-          <div className="space-y-4 pt-4 border-t border-zinc-900">
+          <div className="space-y-4 pt-4">
             <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2">
               <div>
                 <span className="text-xs uppercase tracking-widest text-amber-400 font-bold block">
@@ -320,7 +320,7 @@ export const SeminarDetailModal: React.FC<SeminarDetailModalProps> = ({
               </div>
 
               <div className="flex items-center gap-2">
-                <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-amber-950/60 border border-amber-500/30 text-amber-300 text-xs font-mono font-semibold">
+                <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-amber-950/60 text-amber-300 text-xs font-mono font-semibold">
                   <Flame className="w-3.5 h-3.5 text-amber-400" />
                   Zostávajú 2 voľné kreslá
                 </span>
@@ -331,10 +331,10 @@ export const SeminarDetailModal: React.FC<SeminarDetailModalProps> = ({
               {seminar.tiers.map((tier) => (
                 <div
                   key={tier.id}
-                  className={`p-6 rounded-3xl border flex flex-col justify-between transition-all relative overflow-hidden ${
+                  className={`p-6 rounded-3xl flex flex-col justify-between transition-all relative overflow-hidden ${
                     tier.recommended
-                      ? 'border-2 border-white bg-zinc-900 shadow-2xl ring-1 ring-white/10'
-                      : 'border-zinc-800 bg-zinc-900/60 hover:border-zinc-700'
+                      ? 'bg-zinc-900 ring-1 ring-white/20 shadow-2xl'
+                      : 'bg-zinc-900/40 hover:bg-zinc-900/70'
                   }`}
                 >
                   {tier.recommended && (
@@ -353,7 +353,7 @@ export const SeminarDetailModal: React.FC<SeminarDetailModalProps> = ({
                       </span>
                     </div>
 
-                    <div className="py-2 border-y border-zinc-800">
+                    <div className="py-2">
                       <span className="text-3xl font-black text-white tracking-tight block">
                         {formatPrice(tier.priceEUR, currency)}
                       </span>
@@ -381,7 +381,7 @@ export const SeminarDetailModal: React.FC<SeminarDetailModalProps> = ({
                     className={`w-full mt-6 py-3 px-4 rounded-full text-xs font-bold transition-all flex items-center justify-center gap-1.5 shadow-xl active:scale-95 cursor-pointer ${
                       tier.recommended
                         ? 'bg-white text-black hover:bg-zinc-200'
-                        : 'bg-zinc-800 text-white hover:bg-zinc-700 border border-zinc-700'
+                        : 'bg-zinc-800 text-white hover:bg-zinc-700'
                     }`}
                   >
                     <Flame className="w-3.5 h-3.5 text-amber-500 fill-amber-500" />
@@ -396,7 +396,7 @@ export const SeminarDetailModal: React.FC<SeminarDetailModalProps> = ({
         </div>
 
         {/* Modal Bottom Footer */}
-        <div className="p-4 sm:p-5 bg-zinc-950 border-t border-zinc-850 flex items-center justify-between text-xs text-zinc-500">
+        <div className="p-4 sm:p-5 bg-zinc-950 flex items-center justify-between text-xs text-zinc-500">
           <div className="flex items-center gap-2">
             <span className="w-1.5 h-1.5 rounded-full bg-emerald-400" />
             <span className="text-zinc-300 font-medium">Hair Salon Riccardo • Atelier Lučenec (ZETEREM s.r.o.)</span>
