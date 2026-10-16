@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { Routes, Route, Navigate } from 'react-router-dom';
+import { Routes, Route, Navigate, useLocation } from 'react-router-dom';
 import { Seminar, PortfolioItem, SEMINARS_DATA, STYLIST_PROFILE } from './data/content';
 import { Navbar } from './components/Navbar';
 import { Footer } from './components/Footer';
@@ -16,11 +16,14 @@ import { ContactPage } from './pages/ContactPage';
 import { TermsPage } from './pages/TermsPage';
 import { PrivacyPage } from './pages/PrivacyPage';
 import { RefundCancellationPage } from './pages/RefundCancellationPage';
+import { AdminPage } from './pages/AdminPage';
 import { Phone, Calendar } from 'lucide-react';
 import { verifyStripeSession, getStripe } from './services/stripeService';
 import { sendFormNotification } from './services/formService';
 
 export function App() {
+  const location = useLocation();
+  const isAdmin = location.pathname.startsWith('/admin');
   // Modals
   const [detailSeminar, setDetailSeminar] = useState<Seminar | null>(null);
   const [portfolioItem, setPortfolioItem] = useState<PortfolioItem | null>(null);
@@ -168,6 +171,10 @@ export function App() {
     handleOpenBooking(seminar, tierId);
   };
 
+  if (isAdmin) {
+    return <AdminPage />;
+  }
+
   return (
     <div className="min-h-screen bg-black text-zinc-100 flex flex-col font-sans selection:bg-white selection:text-black">
       <ScrollToTop />
@@ -178,6 +185,8 @@ export function App() {
       {/* Main Routed Content */}
       <main className="flex-grow">
         <Routes>
+          <Route path="/admin/*" element={<AdminPage />} />
+          <Route path="/admin" element={<AdminPage />} />
           <Route
             path="/"
             element={

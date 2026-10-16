@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import { Link } from 'react-router-dom';
 import { STYLIST_PROFILE, COMPANY_DETAILS } from '../data/content';
 import { InstagramIcon, FacebookIcon } from './SocialIcons';
-import { ArrowUp, ExternalLink, ShieldCheck, Scale, FileText } from 'lucide-react';
+import { ArrowUp, ExternalLink, ShieldCheck, Scale, FileText, Lock } from 'lucide-react';
 import { sendFormNotification } from '../services/formService';
 
 export const Footer: React.FC = () => {
@@ -127,6 +127,16 @@ export const Footer: React.FC = () => {
                   <span>Riešenie sporov RSO</span>
                   <ExternalLink className="w-3 h-3 text-zinc-600" />
                 </a>
+              </li>
+              <li className="pt-2 border-t border-zinc-900">
+                <Link
+                  to="/admin"
+                  className="text-zinc-600 hover:text-zinc-300 transition-colors inline-flex items-center gap-1.5 text-[11px] font-mono"
+                  title="Administratívny portál pre správu kurzov a fotografií"
+                >
+                  <Lock className="w-3 h-3 text-zinc-600" />
+                  <span>Správa systému</span>
+                </Link>
               </li>
             </ul>
           </div>

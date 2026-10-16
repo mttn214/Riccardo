@@ -33,6 +33,7 @@ import {
   mountStripePaymentRequestButton,
   STRIPE_TEST_CARD
 } from '../services/stripeService';
+import { adminStore } from '../services/adminStore';
 
 
 interface ReservationModalProps {
@@ -224,6 +225,49 @@ export const ReservationModal: React.FC<ReservationModalProps> = ({
       'Poznámka': formData.notes || 'Žiadna',
       'Prevádzkovateľ eshopu': COMPANY_DETAILS.legalName
     });
+
+    // Record booking into Admin Store for live attendee visibility
+    try {
+      const paymentStatusText = paymentOption === 'deposit'
+        ? 'Uhradená záloha (100 €)'
+        : methodTitle.includes('Prevod') || methodTitle.includes('Faktúra')
+        ? 'Čaká na prevod / faktúru'
+        : 'Uhradené (Plná suma)';
+
+      adminStore.addParticipant({
+        seminarId: selectedSeminar.id,
+        seminarTitle: selectedSeminar.title,
+        seminarDates: selectedSeminar.dates,
+        seminarCity: selectedSeminar.city,
+        fullName: formData.fullName,
+        email: formData.email,
+        phone: formData.phone,
+        salonName: formData.salonName || undefined,
+        city: formData.city || undefined,
+        experience: formData.experience,
+        tierId: currentTier.id,
+        tierName: currentTier.name,
+        tierPriceEUR: totalPackagePriceEUR,
+        paymentOption,
+        amountPaidEUR: amountToPayNow,
+        amountRemainingEUR: paymentOption === 'deposit' ? totalPackagePriceEUR - 100 : 0,
+        paymentMethod: methodTitle,
+        paymentStatus: paymentStatusText as any,
+        stripePaymentIntentId,
+        stripeTokenId,
+        receiptUrl: receiptUrl || undefined,
+        ticketCode: randomId,
+        billingType: formData.billingType,
+        companyName: formData.companyName || formData.salonName || undefined,
+        ico: formData.ico || undefined,
+        dic: formData.dic || undefined,
+        billingAddress: formData.billingAddress || undefined,
+        notes: formData.notes || undefined,
+        internalNotes: `Online rezervácia z webu (${methodTitle})`
+      });
+    } catch (storeErr) {
+      console.warn('Could not record participant into admin store:', storeErr);
+    }
 
     setIsProcessingPayment(false);
     setStep(4);
