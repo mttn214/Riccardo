@@ -9,9 +9,7 @@ import {
   EyeOff,
   AlertTriangle,
   ArrowRight,
-  Sparkles,
   KeyRound,
-  CheckCircle2,
   Clock
 } from 'lucide-react';
 
@@ -70,12 +68,6 @@ export const AdminLogin: React.FC<AdminLoginProps> = ({ onLoginSuccess }) => {
     }, 400);
   };
 
-  const handleFillDemo = () => {
-    setUsername('admin');
-    setPassword('riccardo2026!');
-    setError('');
-  };
-
   return (
     <div className="min-h-screen bg-black text-white flex flex-col justify-center items-center px-4 py-12 relative overflow-hidden font-sans selection:bg-white selection:text-black">
       {/* Background ambient lighting */}
@@ -86,7 +78,7 @@ export const AdminLogin: React.FC<AdminLoginProps> = ({ onLoginSuccess }) => {
       <div className="w-full max-w-md relative z-10 space-y-6">
         {/* Brand header */}
         <div className="text-center space-y-2">
-          <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-zinc-900 border border-zinc-800 text-[11px] font-mono tracking-wider uppercase text-zinc-400 mb-2">
+          <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-zinc-900 text-[11px] font-mono tracking-wider uppercase text-zinc-400 mb-2">
             <ShieldCheck className="w-3.5 h-3.5 text-emerald-400" />
             <span>Zabezpečený prístup</span>
           </div>
@@ -100,20 +92,20 @@ export const AdminLogin: React.FC<AdminLoginProps> = ({ onLoginSuccess }) => {
         </div>
 
         {/* Card */}
-        <div className="p-7 sm:p-8 rounded-3xl bg-zinc-950/90 border border-zinc-850 shadow-2xl backdrop-blur-xl space-y-6">
-          <div className="flex items-center justify-between border-b border-zinc-850 pb-4">
+        <div className="p-7 sm:p-8 rounded-3xl bg-zinc-950/90 shadow-2xl backdrop-blur-xl space-y-6">
+          <div className="flex items-center justify-between pb-2">
             <div>
-              <h2 className="text-sm font-semibold text-white">Prihlásenie správcu</h2>
-              <p className="text-[11px] text-zinc-400">Autorizácia pre {COMPANY_DETAILS.legalName}</p>
+              <h2 className="text-base font-semibold text-white tracking-tight">Prihlásenie správcu</h2>
+              <p className="text-xs text-zinc-400">Autorizácia pre {COMPANY_DETAILS.legalName}</p>
             </div>
-            <div className="w-9 h-9 rounded-xl bg-zinc-900 border border-zinc-800 flex items-center justify-center text-zinc-300">
+            <div className="w-9 h-9 rounded-xl bg-zinc-900 flex items-center justify-center text-zinc-300">
               <Lock className="w-4 h-4 text-white" />
             </div>
           </div>
 
           {/* Lockout Warning */}
           {lockoutSeconds !== null && lockoutSeconds > 0 && (
-            <div className="p-3.5 rounded-xl bg-red-950/60 border border-red-500/40 text-red-200 text-xs flex items-start gap-2.5">
+            <div className="p-3.5 rounded-xl bg-red-950/40 text-red-200 text-xs flex items-start gap-2.5">
               <Clock className="w-4 h-4 text-red-400 shrink-0 mt-0.5 animate-pulse" />
               <div className="space-y-0.5">
                 <span className="font-semibold block">Prístup dočasne uzamknutý</span>
@@ -126,7 +118,7 @@ export const AdminLogin: React.FC<AdminLoginProps> = ({ onLoginSuccess }) => {
 
           {/* Error Message */}
           {error && !lockoutSeconds && (
-            <div className="p-3.5 rounded-xl bg-amber-950/50 border border-amber-500/30 text-amber-200 text-xs flex items-start gap-2.5">
+            <div className="p-3.5 rounded-xl bg-amber-950/40 text-amber-200 text-xs flex items-start gap-2.5">
               <AlertTriangle className="w-4 h-4 text-amber-400 shrink-0 mt-0.5" />
               <span>{error}</span>
             </div>
@@ -151,8 +143,8 @@ export const AdminLogin: React.FC<AdminLoginProps> = ({ onLoginSuccess }) => {
                     setUsername(e.target.value);
                     if (error) setError('');
                   }}
-                  placeholder="admin"
-                  className="w-full bg-zinc-900/80 border border-zinc-800 focus:border-zinc-500 text-white pl-10 pr-4 py-3 rounded-xl text-sm focus:outline-none transition-colors disabled:opacity-50"
+                  placeholder="Zadajte používateľské meno"
+                  className="w-full bg-zinc-900 focus:bg-zinc-850 text-white pl-10 pr-4 py-3.5 rounded-xl text-sm focus:outline-none focus:ring-1 focus:ring-white/20 transition-all disabled:opacity-50"
                 />
               </div>
             </div>
@@ -178,7 +170,7 @@ export const AdminLogin: React.FC<AdminLoginProps> = ({ onLoginSuccess }) => {
                     if (error) setError('');
                   }}
                   placeholder="••••••••••••"
-                  className="w-full bg-zinc-900/80 border border-zinc-800 focus:border-zinc-500 text-white pl-10 pr-11 py-3 rounded-xl text-sm focus:outline-none transition-colors disabled:opacity-50 font-mono"
+                  className="w-full bg-zinc-900 focus:bg-zinc-850 text-white pl-10 pr-11 py-3.5 rounded-xl text-sm focus:outline-none focus:ring-1 focus:ring-white/20 transition-all disabled:opacity-50 font-mono"
                 />
                 <button
                   type="button"
@@ -210,19 +202,6 @@ export const AdminLogin: React.FC<AdminLoginProps> = ({ onLoginSuccess }) => {
               )}
             </button>
           </form>
-
-          {/* Quick Demo Credentials Helper */}
-          <div className="pt-4 border-t border-zinc-850/80 flex items-center justify-between text-xs text-zinc-500">
-            <span className="text-[11px]">Predvolené prihlásenie:</span>
-            <button
-              type="button"
-              onClick={handleFillDemo}
-              className="text-[11px] font-mono text-zinc-400 hover:text-white underline underline-offset-2 transition-colors cursor-pointer flex items-center gap-1"
-            >
-              <Sparkles className="w-3 h-3 text-amber-400" />
-              <span>Vložiť (admin / riccardo2026!)</span>
-            </button>
-          </div>
         </div>
 
         {/* Security Disclosures */}
