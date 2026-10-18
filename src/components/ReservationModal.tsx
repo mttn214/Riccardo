@@ -313,7 +313,7 @@ export const ReservationModal: React.FC<ReservationModalProps> = ({
         setIsApplePayReady(isReady);
         setCanApplePay(isReady);
         setIsCheckingApplePay(false);
-        setStripePaymentRequest(pr);
+        setStripePaymentRequest(isReady ? pr : null);
 
         // Attach payment listener on PaymentRequest
         pr.on('paymentmethod', async (ev) => {
@@ -482,8 +482,8 @@ export const ReservationModal: React.FC<ReservationModalProps> = ({
   const handleProcessApplePayPayment = async () => {
     setStripeError('');
 
-    if (!stripePaymentRequest) {
-      setStripeError('Apple Pay nie je na tomto zariadení alebo prehliadači inicializované. Skontrolujte nastavenie kariet v Apple Wallet (Safari na iOS/macOS) alebo zvoľte platbu platobnou kartou.');
+    if (!stripePaymentRequest || !isApplePayReady) {
+      setStripeError('Apple Pay nie je momentálne na tejto doméne alebo v tomto prehliadači aktívne (čaká na overenie domény v Stripe Dashboarde alebo na kartu v Apple Wallet). Pre okamžitú úhradu prosím zvoľte platbu platobnou kartou.');
       return;
     }
 
@@ -494,7 +494,7 @@ export const ReservationModal: React.FC<ReservationModalProps> = ({
       stripePaymentRequest.show();
     } catch (err: any) {
       setIsProcessingPayment(false);
-      setStripeError('Nepodarilo sa spustiť Apple Pay dialóg: ' + (err?.message || 'Skontrolujte Safari nastavenia.'));
+      setStripeError('Apple Pay dialóg sa nepodarilo spustiť: ' + (err?.message || 'Skontrolujte Safari nastavenia.') + ' Prosím použite platbu platobnou kartou.');
     }
   };
 
@@ -1294,27 +1294,43 @@ export const ReservationModal: React.FC<ReservationModalProps> = ({
                     </p>
                   </div>
 
-                  {/* Official Apple Pay Button */}
-                  <button
-                    type="button"
-                    onClick={handleProcessApplePayPayment}
-                    disabled={isProcessingPayment}
-                    className="w-full max-w-sm py-3.5 px-6 rounded-2xl bg-black text-white font-semibold text-sm transition-all active:scale-[0.99] shadow-2xl flex items-center justify-center gap-2 cursor-pointer disabled:opacity-50 ring-1 ring-white/15 hover:ring-white/40"
-                    style={{ minHeight: '48px' }}
-                  >
-                    {isProcessingPayment ? (
-                      <div className="flex items-center gap-2 text-white">
-                        <Loader2 className="w-4 h-4 animate-spin text-white" />
-                        <span>{paymentStatusText || 'Overujem cez Apple Pay...'}</span>
-                      </div>
-                    ) : (
-                      <div className="flex items-center gap-2">
-                        <span className="text-xs text-zinc-300">Zaplatiť s</span>
-                        <ApplePayLogo className="h-5 w-auto text-white" />
-                        <span className="text-xs font-mono font-bold text-zinc-200">({amountToPayNow} €)</span>
-                      </div>
-                    )}
-                  </button>
+                  {/* Official Apple Pay Button or Fallback */}
+                  {!isApplePayReady && !isCheckingApplePay ? (
+                    <div className="w-full max-w-sm p-4 rounded-2xl bg-zinc-950/70 border-0 text-center space-y-3">
+                      <p className="text-xs text-zinc-400 leading-relaxed">
+                        Apple Pay na tejto doméne zatiaľ čaká na pridanie domény v Stripe Dashboarde alebo na kartu v Apple Wallet.
+                      </p>
+                      <button
+                        type="button"
+                        onClick={() => setPaymentMethod('card')}
+                        className="w-full py-3 px-4 rounded-xl bg-white hover:bg-zinc-200 text-black font-semibold text-xs transition-all shadow cursor-pointer flex items-center justify-center gap-2"
+                      >
+                        <CreditCard className="w-4 h-4" />
+                        <span>Zaplatiť platobnou kartou ({amountToPayNow} €)</span>
+                      </button>
+                    </div>
+                  ) : (
+                    <button
+                      type="button"
+                      onClick={handleProcessApplePayPayment}
+                      disabled={isProcessingPayment}
+                      className="w-full max-w-sm py-3.5 px-6 rounded-2xl bg-black text-white font-semibold text-sm transition-all active:scale-[0.99] shadow-2xl flex items-center justify-center gap-2 cursor-pointer disabled:opacity-50 ring-1 ring-white/15 hover:ring-white/40"
+                      style={{ minHeight: '48px' }}
+                    >
+                      {isProcessingPayment ? (
+                        <div className="flex items-center gap-2 text-white">
+                          <Loader2 className="w-4 h-4 animate-spin text-white" />
+                          <span>{paymentStatusText || 'Overujem cez Apple Pay...'}</span>
+                        </div>
+                      ) : (
+                        <div className="flex items-center gap-2">
+                          <span className="text-xs text-zinc-300">Zaplatiť s</span>
+                          <ApplePayLogo className="h-5 w-auto text-white" />
+                          <span className="text-xs font-mono font-bold text-zinc-200">({amountToPayNow} €)</span>
+                        </div>
+                      )}
+                    </button>
+                  )}
 
                   <div className="flex items-center justify-center gap-1.5 text-[11px] text-zinc-500">
                     <ShieldCheck className="w-3.5 h-3.5 text-emerald-400" />

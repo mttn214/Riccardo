@@ -18,10 +18,14 @@ import {
   Search,
   CreditCard,
   Check,
-  Zap
+  Zap,
+  Sun,
+  Moon
 } from 'lucide-react';
+import { useAdminTheme } from '../../context/AdminThemeContext';
 
 export const AdminSettingsTab: React.FC = () => {
+  const { theme, setTheme } = useAdminTheme();
   const { settings, auditLogs, store } = useAdminStore();
 
   // Password change state
@@ -283,6 +287,80 @@ export const AdminSettingsTab: React.FC = () => {
             </button>
           </div>
         </form>
+      </div>
+
+      {/* Theme Preference Section */}
+      <div className="p-6 rounded-3xl bg-zinc-900/40 space-y-4">
+        <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2">
+          <div className="flex items-center gap-2.5">
+            <div className="p-2 rounded-xl bg-white/10 text-white">
+              {theme === 'light' ? <Sun className="w-4 h-4 text-amber-400" /> : <Moon className="w-4 h-4 text-zinc-300" />}
+            </div>
+            <div>
+              <h2 className="text-sm font-semibold text-white">Vzhľad a motív administrácie</h2>
+              <p className="text-[11px] text-zinc-400">
+                Vyberte si medzi prémiovým tmavým luxusným motívom a čistým svetlým režimom.
+              </p>
+            </div>
+          </div>
+          <span className="text-[10px] font-mono uppercase px-3 py-1 rounded-full bg-white/5 text-zinc-300">
+            Aktívny: {theme === 'light' ? 'Svetlý režim' : 'Tmavý režim'}
+          </span>
+        </div>
+
+        <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 pt-1">
+          {/* Dark Mode Option */}
+          <button
+            type="button"
+            onClick={() => setTheme('dark')}
+            className={`p-4 rounded-2xl text-left transition-all cursor-pointer flex items-start gap-3.5 ${
+              theme === 'dark'
+                ? 'bg-zinc-800 text-white ring-1 ring-white/30 shadow-lg'
+                : 'bg-zinc-950/60 text-zinc-400 hover:text-white hover:bg-zinc-900/60'
+            }`}
+          >
+            <div className="p-2.5 rounded-xl bg-black text-white shrink-0 mt-0.5">
+              <Moon className="w-4 h-4" />
+            </div>
+            <div className="space-y-1">
+              <div className="flex items-center gap-2 font-semibold text-xs text-white">
+                <span>Tmavý luxusný režim</span>
+                {theme === 'dark' && (
+                  <span className="text-[10px] font-mono px-1.5 py-0.5 rounded bg-emerald-500/20 text-emerald-300">Aktívny</span>
+                )}
+              </div>
+              <p className="text-[11px] text-zinc-400 leading-relaxed">
+                Prémiový nočný štýl Hair Salon Riccardo. Chráni zrak pri práci vo večerných hodinách a šetrí displej.
+              </p>
+            </div>
+          </button>
+
+          {/* Light Mode Option */}
+          <button
+            type="button"
+            onClick={() => setTheme('light')}
+            className={`p-4 rounded-2xl text-left transition-all cursor-pointer flex items-start gap-3.5 ${
+              theme === 'light'
+                ? 'bg-zinc-100 text-zinc-900 ring-1 ring-zinc-400 shadow-lg'
+                : 'bg-zinc-950/60 text-zinc-400 hover:text-white hover:bg-zinc-900/60'
+            }`}
+          >
+            <div className="p-2.5 rounded-xl bg-white text-zinc-900 border border-zinc-200 shrink-0 mt-0.5 shadow-sm">
+              <Sun className="w-4 h-4 text-amber-500" />
+            </div>
+            <div className="space-y-1">
+              <div className="flex items-center gap-2 font-semibold text-xs text-zinc-900">
+                <span>Svetlý moderný režim</span>
+                {theme === 'light' && (
+                  <span className="text-[10px] font-mono px-1.5 py-0.5 rounded bg-emerald-500/20 text-emerald-700">Aktívny</span>
+                )}
+              </div>
+              <p className="text-[11px] text-zinc-500 leading-relaxed">
+                Čisté biele a neutrálne tóny v štýle Apple rozhrania. Maximálna čitateľnosť tabuliek a zoznamov účastníkov cez deň.
+              </p>
+            </div>
+          </button>
+        </div>
       </div>
 
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">

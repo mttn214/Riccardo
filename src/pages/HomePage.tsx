@@ -3,7 +3,7 @@ import { Link } from 'react-router-dom';
 import { Hero } from '../components/Hero';
 import { SEMINARS_DATA, PORTFOLIO_DATA, STYLIST_PROFILE, TESTIMONIALS_DATA, TESTIMONIALS_STATS, PortfolioItem } from '../data/content';
 import { formatPrice } from '../utils/currency';
-import { ArrowUpRight, Check, Trophy, MoveHorizontal, Star, CheckCircle2, ChevronLeft, ChevronRight, Bell } from 'lucide-react';
+import { ArrowUpRight, Check, Trophy, MoveHorizontal, Star, CheckCircle2, ChevronLeft, ChevronRight, Bell, MapPin, Building2 } from 'lucide-react';
 import { GoogleIcon, FacebookIcon } from '../components/SocialIcons';
 import { WaitlistModal } from '../components/WaitlistModal';
 
@@ -459,28 +459,109 @@ export const HomePage: React.FC<HomePageProps> = ({ onOpenBooking, onSelectPortf
         </div>
       </section>
 
-      {/* SECTION: Atelier Lučenec Callout */}
-      <section className="py-24 bg-black text-white">
-        <div className="max-w-6xl mx-auto px-4 sm:px-6">
-          <div className="flex flex-col md:flex-row items-start md:items-center justify-between gap-8">
-            <div className="max-w-xl">
+      {/* SECTION: Atelier Lučenec Callout with House Photo & Google Maps */}
+      <section className="py-20 sm:py-28 bg-black text-white">
+        <div className="max-w-6xl mx-auto px-4 sm:px-6 space-y-8">
+          {/* Header Row */}
+          <div className="flex flex-col md:flex-row items-start md:items-end justify-between gap-6">
+            <div className="max-w-2xl">
               <span className="text-xs uppercase tracking-[0.2em] text-zinc-500 font-medium block mb-2">
-                Atelier Lučenec
+                Atelier & Salón Lučenec
               </span>
-              <h3 className="text-2xl sm:text-3xl font-semibold text-white tracking-tight mb-2">
+              <h3 className="text-2xl sm:text-4xl font-semibold text-white tracking-tight mb-2">
                 J. Kármána 1727/30, 984 01 Lučenec
               </h3>
               <p className="text-sm text-zinc-400 leading-relaxed">
-                Príjemné, komorné prostredie pre klientov i účastníkov vzdelávacích kurzov. Bezplatné parkovanie pred salónom.
+                Príjemné, komorné prostredie pre klientov i účastníkov vzdelávacích kurzov. Bezplatné a pohodlné parkovanie priamo pred salónom.
               </p>
             </div>
-            <Link
-              to="/salon"
-              className="inline-flex items-center gap-2 px-6 py-3 rounded-full text-xs sm:text-sm font-semibold bg-zinc-900 hover:bg-zinc-800 text-white transition-all whitespace-nowrap shadow-sm"
-            >
-              <span>Viac o salóne & Navigácia</span>
-              <ArrowUpRight className="w-4 h-4" />
-            </Link>
+
+            <div className="flex flex-wrap items-center gap-3 shrink-0">
+              <a
+                href={STYLIST_PROFILE.googleMapsUrl}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="inline-flex items-center gap-2 px-5 py-3 rounded-full text-xs sm:text-sm font-semibold bg-white hover:bg-zinc-200 text-black transition-all active:scale-95 shadow-lg whitespace-nowrap cursor-pointer"
+              >
+                <MapPin className="w-4 h-4" />
+                <span>Navigovať cez Google Maps</span>
+                <ArrowUpRight className="w-3.5 h-3.5" />
+              </a>
+
+              <Link
+                to="/salon"
+                className="inline-flex items-center gap-2 px-5 py-3 rounded-full text-xs sm:text-sm font-medium bg-zinc-900 hover:bg-zinc-800 text-zinc-200 hover:text-white transition-all whitespace-nowrap"
+              >
+                <span>Viac o salóne</span>
+                <ArrowUpRight className="w-3.5 h-3.5 text-zinc-400" />
+              </Link>
+            </div>
+          </div>
+
+          {/* 2-Card Visual Showcase: House Photo + Google Maps */}
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-6 pt-2">
+            {/* 1. House Photo Card */}
+            <div className="relative rounded-3xl overflow-hidden bg-zinc-950 min-h-[300px] sm:min-h-[360px] group shadow-2xl flex flex-col justify-between">
+              <img
+                src="/images/riccardo/salon_house.jpg"
+                alt="Hair Salon Riccardo - Ateliér a dom na J. Kármána 30 v Lučenci"
+                onError={(e) => {
+                  (e.target as HTMLImageElement).src = '/images/riccardo/salon_logo_wall.jpg';
+                }}
+                className="absolute inset-0 w-full h-full object-cover transition-transform duration-700 group-hover:scale-105"
+              />
+              <div className="absolute inset-0 bg-gradient-to-t from-black/90 via-black/30 to-black/30 pointer-events-none" />
+
+              {/* Top Badges */}
+              <div className="relative z-10 p-5 flex items-center justify-between">
+                <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-black/60 backdrop-blur-md text-[11px] font-mono text-zinc-300">
+                  <Building2 className="w-3.5 h-3.5 text-white" />
+                  <span>Sídlo salónu & Akadémie</span>
+                </span>
+                <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-emerald-500/20 backdrop-blur-md text-[11px] font-mono text-emerald-300">
+                  <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse" />
+                  <span>Parkovanie pred domom</span>
+                </span>
+              </div>
+
+              {/* Bottom Info */}
+              <div className="relative z-10 p-6 space-y-1">
+                <div className="text-white font-semibold text-lg tracking-tight">
+                  Hair Salon Riccardo Atelier
+                </div>
+                <p className="text-xs text-zinc-300">
+                  Rodinný dom pod nadjazdom • J. Kármána 1727/30, Lučenec
+                </p>
+              </div>
+            </div>
+
+            {/* 2. Interactive Google Maps Card */}
+            <div className="relative rounded-3xl overflow-hidden bg-zinc-950 min-h-[300px] sm:min-h-[360px] shadow-2xl flex flex-col">
+              <iframe
+                title="Hair Salon Riccardo Lučenec - Google Maps"
+                src="https://maps.google.com/maps?q=Hair+Salon+Riccardo,+J.+K%C3%A1rm%C3%A1na+1727%2F30,+Lu%C4%8Denec&t=&z=16&ie=UTF8&iwloc=&output=embed"
+                className="w-full h-full min-h-[300px] sm:min-h-[360px] border-0 filter invert-[92%] hue-rotate-180 contrast-[105%]"
+                loading="lazy"
+                allowFullScreen
+              />
+
+              {/* Map Floating Glassmorphism Controls Overlay */}
+              <div className="absolute bottom-4 left-4 right-4 p-3 rounded-2xl bg-black/85 backdrop-blur-md flex items-center justify-between gap-3 text-xs">
+                <div className="flex items-center gap-2 text-zinc-200 min-w-0">
+                  <MapPin className="w-4 h-4 text-emerald-400 shrink-0" />
+                  <span className="font-medium truncate text-xs">J. Kármána 1727/30, 984 01 Lučenec</span>
+                </div>
+                <a
+                  href={STYLIST_PROFILE.googleMapsUrl}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="px-3.5 py-1.5 rounded-xl bg-white hover:bg-zinc-200 text-black font-semibold text-[11px] transition-colors shrink-0 flex items-center gap-1 cursor-pointer"
+                >
+                  <span>Trasa</span>
+                  <ArrowUpRight className="w-3 h-3" />
+                </a>
+              </div>
+            </div>
           </div>
         </div>
       </section>

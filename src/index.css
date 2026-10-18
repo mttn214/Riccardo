@@ -41,3 +41,230 @@
 .group:hover .img-zoom {
   transform: scale(1.03);
 }
+
+/* ==========================================================================
+   ADMIN LIGHT THEME SYSTEM (APPLE-GRADE LUXURY AESTHETIC)
+   ========================================================================== */
+body.admin-light-mode {
+  background-color: #f8f9fa !important;
+  color: #18181b !important;
+}
+
+body.admin-light-mode ::selection {
+  background-color: #18181b !important;
+  color: #ffffff !important;
+}
+
+.admin-theme-light {
+  background-color: #f8f9fa !important;
+  color: #18181b !important;
+}
+
+/* Sidebar in light mode */
+.admin-theme-light aside {
+  background-color: #ffffff !important;
+  border-right: 1px solid rgba(0, 0, 0, 0.06) !important;
+  box-shadow: 2px 0 16px rgba(0, 0, 0, 0.02) !important;
+}
+
+/* Header in light mode */
+.admin-theme-light header {
+  background-color: rgba(255, 255, 255, 0.88) !important;
+  backdrop-filter: blur(20px) !important;
+  border-bottom: 1px solid rgba(0, 0, 0, 0.06) !important;
+}
+
+/* Panels and Cards in light mode */
+.admin-theme-light .bg-zinc-950,
+.admin-theme-light .bg-zinc-950\/90,
+.admin-theme-light .bg-zinc-950\/80,
+.admin-theme-light .bg-zinc-950\/70,
+.admin-theme-light .bg-zinc-900,
+.admin-theme-light .bg-zinc-900\/90,
+.admin-theme-light .bg-zinc-900\/80,
+.admin-theme-light .bg-zinc-900\/60,
+.admin-theme-light .bg-zinc-900\/50,
+.admin-theme-light .bg-zinc-900\/40,
+.admin-theme-light .bg-zinc-900\/30 {
+  background-color: #ffffff !important;
+  border: 1px solid rgba(0, 0, 0, 0.06) !important;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.03), 0 4px 12px rgba(0, 0, 0, 0.02) !important;
+}
+
+/* Inner subtroughs, nested cards and secondary containers */
+.admin-theme-light .bg-zinc-950\/60,
+.admin-theme-light .bg-zinc-950\/50,
+.admin-theme-light .bg-zinc-950\/40,
+.admin-theme-light .bg-zinc-950\/30,
+.admin-theme-light .bg-zinc-950\/20 {
+  background-color: #f8f9fb !important;
+  border: 1px solid rgba(0, 0, 0, 0.05) !important;
+}
+
+.admin-theme-light .bg-zinc-850,
+.admin-theme-light .bg-zinc-800,
+.admin-theme-light .bg-zinc-800\/80,
+.admin-theme-light .bg-zinc-800\/60 {
+  background-color: #f1f2f4 !important;
+  color: #18181b !important;
+}
+
+.admin-theme-light .bg-zinc-800\/80:hover,
+.admin-theme-light .bg-zinc-800:hover {
+  background-color: #e4e4e7 !important;
+  color: #09090b !important;
+}
+
+.admin-theme-light .bg-zinc-900.h-2,
+.admin-theme-light .bg-zinc-950.h-1\.5 {
+  background-color: #e4e4e7 !important;
+}
+
+.admin-theme-light .bg-white\/\[0\.06\],
+.admin-theme-light .bg-white\/5 {
+  background-color: rgba(0, 0, 0, 0.05) !important;
+}
+
+/* Text overrides in light mode */
+.admin-theme-light h1,
+.admin-theme-light h2,
+.admin-theme-light h3,
+.admin-theme-light h4,
+.admin-theme-light .text-white {
+  color: #09090b !important;
+}
+
+.admin-theme-light .text-zinc-100,
+.admin-theme-light .text-zinc-200,
+.admin-theme-light .text-zinc-300 {
+  color: #18181b !important;
+}
+
+.admin-theme-light .text-zinc-400 {
+  color: #52525b !important;
+}
+
+.admin-theme-light .text-zinc-500 {
+  color: #71717a !important;
+}
+
+/* Primary buttons in light mode (invert dark/light) */
+.admin-theme-light button.bg-white,
+.admin-theme-light a.bg-white {
+  background-color: #09090b !important;
+  color: #ffffff !important;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.12) !important;
+}
+
+.admin-theme-light button.bg-white:hover,
+.admin-theme-light a.bg-white:hover {
+  background-color: #27272a !important;
+  color: #ffffff !important;
+}
+
+/* Secondary & Navigation buttons */
+.admin-theme-light nav button.bg-white\/10 {
+  background-color: #f4f4f5 !important;
+  color: #09090b !important;
+  font-weight: 600 !important;
+}
+
+.admin-theme-light nav button.text-zinc-400:hover,
+.admin-theme-light nav button:hover {
+  background-color: #f4f4f5 !important;
+  color: #09090b !important;
+}
+
+/* Form fields: inputs, selects, textareas */
+.admin-theme-light input,
+.admin-theme-light select,
+.admin-theme-light textarea {
+  background-color: #f4f4f6 !important;
+  color: #09090b !important;
+  border: 1px solid #e4e4e7 !important;
+}
+
+.admin-theme-light input::placeholder,
+.admin-theme-light textarea::placeholder {
+  color: #a1a1aa !important;
+}
+
+.admin-theme-light input:focus,
+.admin-theme-light select:focus,
+.admin-theme-light textarea:focus {
+  background-color: #ffffff !important;
+  border-color: #18181b !important;
+  box-shadow: 0 0 0 1px #18181b !important;
+}
+
+/* Table styles */
+.admin-theme-light table {
+  background-color: #ffffff !important;
+}
+
+.admin-theme-light table thead tr {
+  background-color: #f8f9fa !important;
+  border-bottom: 1px solid #e4e4e7 !important;
+}
+
+.admin-theme-light table thead th {
+  color: #52525b !important;
+  background-color: #f8f9fa !important;
+}
+
+.admin-theme-light table tbody tr {
+  border-bottom: 1px solid #f0f0f2 !important;
+}
+
+.admin-theme-light table tbody tr:hover {
+  background-color: #f9fafb !important;
+}
+
+.admin-theme-light table td {
+  border-color: #f0f0f2 !important;
+}
+
+/* Badges & Status Indicators */
+.admin-theme-light .bg-emerald-950\/50,
+.admin-theme-light .bg-emerald-500\/10 {
+  background-color: #ecfdf5 !important;
+  color: #059669 !important;
+}
+
+.admin-theme-light .bg-amber-950\/50,
+.admin-theme-light .bg-amber-950\/40,
+.admin-theme-light .bg-amber-500\/10 {
+  background-color: #fffbeb !important;
+  color: #d97706 !important;
+}
+
+.admin-theme-light .bg-purple-900\/60,
+.admin-theme-light .bg-purple-900 {
+  background-color: #f3e8ff !important;
+  color: #7e22ce !important;
+}
+
+.admin-theme-light .bg-blue-900\/60,
+.admin-theme-light .bg-blue-500\/10 {
+  background-color: #eff6ff !important;
+  color: #2563eb !important;
+}
+
+.admin-theme-light .bg-red-950\/60,
+.admin-theme-light .bg-red-950\/40,
+.admin-theme-light .bg-red-500\/10 {
+  background-color: #fef2f2 !important;
+  color: #dc2626 !important;
+}
+
+/* Modal styling in light mode */
+.admin-theme-light .fixed.inset-0.bg-black\/85 {
+  background-color: rgba(15, 23, 42, 0.45) !important;
+  backdrop-filter: blur(12px) !important;
+}
+
+.admin-theme-light .fixed.inset-0 > div {
+  background-color: #ffffff !important;
+  border: 1px solid rgba(0, 0, 0, 0.08) !important;
+  box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.15) !important;
+}
