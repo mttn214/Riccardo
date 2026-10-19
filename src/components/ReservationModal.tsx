@@ -111,7 +111,10 @@ export const ReservationModal: React.FC<ReservationModalProps> = ({
   // Stripe & Wallet integration states
   const [stripePaymentRequest, setStripePaymentRequest] = useState<any>(null);
   const [canApplePay, setCanApplePay] = useState<boolean>(true);
-  const [isApplePayReady, setIsApplePayReady] = useState<boolean>(false);
+  const [isApplePayReady, setIsApplePayReady] = useState<boolean>(() => {
+    if (typeof window === 'undefined') return false;
+    return /Macintosh|iPhone|iPad|iPod/.test(navigator.userAgent) || Boolean((window as any).ApplePaySession);
+  });
   const [isCheckingApplePay, setIsCheckingApplePay] = useState<boolean>(false);
   const applePayMountRef = useRef<HTMLDivElement>(null);
   const [stripeError, setStripeError] = useState<string>('');
@@ -309,11 +312,12 @@ export const ReservationModal: React.FC<ReservationModalProps> = ({
         const res = await pr.canMakePayment();
         if (!isMounted) return;
 
-        const isReady = Boolean(res && res.applePay);
+        const isAppleEnv = typeof window !== 'undefined' && (/Macintosh|iPhone|iPad|iPod/.test(navigator.userAgent) || Boolean((window as any).ApplePaySession));
+        const isReady = Boolean(res && res.applePay) || isAppleEnv;
         setIsApplePayReady(isReady);
         setCanApplePay(isReady);
         setIsCheckingApplePay(false);
-        setStripePaymentRequest(isReady ? pr : null);
+        setStripePaymentRequest(pr);
 
         // Attach payment listener on PaymentRequest
         pr.on('paymentmethod', async (ev) => {
@@ -493,18 +497,89 @@ export const ReservationModal: React.FC<ReservationModalProps> = ({
   const handleProcessApplePayPayment = async () => {
     setStripeError('');
 
-    if (!stripePaymentRequest || !isApplePayReady) {
-      setStripeError('Apple Pay nie je v tomto prehliadači aktívne (vyžaduje Safari na zariadení Apple s kartou v Apple Wallet). Pre okamžitú úhradu prosím zvoľte platbu platobnou kartou.');
+    let pr = stripePaymentRequest;
+    if (!pr) {
+      try {
+        const stripe = await getStripe();
+        if (stripe) {
+          pr = stripe.paymentRequest({
+            country: 'SK',
+            currency: 'eur',
+            total: {
+              label: `${selectedSeminar.title} • ZETEREM s.r.o.`,
+              amount: Math.round(amountToPayNow * 100),
+            },
+            requestPayerName: true,
+            requestPayerEmail: true,
+            requestPayerPhone: true,
+          });
+          const canPay = await pr.canMakePayment();
+          if (canPay) {
+            setStripePaymentRequest(pr);
+            pr.on('paymentmethod', async (ev: any) => {
+              setIsProcessingPayment(true);
+              setPaymentStatusText('Autorizujem platbu cez Apple Pay v systéme Stripe...');
+              try {
+                const stripeConfig = adminStore.getStripeConfig();
+                const apiRes = await fetch('/api/pay', {
+                  method: 'POST',
+                  headers: { 'Content-Type': 'application/json' },
+                  body: JSON.stringify({
+                    amountEUR: amountToPayNow,
+                    paymentMethodId: ev.paymentMethod.id,
+                    customerName: ev.payerName || formData.fullName,
+                    customerEmail: ev.payerEmail || formData.email,
+                    customerPhone: ev.payerPhone || formData.phone,
+                    seminarTitle: selectedSeminar.title,
+                    ticketId: confirmationCode,
+                    paymentType: 'apple_pay',
+                    customSecretKey: stripeConfig.secretKey || undefined
+                  })
+                });
+                const data = await apiRes.json();
+                if (data.success) {
+                  ev.complete('success');
+                  if (data.receiptUrl) setStripeReceiptUrl(data.receiptUrl);
+                  await completeReservation({
+                    methodTitle: 'Apple Pay',
+                    stripePaymentIntentId: data.paymentIntentId,
+                    receiptUrl: data.receiptUrl,
+                    paymentStatus: 'Uhradené cez Apple Pay (Stripe Live)'
+                  });
+                } else {
+                  ev.complete('fail');
+                  setIsProcessingPayment(false);
+                  setPaymentStatusText('');
+                  setStripeError(data.error || 'Platba cez Apple Pay nebola úspešná.');
+                }
+              } catch (e: any) {
+                ev.complete('fail');
+                setIsProcessingPayment(false);
+                setPaymentStatusText('');
+                setStripeError(e.message || 'Chyba spojenia pri Apple Pay.');
+              }
+            });
+          }
+        }
+      } catch (e) {
+        console.warn('Fallback init PR error:', e);
+      }
+    }
+
+    if (!pr) {
+      setStripeError('Apple Pay nie je v tomto prehliadači pripravené (vyžaduje Safari na zariadení Apple s kartou v Apple Wallet). Pre okamžitú úhradu prosím zvoľte platbu platobnou kartou.');
       return;
     }
 
     try {
-      await stripePaymentRequest.show();
+      await pr.show();
     } catch (err: any) {
       setIsProcessingPayment(false);
       setPaymentStatusText('');
       console.warn('Apple Pay dialog error:', err);
-      setStripeError('Autorizácia Apple Pay nebola dokončená. Pre okamžitú úhradu prosím zvoľte platbu platobnou kartou (Visa / Mastercard).');
+      if (err?.message && !err.message.includes('abort') && !err.message.includes('cancel')) {
+        setStripeError('Autorizácia Apple Pay nebola dokončená. Pre okamžitú úhradu prosím zvoľte platbu platobnou kartou (Visa / Mastercard).');
+      }
     }
   };
 
@@ -584,18 +659,15 @@ export const ReservationModal: React.FC<ReservationModalProps> = ({
         <div className="p-5 sm:p-6 flex items-center justify-between bg-zinc-950/90 backdrop-blur-md sticky top-0 z-10">
           <div>
             <div className="flex items-center gap-2 mb-1">
-              <span className="text-[10px] uppercase tracking-wider font-semibold px-2.5 py-0.5 rounded-full bg-zinc-900/80 text-zinc-300">
+              <span className="text-[10px] uppercase tracking-wider font-semibold px-2.5 py-0.5 rounded-full bg-zinc-900 text-zinc-300">
                 Krok {step} zo 4
               </span>
-              <span className="text-[11px] text-zinc-500 font-medium">
-                Prevádzkovateľ: <strong className="text-zinc-400">{COMPANY_DETAILS.legalName}</strong>
-              </span>
             </div>
-            <h2 className="text-lg sm:text-xl font-semibold text-white tracking-tight">
-              {step === 1 && 'Výber balíčka & Doplnky'}
-              {step === 2 && 'Účastník & Fakturačné údaje'}
-              {step === 3 && 'Bezpečná platba kurzu'}
-              {step === 4 && 'Vstupenka & Potvrdenie'}
+            <h2 className="text-xl sm:text-2xl font-semibold text-white tracking-tight">
+              {step === 1 && 'Výber balíčka'}
+              {step === 2 && 'Údaje účastníka'}
+              {step === 3 && 'Platba'}
+              {step === 4 && 'Potvrdenie rezervácie'}
             </h2>
           </div>
 
@@ -1105,293 +1177,203 @@ export const ReservationModal: React.FC<ReservationModalProps> = ({
             </div>
           )}
 
-          {/* STEP 3: Payment Gateway (Card, Apple Pay, Bank Transfer) */}
+          {/* STEP 3: Payment Gateway (Clean Apple Pay & Card - Photo 2 style) */}
           {step === 3 && (
-            <div className="space-y-4 animate-fadeIn">
+            <div className="space-y-5 animate-fadeIn">
               
-              {/* Compact Order Summary Strip */}
-              <div className="p-3.5 rounded-2xl bg-zinc-900 border border-zinc-800 flex items-center justify-between">
-                <div className="min-w-0 pr-3">
-                  <div className="flex items-center gap-2">
-                    <strong className="text-sm font-semibold text-white truncate">{selectedSeminar.title}</strong>
-                    <span className="text-[10px] font-mono uppercase px-2 py-0.5 rounded-md bg-zinc-800 text-zinc-300 border border-zinc-700 shrink-0">
-                      {currentTier.name}
-                    </span>
-                  </div>
-                  <div className="text-[11px] text-zinc-400 mt-0.5 flex flex-wrap items-center gap-2">
-                    <span>{selectedSeminar.dates}</span>
-                    <span>•</span>
-                    <span>{paymentOption === 'deposit' ? 'Záloha 100 € (doplatok na mieste)' : 'Úhrada celej sumy'}</span>
-                    <span>•</span>
-                    <span className="text-zinc-500">{COMPANY_DETAILS.legalName}</span>
-                  </div>
+              {/* Clean Order Summary Card */}
+              <div className="p-5 rounded-2xl bg-zinc-900/60 flex items-center justify-between gap-4">
+                <div className="min-w-0 space-y-1">
+                  <h3 className="text-base sm:text-lg font-semibold text-white tracking-tight">
+                    {selectedSeminar.title}
+                  </h3>
+                  <p className="text-xs sm:text-sm text-zinc-400">
+                    {selectedSeminar.dates} • {currentTier.name}
+                  </p>
                 </div>
                 <div className="text-right shrink-0">
-                  <div className="text-2xl font-bold font-mono text-white tracking-tight">
+                  <span className="text-2xl sm:text-3xl font-bold font-mono text-white tracking-tight">
                     {amountToPayNow} €
-                  </div>
-                  <span className="text-[10px] text-emerald-400 font-mono flex items-center justify-end gap-1">
-                    <ShieldCheck className="w-3 h-3 text-emerald-400" />
-                    <span>256-bit SSL</span>
                   </span>
                 </div>
               </div>
 
               {/* Stripe Error or Info Box (if any) */}
               {stripeError && (
-                <div className="p-3.5 rounded-xl bg-amber-500/10 border border-amber-500/30 text-amber-200 text-xs flex items-start gap-2.5 animate-fadeIn">
+                <div className="p-4 rounded-2xl bg-amber-500/10 border border-amber-500/20 text-amber-200 text-xs flex items-start gap-3 animate-fadeIn">
                   <AlertCircle className="w-4 h-4 mt-0.5 flex-shrink-0 text-amber-400" />
-                  <div className="flex-1">
-                    <p className="font-semibold text-amber-300">Upozornenie:</p>
-                    <p className="mt-0.5 text-zinc-300 leading-relaxed">{stripeError}</p>
+                  <p className="text-zinc-200 leading-relaxed">{stripeError}</p>
+                </div>
+              )}
+
+              {/* Official Apple Pay Button (Primary Hero Action - Photo 2) */}
+              {isApplePayReady && (
+                <div className="space-y-4 pt-1">
+                  <button
+                    type="button"
+                    onClick={handleProcessApplePayPayment}
+                    disabled={isProcessingPayment}
+                    className="w-full h-14 rounded-full bg-black text-white hover:bg-zinc-900 active:scale-[0.99] transition-all flex items-center justify-center cursor-pointer shadow-2xl ring-1 ring-white/20 hover:ring-white/40 disabled:opacity-50"
+                    style={{ minHeight: '52px' }}
+                    aria-label="Apple Pay"
+                  >
+                    <ApplePayLogo className="h-7 w-auto text-white" />
+                  </button>
+
+                  <div className="relative flex items-center justify-center">
+                    <div className="absolute inset-0 flex items-center">
+                      <div className="w-full border-t border-zinc-800/80" />
+                    </div>
+                    <span className="relative px-4 bg-zinc-950 text-xs text-zinc-500 font-medium">
+                      alebo zaplatiť platobnou kartou
+                    </span>
                   </div>
                 </div>
               )}
 
-              {/* Payment Methods Segmented Selector (3 options side-by-side) */}
-              <div className="grid grid-cols-3 gap-1.5 p-1 bg-zinc-900 rounded-2xl border border-zinc-800">
-                <button
-                  type="button"
-                  onClick={() => {
-                    setPaymentMethod('card');
-                    setStripeError('');
-                  }}
-                  className={`py-2 px-3 rounded-xl text-xs font-semibold flex items-center justify-center gap-2 transition-all cursor-pointer ${
-                    paymentMethod === 'card'
-                      ? 'bg-white text-black shadow-md'
-                      : 'text-zinc-400 hover:text-white hover:bg-zinc-800/60'
-                  }`}
-                >
-                  <CreditCard className="w-3.5 h-3.5" />
-                  <span className="truncate">Platobná karta</span>
-                </button>
+              {/* Clean Card Payment Form */}
+              <div className="space-y-3.5">
+                <div>
+                  <label className="text-xs font-medium text-zinc-300 block mb-1.5">
+                    Číslo karty
+                  </label>
+                  <div className="relative">
+                    <input
+                      type="text"
+                      inputMode="numeric"
+                      autoComplete="cc-number"
+                      placeholder="•••• •••• •••• ••••"
+                      value={cardNumber}
+                      onChange={handleCardNumberChange}
+                      maxLength={19}
+                      className="w-full bg-zinc-900 text-white pl-4 pr-24 py-3.5 rounded-xl text-sm font-mono tracking-wider focus:outline-none focus:ring-1 focus:ring-white/30 border-0"
+                    />
+                    <div className="absolute inset-y-0 right-0 pr-3.5 flex items-center pointer-events-none">
+                      <CreditCardBrandIcons />
+                    </div>
+                  </div>
+                </div>
+
+                <div className="grid grid-cols-2 gap-3">
+                  <div>
+                    <label className="text-xs font-medium text-zinc-300 block mb-1.5">
+                      Platnosť
+                    </label>
+                    <input
+                      type="text"
+                      inputMode="numeric"
+                      autoComplete="cc-exp"
+                      placeholder="MM/RR"
+                      value={cardExpiry}
+                      onChange={handleCardExpiryChange}
+                      maxLength={5}
+                      className="w-full bg-zinc-900 text-white p-3.5 rounded-xl text-sm font-mono text-center focus:outline-none focus:ring-1 focus:ring-white/30 border-0"
+                    />
+                  </div>
+                  <div>
+                    <label className="text-xs font-medium text-zinc-300 block mb-1.5">
+                      CVC kód
+                    </label>
+                    <input
+                      type="password"
+                      inputMode="numeric"
+                      autoComplete="cc-csc"
+                      placeholder="•••"
+                      value={cardCvc}
+                      onChange={(e) => {
+                        setCardCvc(e.target.value.replace(/\D/g, '').slice(0, 4));
+                        if (stripeError) setStripeError('');
+                      }}
+                      maxLength={4}
+                      className="w-full bg-zinc-900 text-white p-3.5 rounded-xl text-sm font-mono text-center tracking-widest focus:outline-none focus:ring-1 focus:ring-white/30 border-0"
+                    />
+                  </div>
+                </div>
 
                 <button
                   type="button"
-                  onClick={() => {
-                    setPaymentMethod('apple_pay');
-                    setStripeError('');
-                  }}
-                  className={`py-2 px-3 rounded-xl text-xs font-semibold flex items-center justify-center gap-2 transition-all cursor-pointer ${
-                    paymentMethod === 'apple_pay'
-                      ? 'bg-white text-black shadow-md'
-                      : 'text-zinc-400 hover:text-white hover:bg-zinc-800/60'
-                  }`}
+                  onClick={handleProcessCardPayment}
+                  disabled={isProcessingPayment}
+                  className="w-full h-14 rounded-full bg-white hover:bg-zinc-100 text-black font-semibold text-sm sm:text-base transition-all active:scale-[0.99] shadow-xl flex items-center justify-center gap-2 cursor-pointer disabled:opacity-50 mt-1"
                 >
-                  <ApplePayLogo className={`h-3.5 w-auto ${paymentMethod === 'apple_pay' ? 'text-black' : 'text-white'}`} />
-                  <span className="truncate">Apple Pay</span>
-                </button>
-
-                <button
-                  type="button"
-                  onClick={() => {
-                    setPaymentMethod('transfer');
-                    setStripeError('');
-                  }}
-                  className={`py-2 px-3 rounded-xl text-xs font-semibold flex items-center justify-center gap-2 transition-all cursor-pointer ${
-                    paymentMethod === 'transfer'
-                      ? 'bg-white text-black shadow-md'
-                      : 'text-zinc-400 hover:text-white hover:bg-zinc-800/60'
-                  }`}
-                >
-                  <Building2 className="w-3.5 h-3.5" />
-                  <span className="truncate">Faktúra / Účet</span>
+                  {isProcessingPayment ? (
+                    <div className="flex items-center gap-2">
+                      <Loader2 className="w-5 h-5 animate-spin text-black" />
+                      <span>Spracúvam platbu...</span>
+                    </div>
+                  ) : (
+                    <span>Zaplatiť {amountToPayNow} € kartou</span>
+                  )}
                 </button>
               </div>
 
-              {/* 1. Platobná karta Panel */}
-              {paymentMethod === 'card' && (
-                <div className="p-5 rounded-3xl bg-zinc-900/40 space-y-3 animate-fadeIn">
-                  <div>
-                    <label className="text-[11px] font-medium text-zinc-400 block mb-1">
-                      Číslo platobnej karty *
-                    </label>
-                    <div className="relative">
-                      <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none text-zinc-400">
-                        <CreditCard className="w-3.5 h-3.5" />
-                      </div>
-                      <input
-                        type="text"
-                        inputMode="numeric"
-                        autoComplete="cc-number"
-                        placeholder="•••• •••• •••• ••••"
-                        value={cardNumber}
-                        onChange={handleCardNumberChange}
-                        maxLength={19}
-                        className="w-full bg-zinc-950 text-white pl-9 pr-24 py-3 rounded-xl text-xs sm:text-sm font-mono tracking-wider focus:outline-none focus:ring-1 focus:ring-white/20 border-0"
-                      />
-                      <div className="absolute inset-y-0 right-0 pr-3 flex items-center pointer-events-none">
-                        <CreditCardBrandIcons />
-                      </div>
-                    </div>
-                  </div>
-
-                  <div className="grid grid-cols-2 gap-3">
-                    <div>
-                      <label className="text-[11px] font-medium text-zinc-400 block mb-1">
-                        Platnosť (MM/RR) *
-                      </label>
-                      <input
-                        type="text"
-                        inputMode="numeric"
-                        autoComplete="cc-exp"
-                        placeholder="MM/RR"
-                        value={cardExpiry}
-                        onChange={handleCardExpiryChange}
-                        maxLength={5}
-                        className="w-full bg-zinc-950 text-white p-3 rounded-xl text-xs sm:text-sm font-mono text-center focus:outline-none focus:ring-1 focus:ring-white/20 border-0"
-                      />
-                    </div>
-                    <div>
-                      <label className="text-[11px] font-medium text-zinc-400 block mb-1">
-                        Bezpečnostný kód (CVC) *
-                      </label>
-                      <input
-                        type="password"
-                        inputMode="numeric"
-                        autoComplete="cc-csc"
-                        placeholder="•••"
-                        value={cardCvc}
-                        onChange={(e) => {
-                          setCardCvc(e.target.value.replace(/\D/g, '').slice(0, 4));
-                          if (stripeError) setStripeError('');
-                        }}
-                        maxLength={4}
-                        className="w-full bg-zinc-950 text-white p-3 rounded-xl text-xs sm:text-sm font-mono text-center tracking-widest focus:outline-none focus:ring-1 focus:ring-white/20 border-0"
-                      />
-                    </div>
-                  </div>
-
-                  <div className="flex items-center justify-between text-[11px] text-zinc-500 pt-0.5">
-                    <span>Autorizované cez Stripe 3D Secure</span>
-                    <button
-                      type="button"
-                      onClick={handleFillTestCard}
-                      className="text-zinc-400 hover:text-white underline underline-offset-2 transition-colors cursor-pointer"
-                    >
-                      Vložiť testovaciu kartu (4242...)
-                    </button>
-                  </div>
-
+              {/* Optional Bank Transfer Toggle */}
+              <div className="pt-2 text-center">
+                {paymentMethod !== 'transfer' ? (
                   <button
                     type="button"
-                    onClick={handleProcessCardPayment}
-                    disabled={isProcessingPayment}
-                    className="w-full py-3.5 px-6 rounded-xl bg-white hover:bg-zinc-200 text-black font-semibold text-xs sm:text-sm transition-all active:scale-[0.99] shadow-xl flex items-center justify-center gap-2 cursor-pointer disabled:opacity-50"
+                    onClick={() => {
+                      setPaymentMethod('transfer');
+                      setStripeError('');
+                    }}
+                    className="text-xs text-zinc-400 hover:text-white transition-colors cursor-pointer"
                   >
-                    {isProcessingPayment ? (
-                      <div className="flex items-center gap-2">
-                        <Loader2 className="w-4 h-4 animate-spin text-black" />
-                        <span>{paymentStatusText || 'Spracúvam platbu kartou...'}</span>
-                      </div>
-                    ) : (
-                      <>
-                        <Lock className="w-3.5 h-3.5" />
-                        <span>Zaplatiť {amountToPayNow} € kartou</span>
-                      </>
-                    )}
+                    Potrebujete faktúru na firmu? Úhrada bankovým prevodom
                   </button>
-                </div>
-              )}
-
-              {/* 2. Apple Pay Panel */}
-              {paymentMethod === 'apple_pay' && (
-                <div className="p-6 rounded-3xl bg-zinc-900/40 flex flex-col items-center justify-center text-center space-y-4 animate-fadeIn">
-                  <div className="space-y-1">
-                    <h4 className="text-base font-semibold text-white">Apple Pay</h4>
-                    <p className="text-xs text-zinc-400 max-w-sm leading-relaxed">
-                      Rýchla a bezpečná autorizácia cez Face ID alebo Touch ID na zariadeniach Apple.
-                    </p>
-                  </div>
-
-                  {/* Official Apple Pay Button or Fallback */}
-                  {!isApplePayReady && !isCheckingApplePay ? (
-                    <div className="w-full max-w-sm p-4 rounded-2xl bg-zinc-950/70 border-0 text-center space-y-3">
-                      <p className="text-xs text-zinc-400 leading-relaxed">
-                        Pre platbu cez Apple Pay použite Safari na iPhone, iPad alebo Macu s kartou v Apple Wallet. Pre okamžitú úhradu v tomto prehliadači použite platobnú kartu.
-                      </p>
+                ) : (
+                  <div className="p-5 rounded-2xl bg-zinc-900/60 space-y-4 text-left animate-fadeIn">
+                    <div className="flex items-center justify-between">
+                      <h4 className="text-sm font-semibold text-white">Údaje pre bankový prevod</h4>
                       <button
                         type="button"
                         onClick={() => setPaymentMethod('card')}
-                        className="w-full py-3 px-4 rounded-xl bg-white hover:bg-zinc-200 text-black font-semibold text-xs transition-all shadow cursor-pointer flex items-center justify-center gap-2"
+                        className="text-xs text-zinc-400 hover:text-white cursor-pointer"
                       >
-                        <CreditCard className="w-4 h-4" />
-                        <span>Zaplatiť platobnou kartou ({amountToPayNow} €)</span>
+                        Zatvoriť
                       </button>
                     </div>
-                  ) : (
-                    <button
-                      type="button"
-                      onClick={handleProcessApplePayPayment}
-                      disabled={isProcessingPayment}
-                      className="w-full max-w-sm py-3.5 px-6 rounded-2xl bg-black text-white font-semibold text-sm transition-all active:scale-[0.99] shadow-2xl flex items-center justify-center gap-2 cursor-pointer disabled:opacity-50 ring-1 ring-white/15 hover:ring-white/40"
-                      style={{ minHeight: '48px' }}
-                    >
-                      {isProcessingPayment ? (
-                        <div className="flex items-center gap-2 text-white">
-                          <Loader2 className="w-4 h-4 animate-spin text-white" />
-                          <span>{paymentStatusText || 'Overujem cez Apple Pay...'}</span>
-                        </div>
-                      ) : (
-                        <div className="flex items-center gap-2">
-                          <span className="text-xs text-zinc-300">Zaplatiť s</span>
-                          <ApplePayLogo className="h-5 w-auto text-white" />
-                          <span className="text-xs font-mono font-bold text-zinc-200">({amountToPayNow} €)</span>
-                        </div>
-                      )}
-                    </button>
-                  )}
 
-                  <div className="flex items-center justify-center gap-1.5 text-[11px] text-zinc-500">
-                    <ShieldCheck className="w-3.5 h-3.5 text-emerald-400" />
-                    <span>Apple Secure Enclave • Prevádzkovateľ: {COMPANY_DETAILS.legalName}</span>
-                  </div>
-                </div>
-              )}
-
-              {/* 3. Bank Transfer Panel */}
-              {paymentMethod === 'transfer' && (
-                <div className="p-5 rounded-3xl bg-zinc-900/40 space-y-3 animate-fadeIn">
-                  <div className="p-4 rounded-2xl bg-zinc-950/60 space-y-2 text-xs">
-                    <div className="flex justify-between items-center">
-                      <span className="text-zinc-500">Príjemca:</span>
-                      <strong className="text-white">{COMPANY_DETAILS.legalName}</strong>
-                    </div>
-                    <div className="flex justify-between items-center">
-                      <span className="text-zinc-500">IBAN ({COMPANY_DETAILS.bankAccount.bankName}):</span>
-                      <div className="flex items-center gap-1.5">
-                        <span className="font-mono text-white text-xs">{COMPANY_DETAILS.bankAccount.iban}</span>
-                        <button
-                          type="button"
-                          onClick={handleCopyIban}
-                          className="p-1 rounded hover:bg-zinc-800 text-zinc-400 hover:text-white"
-                          title="Kopírovať IBAN"
-                        >
-                          {copiedIban ? <Check className="w-3.5 h-3.5 text-emerald-400" /> : <Copy className="w-3.5 h-3.5" />}
-                        </button>
+                    <div className="space-y-2 text-xs">
+                      <div className="flex justify-between items-center">
+                        <span className="text-zinc-400">Príjemca:</span>
+                        <strong className="text-white">{COMPANY_DETAILS.legalName}</strong>
+                      </div>
+                      <div className="flex justify-between items-center">
+                        <span className="text-zinc-400">Banka:</span>
+                        <span className="text-white">{COMPANY_DETAILS.bankAccount.bankName}</span>
+                      </div>
+                      <div className="flex justify-between items-center">
+                        <span className="text-zinc-400">IBAN:</span>
+                        <div className="flex items-center gap-1.5">
+                          <span className="font-mono text-white text-xs">{COMPANY_DETAILS.bankAccount.iban}</span>
+                          <button
+                            type="button"
+                            onClick={handleCopyIban}
+                            className="p-1 rounded hover:bg-zinc-800 text-zinc-400 hover:text-white"
+                            title="Kopírovať IBAN"
+                          >
+                            {copiedIban ? <Check className="w-3.5 h-3.5 text-emerald-400" /> : <Copy className="w-3.5 h-3.5" />}
+                          </button>
+                        </div>
+                      </div>
+                      <div className="flex justify-between items-center">
+                        <span className="text-zinc-400">SWIFT / BIC:</span>
+                        <span className="font-mono text-zinc-300">{COMPANY_DETAILS.bankAccount.swift}</span>
                       </div>
                     </div>
-                    <div className="flex justify-between items-center">
-                      <span className="text-zinc-500">SWIFT / BIC:</span>
-                      <span className="text-zinc-300 font-mono text-xs">{COMPANY_DETAILS.bankAccount.swift}</span>
-                    </div>
-                    <div className="flex justify-between items-center">
-                      <span className="text-zinc-500">IČO / DIČ:</span>
-                      <span className="text-zinc-300 font-mono">IČO: {COMPANY_DETAILS.ico} | DIČ: {COMPANY_DETAILS.dic}</span>
-                    </div>
-                  </div>
 
-                  <button
-                    type="button"
-                    onClick={handleProcessTransferPayment}
-                    disabled={isProcessingPayment}
-                    className="w-full py-3.5 px-6 rounded-xl bg-white hover:bg-zinc-200 text-black font-semibold text-xs sm:text-sm transition-all active:scale-[0.99] shadow-xl flex items-center justify-center gap-2 cursor-pointer disabled:opacity-50"
-                  >
-                    <FileText className="w-3.5 h-3.5" />
-                    <span>Záväzne rezervovať na faktúru ({amountToPayNow} €)</span>
-                  </button>
-                </div>
-              )}
+                    <button
+                      type="button"
+                      onClick={handleProcessTransferPayment}
+                      disabled={isProcessingPayment}
+                      className="w-full h-12 rounded-full bg-white hover:bg-zinc-100 text-black font-semibold text-xs sm:text-sm transition-all active:scale-[0.99] shadow-lg flex items-center justify-center gap-2 cursor-pointer disabled:opacity-50"
+                    >
+                      <FileText className="w-3.5 h-3.5" />
+                      <span>Záväzne rezervovať na faktúru ({amountToPayNow} €)</span>
+                    </button>
+                  </div>
+                )}
+              </div>
 
               {/* Processing Overlay if in progress */}
               {isProcessingPayment && (
@@ -1652,21 +1634,18 @@ export const ReservationModal: React.FC<ReservationModalProps> = ({
 
         {/* Step 3 back button */}
         {step === 3 && (
-          <div className="p-4 sm:p-5 flex items-center justify-between bg-zinc-950/90 backdrop-blur-md">
+          <div className="p-4 sm:p-5 flex items-center justify-start bg-zinc-950/90 backdrop-blur-md">
             <button
               type="button"
               onClick={() => {
                 setStep(2);
                 setStripeError('');
               }}
-              className="px-4 py-2 rounded-full text-xs font-medium text-zinc-400 hover:text-white transition-colors flex items-center gap-1"
+              className="px-4 py-2 rounded-full text-xs font-medium text-zinc-400 hover:text-white transition-colors flex items-center gap-1 cursor-pointer"
             >
               <ArrowLeft className="w-3.5 h-3.5" />
               <span>Späť na údaje</span>
             </button>
-            <span className="text-xs text-zinc-500">
-              Vyberte Platobnú kartu, Apple Pay alebo Faktúru na salón
-            </span>
           </div>
         )}
 
