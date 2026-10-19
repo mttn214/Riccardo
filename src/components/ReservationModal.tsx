@@ -503,10 +503,8 @@ export const ReservationModal: React.FC<ReservationModalProps> = ({
     } catch (err: any) {
       setIsProcessingPayment(false);
       setPaymentStatusText('');
-      if (err?.name !== 'AbortError') {
-        console.warn('Apple Pay dialog error:', err);
-        setStripeError('Apple Pay dialóg sa nepodarilo otvoriť (' + (err?.message || 'Skontrolujte nastavenia Safari') + '). Pre okamžitú úhradu prosím zvoľte platbu platobnou kartou.');
-      }
+      console.warn('Apple Pay dialog error:', err);
+      setStripeError('Autorizácia Apple Pay nebola dokončená. Pre okamžitú úhradu prosím zvoľte platbu platobnou kartou (Visa / Mastercard).');
     }
   };
 
