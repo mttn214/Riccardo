@@ -379,6 +379,17 @@ export const ReservationModal: React.FC<ReservationModalProps> = ({
     };
   }, [isOpen, step, paymentMethod, amountToPayNow, selectedSeminar, formData.fullName, formData.email, formData.phone, confirmationCode]);
 
+  // Safety timeout: Ensure payment processing overlay never hangs indefinitely
+  useEffect(() => {
+    if (!isProcessingPayment) return;
+    const timeout = setTimeout(() => {
+      setIsProcessingPayment(false);
+      setPaymentStatusText('');
+      setStripeError('Spracovanie platby trvalo neobvykle dlho. Ak vám platba neprešla, skúste to znova alebo zvoľte platbu platobnou kartou či prevodom.');
+    }, 12000);
+    return () => clearTimeout(timeout);
+  }, [isProcessingPayment]);
+
   // Format Card Number (adds space every 4 digits)
   const handleCardNumberChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const raw = e.target.value.replace(/\D/g, '').slice(0, 16);
@@ -409,7 +420,7 @@ export const ReservationModal: React.FC<ReservationModalProps> = ({
 
   // Copy IBAN helper
   const handleCopyIban = () => {
-    navigator.clipboard.writeText('SK9111000000002938475612');
+    navigator.clipboard.writeText(COMPANY_DETAILS.bankAccount.ibanRaw);
     setCopiedIban(true);
     setTimeout(() => setCopiedIban(false), 2000);
   };
@@ -487,14 +498,15 @@ export const ReservationModal: React.FC<ReservationModalProps> = ({
       return;
     }
 
-    setIsProcessingPayment(true);
-    setPaymentStatusText('Otváram autorizačný dialóg Apple Pay (Face ID / Touch ID)...');
-
     try {
-      stripePaymentRequest.show();
+      await stripePaymentRequest.show();
     } catch (err: any) {
       setIsProcessingPayment(false);
-      setStripeError('Apple Pay dialóg sa nepodarilo spustiť: ' + (err?.message || 'Skontrolujte Safari nastavenia.') + ' Prosím použite platbu platobnou kartou.');
+      setPaymentStatusText('');
+      if (err?.name !== 'AbortError') {
+        console.warn('Apple Pay dialog error:', err);
+        setStripeError('Apple Pay dialóg sa nepodarilo otvoriť (' + (err?.message || 'Skontrolujte nastavenia Safari') + '). Pre okamžitú úhradu prosím zvoľte platbu platobnou kartou.');
+      }
     }
   };
 
@@ -1348,9 +1360,9 @@ export const ReservationModal: React.FC<ReservationModalProps> = ({
                       <strong className="text-white">{COMPANY_DETAILS.legalName}</strong>
                     </div>
                     <div className="flex justify-between items-center">
-                      <span className="text-zinc-500">IBAN (Tatra banka):</span>
+                      <span className="text-zinc-500">IBAN ({COMPANY_DETAILS.bankAccount.bankName}):</span>
                       <div className="flex items-center gap-1.5">
-                        <span className="font-mono text-white text-xs">SK91 1100 0000 0029 3847 5612</span>
+                        <span className="font-mono text-white text-xs">{COMPANY_DETAILS.bankAccount.iban}</span>
                         <button
                           type="button"
                           onClick={handleCopyIban}
@@ -1360,6 +1372,10 @@ export const ReservationModal: React.FC<ReservationModalProps> = ({
                           {copiedIban ? <Check className="w-3.5 h-3.5 text-emerald-400" /> : <Copy className="w-3.5 h-3.5" />}
                         </button>
                       </div>
+                    </div>
+                    <div className="flex justify-between items-center">
+                      <span className="text-zinc-500">SWIFT / BIC:</span>
+                      <span className="text-zinc-300 font-mono text-xs">{COMPANY_DETAILS.bankAccount.swift}</span>
                     </div>
                     <div className="flex justify-between items-center">
                       <span className="text-zinc-500">IČO / DIČ:</span>
@@ -1388,7 +1404,18 @@ export const ReservationModal: React.FC<ReservationModalProps> = ({
                   <h3 className="text-xl font-semibold text-white tracking-tight mb-2">
                     Spracúvam rezerváciu...
                   </h3>
-                  <p className="text-sm text-zinc-400">{paymentStatusText}</p>
+                  <p className="text-sm text-zinc-400 mb-6 max-w-sm">{paymentStatusText}</p>
+
+                  <button
+                    type="button"
+                    onClick={() => {
+                      setIsProcessingPayment(false);
+                      setPaymentStatusText('');
+                    }}
+                    className="px-5 py-2.5 rounded-full bg-zinc-900 hover:bg-zinc-800 border border-zinc-750 text-white text-xs font-medium transition-all shadow-lg active:scale-95 cursor-pointer"
+                  >
+                    Zrušiť a vrátiť sa k výberu platby
+                  </button>
                 </div>
               )}
 

@@ -119,6 +119,12 @@ export const COMPANY_DETAILS = {
   contactEmail: "hair.riccardo@gmail.com",
   phone: "+421 915 869 758",
   secondaryPhone: "+421 908 261 740",
+  bankAccount: {
+    bankName: "Slovenská sporiteľňa, a.s.",
+    iban: "SK42 0900 0000 0051 9804 5820",
+    ibanRaw: "SK4209000000005198045820",
+    swift: "GIBASKBX"
+  },
   supervisoryAuthority: {
     name: "Slovenská obchodná inšpekcia (SOI)",
     inspectorate: "Inšpektorát SOI pre Banskobystrický kraj",

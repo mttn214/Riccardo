@@ -240,7 +240,7 @@ export const AdminAddParticipantModal: React.FC<AdminAddParticipantModalProps> =
                   className="w-full bg-zinc-950 border border-zinc-800 text-white p-2 rounded-xl focus:outline-none cursor-pointer"
                 >
                   <option value="Hotovosť na salóne">Hotovosť na salóne</option>
-                  <option value="Prevod na účet Tatra banka">Prevod na účet Tatra banka</option>
+                  <option value="Prevod na bankový účet">Prevod na bankový účet</option>
                   <option value="Platobná karta (Terminál / Stripe)">Platobná karta</option>
                   <option value="Apple Pay">Apple Pay</option>
                   <option value="Faktúra na salón (Splatnosť)">Faktúra (Splatnosť)</option>

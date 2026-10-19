@@ -547,8 +547,8 @@ export const AdminSettingsTab: React.FC = () => {
 
           <div className="p-4 rounded-2xl bg-zinc-950/60">
             <span className="text-[10px] text-zinc-500 block uppercase">Bankové spojenie:</span>
-            <span className="text-white block mt-1">Tatra banka, a.s.</span>
-            <span className="text-zinc-400 block text-[10px] truncate">SK91 1100 0000 0029 3847 5612</span>
+            <span className="text-white block mt-1">{COMPANY_DETAILS.bankAccount.bankName}</span>
+            <span className="text-zinc-400 block text-[10px] truncate">{COMPANY_DETAILS.bankAccount.iban}</span>
           </div>
 
           <div className="p-4 rounded-2xl bg-zinc-950/60">

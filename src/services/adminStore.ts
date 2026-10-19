@@ -143,7 +143,7 @@ const SEED_PARTICIPANTS: Participant[] = [
     dic: '2120485912',
     billingAddress: 'Dolná 14, 974 01 Banská Bystrica',
     notes: 'Prosím o vystavenie faktúry na firmu pre odpočet nákladov.',
-    internalNotes: 'Overené v Tatra banke, certifikát vytlačený vopred.'
+    internalNotes: 'Overené na bankovom účte (SLSP), certifikát vytlačený vopred.'
   },
   {
     id: 'part-002',
@@ -191,7 +191,7 @@ const SEED_PARTICIPANTS: Participant[] = [
     paymentOption: 'full',
     amountPaidEUR: 380,
     amountRemainingEUR: 0,
-    paymentMethod: 'Faktúra / Tatra banka prevod',
+    paymentMethod: 'Faktúra / Bankový prevod (SLSP)',
     paymentStatus: 'Uhradené (Plná suma)',
     ticketCode: 'RIC-LUC-2938',
     registeredAt: '2026-10-14 11:40',
@@ -202,7 +202,7 @@ const SEED_PARTICIPANTS: Participant[] = [
     dic: '2029481920',
     billingAddress: 'Hlavná 42, 040 01 Košice',
     notes: 'Platba prevedená s variabilným symbolom 2938.',
-    internalNotes: 'Platba spárovaná s výpisom Tatra banky.'
+    internalNotes: 'Platba spárovaná s výpisom z účtu v Slovenskej sporiteľni.'
   },
   {
     id: 'part-004',
