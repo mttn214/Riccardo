@@ -483,7 +483,7 @@ export const ReservationModal: React.FC<ReservationModalProps> = ({
     setStripeError('');
 
     if (!stripePaymentRequest || !isApplePayReady) {
-      setStripeError('Apple Pay nie je momentálne na tejto doméne alebo v tomto prehliadači aktívne (čaká na overenie domény v Stripe Dashboarde alebo na kartu v Apple Wallet). Pre okamžitú úhradu prosím zvoľte platbu platobnou kartou.');
+      setStripeError('Apple Pay nie je v tomto prehliadači aktívne (vyžaduje Safari na zariadení Apple s kartou v Apple Wallet). Pre okamžitú úhradu prosím zvoľte platbu platobnou kartou.');
       return;
     }
 
@@ -1298,7 +1298,7 @@ export const ReservationModal: React.FC<ReservationModalProps> = ({
                   {!isApplePayReady && !isCheckingApplePay ? (
                     <div className="w-full max-w-sm p-4 rounded-2xl bg-zinc-950/70 border-0 text-center space-y-3">
                       <p className="text-xs text-zinc-400 leading-relaxed">
-                        Apple Pay na tejto doméne zatiaľ čaká na pridanie domény v Stripe Dashboarde alebo na kartu v Apple Wallet.
+                        Pre platbu cez Apple Pay použite Safari na iPhone, iPad alebo Macu s kartou v Apple Wallet. Pre okamžitú úhradu v tomto prehliadači použite platobnú kartu.
                       </p>
                       <button
                         type="button"
