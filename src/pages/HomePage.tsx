@@ -293,24 +293,40 @@ export const HomePage: React.FC<HomePageProps> = ({ onOpenBooking, onSelectPortf
                 </div>
               </div>
 
-              {/* Real Photo Strip */}
-              <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 sm:gap-4 pt-4">
+              {/* Gala Ceremony Photo Gallery (Distinct from portfolio above) */}
+              <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 pt-4">
                 {[
-                  { img: '/images/riccardo/richard_conka_hda_1.jpg', label: 'Žitná Symfónia • Look 1' },
-                  { img: '/images/riccardo/richard_conka_hda_2.jpg', label: 'Avant-Garde • Look 2' },
-                  { img: '/images/riccardo/richard_conka_hda_3.jpg', label: 'Dark Elegance • Look 3' },
-                  { img: '/images/riccardo/richard_conka_hda_4.jpg', label: 'Pocta Tradícii • Look 4' },
+                  {
+                    img: '/images/riccardo/hda_winners_group_hires.jpg',
+                    title: 'Víťazný ceremoniál na pódiu',
+                    subtitle: 'Richard Čonka a ocenení víťazi s trofejami'
+                  },
+                  {
+                    img: '/images/riccardo/richard_conka_stage_award.jpg',
+                    title: 'Galavečer Forum Karlín',
+                    subtitle: 'Craft The Future • Slávnostná sála Praha'
+                  },
+                  {
+                    img: '/images/riccardo/hda_gala_atmosphere.jpg',
+                    title: 'Atmosféra & Galashow',
+                    subtitle: 'Finálový večer kaderníckych Oskarov'
+                  }
                 ].map((item, idx) => (
-                  <div key={idx} className="relative aspect-[3/4] rounded-xl overflow-hidden bg-zinc-900 group">
+                  <div key={idx} className="group relative aspect-[16/10] rounded-2xl overflow-hidden bg-zinc-900 border border-zinc-800">
                     <img
                       src={item.img}
-                      alt={item.label}
-                      className="w-full h-full object-cover object-top group-hover:scale-105 transition-transform duration-500 filter brightness-[0.95]"
+                      alt={item.title}
+                      className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500 filter brightness-[0.92]"
                     />
-                    <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-transparent to-transparent opacity-80" />
-                    <span className="absolute bottom-2.5 left-2.5 text-[11px] font-medium text-white truncate pr-2">
-                      {item.label}
-                    </span>
+                    <div className="absolute inset-0 bg-gradient-to-t from-black/85 via-black/20 to-transparent opacity-90 group-hover:opacity-100 transition-opacity" />
+                    <div className="absolute bottom-3 left-3 right-3 space-y-0.5">
+                      <span className="text-xs font-semibold text-white block truncate">
+                        {item.title}
+                      </span>
+                      <span className="text-[11px] text-zinc-400 block truncate">
+                        {item.subtitle}
+                      </span>
+                    </div>
                   </div>
                 ))}
               </div>
