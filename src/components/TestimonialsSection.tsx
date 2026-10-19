@@ -381,14 +381,8 @@ export const TestimonialsSection: React.FC = () => {
               ))}
             </div>
 
-            {/* Slider Scroll Progress Bar & Helper Prompt */}
-            <div className="flex items-center justify-between gap-4 pt-2 text-xs text-zinc-500">
-              <span className="flex items-center gap-1.5">
-                <span className="w-1.5 h-1.5 rounded-full bg-zinc-500 animate-pulse" />
-                <span>Posúvajte potiahnutím myšou, dotykom prsta alebo šípkami</span>
-              </span>
-
-              {/* Minimal Progress Track */}
+            {/* Minimal Progress Track */}
+            <div className="flex justify-end pt-2">
               <div className="w-24 sm:w-36 h-1 rounded-full bg-zinc-900 overflow-hidden">
                 <div
                   className="h-full bg-zinc-500 rounded-full transition-all duration-150"
@@ -462,22 +456,6 @@ export const TestimonialsSection: React.FC = () => {
             ))}
           </div>
         )}
-
-        {/* Trust Badges Footer */}
-        <div className="mt-16 pt-10 border-t border-zinc-900 grid grid-cols-1 md:grid-cols-3 gap-6 text-xs text-zinc-400 text-center md:text-left">
-          <div className="flex items-center gap-3 justify-center md:justify-start">
-            <ShieldCheck className="w-5 h-5 text-white flex-shrink-0" />
-            <span>100% transparentný zber recenzií cez Google Maps a Facebook</span>
-          </div>
-          <div className="flex items-center gap-3 justify-center md:justify-start">
-            <Star className="w-5 h-5 text-amber-400 fill-amber-400 flex-shrink-0" />
-            <span>Najlepšie hodnotený salón v regióne Lučenca a Novohradu</span>
-          </div>
-          <div className="flex items-center gap-3 justify-center md:justify-start">
-            <CheckCircle2 className="w-5 h-5 text-emerald-400 flex-shrink-0" />
-            <span>Držiteľ ocenenia Zlatá Firma za kvalitu služieb</span>
-          </div>
-        </div>
 
       </div>
     </section>

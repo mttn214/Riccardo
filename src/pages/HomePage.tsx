@@ -347,9 +347,6 @@ export const HomePage: React.FC<HomePageProps> = ({ onOpenBooking, onSelectPortf
               <h2 className="text-3xl sm:text-5xl font-semibold tracking-[-0.03em] leading-tight">
                 Dôvera klientov v číslach.
               </h2>
-              <p className="text-xs sm:text-sm text-zinc-400 mt-2">
-                Potiahnite do strany alebo použite šípky na prehliadanie recenzií.
-              </p>
             </div>
             
             <div className="flex items-center gap-3">
