@@ -6,6 +6,7 @@ import { adminStore } from './adminStore';
  * Fully wired to client Stripe.js and backend /api/pay (Stripe Serverless).
  * ZERO EMOJIS COMPLIANT.
  */
+export const DEFAULT_STRIPE_LIVE_KEY = 'pk_live_51UQoDZHAmh46e1VBb3RxsHk6XPTQg6ttug0vwDCux9p7Bxgva79oiJm2gvsUNzJfCPEMaoc9bb0MC0HEbhyjzixa008QwAoWJr';
 export const DEFAULT_STRIPE_TEST_KEY = 'pk_test_51UQoDrHFKYzQN3E7Y5Fix2WRZT4EhqLQzqnlN40yTvdFbCxHnAiU2oSG15CxZoEQeF1lPKO6yuBaimp2vw3Ag32R00tzYoVzmA';
 
 export function getActiveStripePublishableKey(): string {
@@ -15,7 +16,7 @@ export function getActiveStripePublishableKey(): string {
       return config.publishableKey.trim();
     }
   } catch (_) {}
-  return (import.meta as any).env?.VITE_STRIPE_PUBLISHABLE_KEY || DEFAULT_STRIPE_TEST_KEY;
+  return (import.meta as any).env?.VITE_STRIPE_PUBLISHABLE_KEY || DEFAULT_STRIPE_LIVE_KEY;
 }
 
 let loadedKey: string | null = null;
@@ -153,6 +154,25 @@ export async function processStripeCardPayment(params: CreateStripePaymentParams
 
       const data = await apiRes.json();
       if (data.success) {
+        if (data.status === 'requires_action' && data.clientSecret) {
+          const { error: confirmError, paymentIntent: confirmedPI } = await stripe.handleCardAction(data.clientSecret);
+          if (confirmError) {
+            return {
+              success: false,
+              error: confirmError.message || '3D Secure overenie karty bolo zamietnuté.'
+            };
+          }
+          if (confirmedPI && (confirmedPI.status === 'succeeded' || confirmedPI.status === 'processing')) {
+            return {
+              success: true,
+              tokenId: tokenId,
+              paymentIntentId: confirmedPI.id,
+              cardBrand: cardBrand,
+              last4: last4,
+              receiptUrl: data.receiptUrl || null
+            };
+          }
+        }
         return {
           success: true,
           tokenId: tokenId,

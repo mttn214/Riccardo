@@ -835,10 +835,22 @@ class AdminStore {
 
   public getStripeConfig(): { mode: 'test' | 'live'; publishableKey: string; secretKey: string } {
     const s = this.getSettings();
+    const defaultLivePk = 'pk_live_51UQoDZHAmh46e1VBb3RxsHk6XPTQg6ttug0vwDCux9p7Bxgva79oiJm2gvsUNzJfCPEMaoc9bb0MC0HEbhyjzixa008QwAoWJr';
+
+    const mode = s.stripeMode || 'live';
+    let publishableKey = s.stripePublishableKey || defaultLivePk;
+    let secretKey = s.stripeSecretKey || '';
+
+    if (mode === 'live') {
+      if (!publishableKey || publishableKey.startsWith('pk_test_')) {
+        publishableKey = defaultLivePk;
+      }
+    }
+
     return {
-      mode: s.stripeMode || 'test',
-      publishableKey: s.stripePublishableKey || '',
-      secretKey: s.stripeSecretKey || ''
+      mode,
+      publishableKey,
+      secretKey
     };
   }
 
