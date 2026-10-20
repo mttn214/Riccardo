@@ -69,7 +69,7 @@ export default async function handler(req, res) {
         currency: 'eur',
         payment_method: paymentMethodId,
         confirm: true,
-        return_url: 'https://riccardo-zednici.vercel.app',
+        return_url: 'https://hairsalonriccardo.vercel.app',
         description: `Hair Salon Riccardo — ${seminarTitle || 'Masterclass'} (${customerName || 'Zákazník'})`,
         receipt_email: customerEmail || undefined,
         metadata: {
@@ -92,7 +92,7 @@ export default async function handler(req, res) {
           card: { token: tokenId }
         },
         confirm: true,
-        return_url: 'https://riccardo-zednici.vercel.app',
+        return_url: 'https://hairsalonriccardo.vercel.app',
         description: `Hair Salon Riccardo — ${seminarTitle || 'Masterclass'} (${customerName || 'Zákazník'})`,
         receipt_email: customerEmail || undefined,
         metadata: {
