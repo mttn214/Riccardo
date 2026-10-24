@@ -1,8 +1,8 @@
 import { createClient } from '@supabase/supabase-js';
 
 // Environment variables or fallback local config
-const supabaseUrl = import.meta.env.VITE_SUPABASE_URL || '';
-const supabaseAnonKey = import.meta.env.VITE_SUPABASE_ANON_KEY || '';
+const supabaseUrl = import.meta.env.VITE_SUPABASE_URL || 'https://bbhwyuowlxxczjdlunah.supabase.co';
+const supabaseAnonKey = import.meta.env.VITE_SUPABASE_ANON_KEY || 'sb_publishable_SUaa8Qhm7zdTG4R9NWI9Ng_YQqNQQ9M';
 
 export const isSupabaseConfigured = Boolean(supabaseUrl && supabaseAnonKey && !supabaseUrl.includes('placeholder'));
 

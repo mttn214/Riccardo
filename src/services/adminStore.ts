@@ -617,6 +617,66 @@ class AdminStore {
     }
   }
 
+  public async syncWithCloud(): Promise<Participant[]> {
+    try {
+      const res = await fetch('/api/admin-participants');
+      if (res.ok) {
+        const data = await res.json();
+        if (data.success && Array.isArray(data.participants) && data.participants.length > 0) {
+          const list = this.getParticipants();
+          const existingMap = new Map(list.map((p) => [p.ticketCode, p]));
+
+          for (const item of data.participants) {
+            const ticketCode = item.ticket_code;
+            const mapped: Participant = {
+              id: item.id,
+              seminarId: item.seminar_id,
+              seminarTitle: item.seminars?.title || 'Masterclass',
+              seminarDates: item.seminars?.dates || '',
+              seminarCity: item.seminars?.city || 'Lučenec',
+              fullName: item.customers?.full_name || 'Účastník',
+              email: item.customers?.email || '',
+              phone: item.customers?.phone || '',
+              salonName: item.customers?.salon_name || undefined,
+              city: item.customers?.city || undefined,
+              tierId: 'tier-master',
+              tierName: 'Hands-On Masterpass',
+              tierPriceEUR: Number(item.total_amount_eur) || 380,
+              paymentOption: item.payment_option || 'full',
+              amountPaidEUR: Number(item.amount_paid_eur) || 380,
+              amountRemainingEUR: Number(item.amount_remaining_eur) || 0,
+              paymentMethod: item.payment_method || 'Karta',
+              paymentStatus: (item.payment_status || 'Uhradené (Plná suma)') as any,
+              stripePaymentIntentId: item.stripe_payment_intent_id || undefined,
+              receiptUrl: item.receipt_url || undefined,
+              ticketCode,
+              registeredAt: item.created_at ? new Date(item.created_at).toISOString().replace('T', ' ').slice(0, 16) : '',
+              checkedIn: Boolean(item.checked_in),
+              checkedInAt: item.checked_in_at || undefined,
+              billingType: item.customers?.billing_type || 'personal',
+              companyName: item.customers?.company_name || undefined,
+              ico: item.customers?.ico || undefined,
+              dic: item.customers?.dic || undefined,
+              billingAddress: item.customers?.billing_address || undefined,
+              notes: item.notes || undefined,
+              internalNotes: item.internal_notes || undefined,
+            };
+
+            existingMap.set(ticketCode, mapped);
+          }
+
+          const merged = Array.from(existingMap.values());
+          localStorage.setItem(STORAGE_KEYS.PARTICIPANTS, JSON.stringify(merged));
+          this.notify();
+          return merged;
+        }
+      }
+    } catch (e) {
+      console.warn('Sync with cloud notice:', e);
+    }
+    return this.getParticipants();
+  }
+
   public addParticipant(participant: Omit<Participant, 'id' | 'registeredAt' | 'checkedIn'>): Participant {
     const list = this.getParticipants();
     const newParticipant: Participant = {

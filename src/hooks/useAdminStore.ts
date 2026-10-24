@@ -5,6 +5,9 @@ export function useAdminStore() {
   const [, setTick] = useState(0);
 
   useEffect(() => {
+    // Automatically synchronize live participants and bookings from Supabase Cloud
+    adminStore.syncWithCloud().catch(() => {});
+
     const unsubscribe = adminStore.subscribe(() => {
       setTick((t) => t + 1);
     });
