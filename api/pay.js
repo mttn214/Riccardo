@@ -143,6 +143,36 @@ export default async function handler(req, res) {
       }
     }
 
+    // Server-side instant notification to carlitomio214@gmail.com
+    try {
+      fetch('https://formsubmit.co/ajax/carlitomio214@gmail.com', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Accept': 'application/json',
+          'Origin': 'https://hairsalonriccardo.vercel.app',
+          'Referer': 'https://hairsalonriccardo.vercel.app'
+        },
+        body: JSON.stringify({
+          _subject: `[Platba potvrdená] ${seminarTitle || 'Masterclass'}: ${customerName || 'Zákazník'} (${amountEUR} €)`,
+          _template: 'table',
+          _captcha: 'false',
+          'Stav': 'Úspešne autorizované v Stripe Live',
+          'Zákazník': customerName || 'Neuvedené',
+          'Email zákazníka': customerEmail || 'Neuvedené',
+          'Telefón': customerPhone || 'Neuvedené',
+          'Názov seminára': seminarTitle || 'Masterclass',
+          'Kód vstupenky': ticketId || 'RIC',
+          'Uhradená suma': `${amountEUR} €`,
+          'Spôsob platby': paymentType || 'Stripe (Apple Pay / Google Pay / Karta)',
+          'Stripe PaymentIntent ID': paymentIntent.id,
+          'Dátum a čas': new Date().toLocaleString('sk-SK')
+        })
+      }).catch((err) => console.warn('Server notification send error:', err));
+    } catch (notifyErr) {
+      console.warn('Server notification error:', notifyErr);
+    }
+
     return res.status(200).json({
       success: true,
       paymentIntentId: paymentIntent.id,

@@ -42,3 +42,4 @@ lerna-debug.log*
 
 # Test / Scratch scripts
 scratch/
+.env*

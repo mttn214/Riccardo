@@ -34,6 +34,7 @@ import {
 } from '../services/stripeService';
 import { adminStore } from '../services/adminStore';
 import { generateLuxuryTicketPDF } from '../services/ticketService';
+import { saveReservationToCloud } from '../services/supabaseClient';
 
 
 interface ReservationModalProps {
@@ -276,6 +277,31 @@ export const ReservationModal: React.FC<ReservationModalProps> = ({
     } catch (storeErr) {
       console.warn('Could not record participant into admin store:', storeErr);
     }
+
+    // Direct synchronization to Supabase Cloud PostgreSQL database
+    saveReservationToCloud({
+      ticketCode: randomId,
+      fullName: formData.fullName,
+      email: formData.email,
+      phone: formData.phone,
+      salonName: formData.salonName || undefined,
+      city: formData.city || undefined,
+      billingType: formData.billingType,
+      companyName: formData.companyName || formData.salonName || undefined,
+      ico: formData.ico || undefined,
+      dic: formData.dic || undefined,
+      billingAddress: formData.billingAddress || undefined,
+      seminarId: selectedSeminar.id,
+      paymentOption,
+      totalAmountEUR: totalPackagePriceEUR,
+      amountPaidEUR: amountToPayNow,
+      amountRemainingEUR: paymentOption === 'deposit' ? totalPackagePriceEUR - 100 : 0,
+      paymentMethod: methodTitle,
+      paymentStatus: paymentOption === 'deposit' ? 'Uhradená záloha (100 €)' : 'Uhradené (Plná suma)',
+      stripePaymentIntentId,
+      receiptUrl: receiptUrl || null,
+      notes: formData.notes || undefined,
+    }).catch((cloudErr) => console.warn('Cloud sync background error:', cloudErr));
 
     setIsProcessingPayment(false);
     setStep(4);
