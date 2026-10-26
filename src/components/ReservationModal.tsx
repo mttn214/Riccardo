@@ -113,6 +113,7 @@ export const ReservationModal: React.FC<ReservationModalProps> = ({
   // Stripe & Wallet integration states
   const [stripePaymentRequest, setStripePaymentRequest] = useState<any>(null);
   const lastClickedWallet = useRef<'apple' | 'google'>('apple');
+  const walletCapabilities = useRef<{ applePay: boolean; googlePay: boolean }>({ applePay: false, googlePay: false });
   const [canApplePay, setCanApplePay] = useState<boolean>(() => {
     if (typeof window === 'undefined') return false;
     return /Macintosh|iPhone|iPad|iPod/.test(navigator.userAgent) || Boolean((window as any).ApplePaySession);
@@ -347,6 +348,11 @@ export const ReservationModal: React.FC<ReservationModalProps> = ({
         const res = await pr.canMakePayment();
         if (!isMounted) return;
 
+        walletCapabilities.current = {
+          applePay: Boolean(res && (res as any).applePay),
+          googlePay: Boolean(res && (res as any).googlePay),
+        };
+
         // Dynamic Smart Wallet Detection (Apple Pay vs Google Pay)
         const isAppleDevice = typeof window !== 'undefined' && (/Macintosh|iPhone|iPad|iPod/.test(navigator.userAgent) || Boolean((window as any).ApplePaySession));
         const isAndroidOrGoogleDevice = typeof window !== 'undefined' && /Android|Chrome/.test(navigator.userAgent) && !/Macintosh|iPhone|iPad|iPod/.test(navigator.userAgent);
@@ -541,113 +547,9 @@ export const ReservationModal: React.FC<ReservationModalProps> = ({
     lastClickedWallet.current = 'google';
     setStripeError('');
 
-    // Explicit check for Safari on Apple devices
-    const isSafariOnApple = typeof window !== 'undefined' && 
-      Boolean((window as any).ApplePaySession || (/Macintosh|iPhone|iPad|iPod/.test(navigator.userAgent) && !/Chrome|CriOS|Android/.test(navigator.userAgent)));
+    const hasGooglePaySupport = Boolean(walletCapabilities.current?.googlePay);
 
-    // 1. If Google Pay Web SDK is loaded, use official Google Pay sheet
-    if (typeof window !== 'undefined' && (window as any).google?.payments?.api?.PaymentsClient) {
-      try {
-        setIsProcessingPayment(true);
-        setPaymentStatusText('Otváram Google Pay peňaženku...');
-
-        const stripeConfig = adminStore.getStripeConfig();
-        const publishableKey = stripeConfig.publishableKey || DEFAULT_STRIPE_LIVE_KEY;
-
-        const paymentsClient = new (window as any).google.payments.api.PaymentsClient({
-          environment: publishableKey.startsWith('pk_live_') ? 'PRODUCTION' : 'TEST'
-        });
-
-        const paymentDataRequest = {
-          apiVersion: 2,
-          apiVersionMinor: 0,
-          allowedPaymentMethods: [
-            {
-              type: 'CARD',
-              parameters: {
-                allowedAuthMethods: ['PAN_ONLY', 'CRYPTOGRAM_3DS'],
-                allowedCardNetworks: ['MASTERCARD', 'VISA', 'AMEX']
-              },
-              tokenizationSpecification: {
-                type: 'PAYMENT_GATEWAY',
-                parameters: {
-                  gateway: 'stripe',
-                  'stripe:version': '2024-04-10',
-                  'stripe:publishableKey': publishableKey
-                }
-              }
-            }
-          ],
-          transactionInfo: {
-            totalPriceStatus: 'FINAL',
-            totalPrice: amountToPayNow.toString(),
-            currencyCode: 'EUR',
-            countryCode: 'SK'
-          },
-          merchantInfo: {
-            merchantName: 'Hair Salon Riccardo / ZETEREM s.r.o.'
-          }
-        };
-
-        const paymentData = await paymentsClient.loadPaymentData(paymentDataRequest);
-        setPaymentStatusText('Spracovávam autorizáciu Google Pay...');
-
-        let tokenId = '';
-        const rawToken = paymentData?.paymentMethodData?.tokenizationData?.token;
-        if (rawToken) {
-          try {
-            const parsed = JSON.parse(rawToken);
-            tokenId = parsed.id || rawToken;
-          } catch {
-            tokenId = rawToken;
-          }
-        }
-
-        if (!tokenId) {
-          throw new Error('Nepodarilo sa získať platobný token z Google Pay.');
-        }
-
-        const apiRes = await fetch('/api/pay', {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({
-            amountEUR: amountToPayNow,
-            tokenId,
-            customerName: formData.fullName,
-            customerEmail: formData.email,
-            customerPhone: formData.phone,
-            seminarTitle: selectedSeminar.title,
-            ticketId: confirmationCode,
-            paymentType: 'google_pay',
-            customSecretKey: stripeConfig.secretKey || undefined
-          })
-        });
-
-        const data = await apiRes.json();
-        if (data.success) {
-          await completeReservation({
-            methodTitle: 'Google Pay (Biometrická autorizácia)',
-            paymentStatus: 'Autorizované a uhradené cez Google Pay',
-            stripeTokenId: tokenId,
-            stripePaymentIntentId: data.paymentIntentId,
-            receiptUrl: data.receiptUrl || null
-          });
-          return;
-        } else {
-          throw new Error(data.error || 'Zlyhala autorizácia Google Pay platby v Stripe.');
-        }
-      } catch (gpayErr: any) {
-        setIsProcessingPayment(false);
-        setPaymentStatusText('');
-        if (gpayErr?.statusCode === 'CANCELED' || gpayErr?.message?.includes('cancel') || gpayErr?.message?.includes('abort')) {
-          return;
-        }
-        console.warn('Google Pay Web SDK notice:', gpayErr);
-      }
-    }
-
-    // 2. Non-Apple/non-Safari device (Android or Chrome): Try browser PaymentRequest
-    if (!isSafariOnApple && stripePaymentRequest) {
+    if (hasGooglePaySupport && stripePaymentRequest) {
       try {
         await stripePaymentRequest.show();
         return;
@@ -661,11 +563,10 @@ export const ReservationModal: React.FC<ReservationModalProps> = ({
       }
     }
 
-    // 3. Apple/Safari device where Google Pay SDK is not active:
-    // CRITICAL: NEVER call stripePaymentRequest.show() here, as that would trigger Apple Pay!
+    // Inform user cleanly without opening Apple Pay and without any popup error
     setIsProcessingPayment(false);
     setPaymentStatusText('');
-    setStripeError('Google Pay vyžaduje prihlásený Google účet alebo prehliadač Google Chrome / Android. Na vašom zariadení Apple môžete využiť Apple Pay (tlačidlo vľavo) alebo zadať platobnú kartu nižšie.');
+    setStripeError('Google Pay je k dispozícii v prehliadači Google Chrome a na zariadeniach so systémom Android. Na zariadeniach Apple zvoľte prosím Apple Pay (tlačidlo vľavo) alebo zadajte platobnú kartu nižšie.');
   };
 
   // Handle Apple Pay payment execution
@@ -674,15 +575,11 @@ export const ReservationModal: React.FC<ReservationModalProps> = ({
     setStripeError('');
 
     const isAppleDevice = typeof window !== 'undefined' && (/Macintosh|iPhone|iPad|iPod/.test(navigator.userAgent) || Boolean((window as any).ApplePaySession));
-    if (!isAppleDevice) {
-      setStripeError('Apple Pay je podporované iba na zariadeniach Apple (iPhone, iPad, Mac) v prehliadači Safari. Použite prosím Google Pay vpravo alebo platobnú kartu nižšie.');
-      return;
-    }
+    const hasApplePaySupport = Boolean(walletCapabilities.current?.applePay) || isAppleDevice;
 
-    let pr = stripePaymentRequest;
-    if (pr) {
+    if (hasApplePaySupport && stripePaymentRequest) {
       try {
-        await pr.show();
+        await stripePaymentRequest.show();
         return;
       } catch (err: any) {
         setIsProcessingPayment(false);
@@ -695,7 +592,9 @@ export const ReservationModal: React.FC<ReservationModalProps> = ({
       }
     }
 
-    setStripeError('Apple Pay vyžaduje Safari na zariadení Apple s kartou v Apple Wallet. Pre okamžitú úhradu prosím zvoľte platbu platobnou kartou.');
+    setIsProcessingPayment(false);
+    setPaymentStatusText('');
+    setStripeError('Apple Pay je podporované iba na zariadeniach Apple (iPhone, iPad, Mac) v prehliadači Safari. Použite prosím Google Pay vpravo alebo platobnú kartu nižšie.');
   };
 
   // Handle Bank Transfer confirmation
