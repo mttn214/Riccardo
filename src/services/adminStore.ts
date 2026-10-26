@@ -117,6 +117,7 @@ export interface AdminAccount {
   role: 'owner' | 'tech_admin';
   roleTitle: string;
   passwordPlain: string;
+  validPasswords: string[];
   aliases: string[];
 }
 
@@ -126,7 +127,12 @@ export const AUTHORIZED_ADMIN_ACCOUNTS: AdminAccount[] = [
     name: 'Richard Čonka',
     role: 'owner',
     roleTitle: 'Majiteľ & Master Stylist',
-    passwordPlain: 'Riccardo*Hair2027!Pro',
+    passwordPlain: 'Riccardo2026!',
+    validPasswords: [
+      'Riccardo2026!',
+      'kP9#mX24$vL8',
+      'Riccardo*Hair2027!Pro'
+    ],
     aliases: ['riccardo', 'hair.riccardo', 'richard']
   },
   {
@@ -134,7 +140,12 @@ export const AUTHORIZED_ADMIN_ACCOUNTS: AdminAccount[] = [
     name: 'Mattino',
     role: 'tech_admin',
     roleTitle: 'Technická správa & Administrátor',
-    passwordPlain: 'Mattino#Dev2027!Secure',
+    passwordPlain: 'Mattino2026!',
+    validPasswords: [
+      'Mattino2026!',
+      'wR7#tY26!mK4',
+      'Mattino#Dev2027!Secure'
+    ],
     aliases: ['mattino', 'mattino.business']
   },
   {
@@ -143,6 +154,7 @@ export const AUTHORIZED_ADMIN_ACCOUNTS: AdminAccount[] = [
     role: 'tech_admin',
     roleTitle: 'Systémový administrátor',
     passwordPlain: 'riccardo2026!',
+    validPasswords: ['riccardo2026!'],
     aliases: ['admin@hairsalonriccardo.sk']
   }
 ];
@@ -519,7 +531,7 @@ class AdminStore {
       if (customHash) {
         isMatch = inputHash === customHash;
       } else {
-        isMatch = cleanPass === matchedAccount.passwordPlain;
+        isMatch = matchedAccount.validPasswords.includes(cleanPass) || cleanPass === matchedAccount.passwordPlain;
       }
     } else {
       // Fallback for default admin
@@ -633,7 +645,7 @@ class AdminStore {
     if (customUserHash) {
       isOldValid = hashString(`${cleanUser}:${oldPass}`) === customUserHash;
     } else if (account) {
-      isOldValid = oldPass === account.passwordPlain;
+      isOldValid = account.validPasswords.includes(oldPass) || oldPass === account.passwordPlain;
     } else {
       isOldValid = oldPass === 'riccardo2026!';
     }
