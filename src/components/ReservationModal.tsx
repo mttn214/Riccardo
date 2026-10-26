@@ -112,7 +112,14 @@ export const ReservationModal: React.FC<ReservationModalProps> = ({
   // Stripe & Wallet integration states
   const [stripePaymentRequest, setStripePaymentRequest] = useState<any>(null);
   const lastClickedWallet = useRef<'apple' | 'google'>('apple');
-  const [canApplePay, setCanApplePay] = useState<boolean>(true);
+  const [canApplePay, setCanApplePay] = useState<boolean>(() => {
+    if (typeof window === 'undefined') return false;
+    return /Macintosh|iPhone|iPad|iPod/.test(navigator.userAgent) || Boolean((window as any).ApplePaySession);
+  });
+  const [canGooglePay, setCanGooglePay] = useState<boolean>(() => {
+    if (typeof window === 'undefined') return false;
+    return /Android|Chrome/.test(navigator.userAgent) && !/Macintosh|iPhone|iPad|iPod/.test(navigator.userAgent);
+  });
   const [isApplePayReady, setIsApplePayReady] = useState<boolean>(() => {
     if (typeof window === 'undefined') return false;
     return /Macintosh|iPhone|iPad|iPod/.test(navigator.userAgent) || Boolean((window as any).ApplePaySession);
@@ -339,10 +346,16 @@ export const ReservationModal: React.FC<ReservationModalProps> = ({
         const res = await pr.canMakePayment();
         if (!isMounted) return;
 
-        const isAppleEnv = typeof window !== 'undefined' && (/Macintosh|iPhone|iPad|iPod/.test(navigator.userAgent) || Boolean((window as any).ApplePaySession));
-        const isReady = Boolean(res && res.applePay) || isAppleEnv;
-        setIsApplePayReady(isReady);
-        setCanApplePay(isReady);
+        // Dynamic Smart Wallet Detection (Apple Pay vs Google Pay)
+        const isAppleDevice = typeof window !== 'undefined' && (/Macintosh|iPhone|iPad|iPod/.test(navigator.userAgent) || Boolean((window as any).ApplePaySession));
+        const isAndroidOrGoogleDevice = typeof window !== 'undefined' && /Android|Chrome/.test(navigator.userAgent) && !/Macintosh|iPhone|iPad|iPod/.test(navigator.userAgent);
+
+        const appleAvailable = Boolean(res && res.applePay) || isAppleDevice;
+        const googleAvailable = Boolean(res && res.googlePay) || isAndroidOrGoogleDevice;
+
+        setCanApplePay(appleAvailable);
+        setCanGooglePay(googleAvailable);
+        setIsApplePayReady(appleAvailable || googleAvailable);
         setIsCheckingApplePay(false);
         setStripePaymentRequest(pr);
 
@@ -527,6 +540,11 @@ export const ReservationModal: React.FC<ReservationModalProps> = ({
     lastClickedWallet.current = 'google';
     setStripeError('');
 
+    if (!canGooglePay) {
+      setStripeError('Google Pay nie je v tomto prehliadači podporované. Na zariadeniach Apple použite prosím Apple Pay alebo platobnú kartu nižšie.');
+      return;
+    }
+
     let pr = stripePaymentRequest;
     if (pr) {
       try {
@@ -549,6 +567,11 @@ export const ReservationModal: React.FC<ReservationModalProps> = ({
   const handleProcessApplePayPayment = async () => {
     lastClickedWallet.current = 'apple';
     setStripeError('');
+
+    if (!canApplePay) {
+      setStripeError('Apple Pay je podporované iba na zariadeniach Apple (iPhone, iPad, Mac) v prehliadači Safari.');
+      return;
+    }
 
     let pr = stripePaymentRequest;
     if (pr) {
@@ -1100,41 +1123,67 @@ export const ReservationModal: React.FC<ReservationModalProps> = ({
                 </div>
               )}
 
-              {/* Dual Wallet Buttons (Apple Pay & Google Pay Side-by-Side) */}
-              <div className="space-y-4 pt-1">
-                <div className="grid grid-cols-2 gap-3">
-                  <button
-                    type="button"
-                    onClick={handleProcessApplePayPayment}
-                    disabled={isProcessingPayment}
-                    className="h-14 rounded-2xl bg-black text-white hover:bg-zinc-900 active:scale-[0.98] transition-all flex items-center justify-center cursor-pointer shadow-xl ring-1 ring-white/20 hover:ring-white/40 disabled:opacity-50"
-                    style={{ minHeight: '52px' }}
-                    aria-label="Apple Pay"
-                  >
-                    <ApplePayLogo className="h-7 w-auto text-white" />
-                  </button>
+              {/* Smart Digital Wallet (Platform-native Apple Pay / Google Pay) */}
+              {(canApplePay || canGooglePay) && (
+                <div className="space-y-4 pt-1">
+                  {canApplePay && canGooglePay ? (
+                    <div className="grid grid-cols-2 gap-3">
+                      <button
+                        type="button"
+                        onClick={handleProcessApplePayPayment}
+                        disabled={isProcessingPayment}
+                        className="h-14 rounded-2xl bg-black text-white hover:bg-zinc-900 active:scale-[0.98] transition-all flex items-center justify-center cursor-pointer shadow-xl ring-1 ring-white/20 hover:ring-white/40 disabled:opacity-50"
+                        style={{ minHeight: '52px' }}
+                        aria-label="Apple Pay"
+                      >
+                        <ApplePayLogo className="h-7 w-auto text-white" />
+                      </button>
 
-                  <button
-                    type="button"
-                    onClick={handleProcessGooglePayPayment}
-                    disabled={isProcessingPayment}
-                    className="h-14 rounded-2xl bg-black text-white hover:bg-zinc-900 active:scale-[0.98] transition-all flex items-center justify-center cursor-pointer shadow-xl ring-1 ring-white/20 hover:ring-white/40 disabled:opacity-50"
-                    style={{ minHeight: '52px' }}
-                    aria-label="Google Pay"
-                  >
-                    <GooglePayLogo className="h-6 w-auto" lightText={true} />
-                  </button>
-                </div>
+                      <button
+                        type="button"
+                        onClick={handleProcessGooglePayPayment}
+                        disabled={isProcessingPayment}
+                        className="h-14 rounded-2xl bg-black text-white hover:bg-zinc-900 active:scale-[0.98] transition-all flex items-center justify-center cursor-pointer shadow-xl ring-1 ring-white/20 hover:ring-white/40 disabled:opacity-50"
+                        style={{ minHeight: '52px' }}
+                        aria-label="Google Pay"
+                      >
+                        <GooglePayLogo className="h-6 w-auto" lightText={true} />
+                      </button>
+                    </div>
+                  ) : canApplePay ? (
+                    <button
+                      type="button"
+                      onClick={handleProcessApplePayPayment}
+                      disabled={isProcessingPayment}
+                      className="w-full h-14 rounded-2xl bg-black text-white hover:bg-zinc-900 active:scale-[0.98] transition-all flex items-center justify-center cursor-pointer shadow-xl ring-1 ring-white/20 hover:ring-white/40 disabled:opacity-50"
+                      style={{ minHeight: '52px' }}
+                      aria-label="Apple Pay"
+                    >
+                      <ApplePayLogo className="h-7 w-auto text-white" />
+                    </button>
+                  ) : (
+                    <button
+                      type="button"
+                      onClick={handleProcessGooglePayPayment}
+                      disabled={isProcessingPayment}
+                      className="w-full h-14 rounded-2xl bg-black text-white hover:bg-zinc-900 active:scale-[0.98] transition-all flex items-center justify-center cursor-pointer shadow-xl ring-1 ring-white/20 hover:ring-white/40 disabled:opacity-50"
+                      style={{ minHeight: '52px' }}
+                      aria-label="Google Pay"
+                    >
+                      <GooglePayLogo className="h-6 w-auto" lightText={true} />
+                    </button>
+                  )}
 
-                <div className="relative flex items-center justify-center">
-                  <div className="absolute inset-0 flex items-center">
-                    <div className="w-full border-t border-zinc-800/80" />
+                  <div className="relative flex items-center justify-center">
+                    <div className="absolute inset-0 flex items-center">
+                      <div className="w-full border-t border-zinc-800/80" />
+                    </div>
+                    <span className="relative px-4 bg-zinc-950 text-xs text-zinc-500 font-medium">
+                      alebo zaplatiť platobnou kartou
+                    </span>
                   </div>
-                  <span className="relative px-4 bg-zinc-950 text-xs text-zinc-500 font-medium">
-                    alebo zaplatiť platobnou kartou
-                  </span>
                 </div>
-              </div>
+              )}
 
               {/* Clean Card Payment Form */}
               <div className="space-y-3.5">
