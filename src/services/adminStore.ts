@@ -73,14 +73,96 @@ export interface StripeGatewayConfig {
 }
 
 export interface AdminSecuritySettings {
+  // Session & Access Security
   sessionTimeoutMinutes: number;
   maxFailedAttempts: number;
   lockoutDurationMinutes: number;
   requireTwoFactorDemo: boolean;
-  stripeMode?: 'test' | 'live';
+
+  // Stripe Payment Gateway (Live Only)
+  stripeMode?: 'live';
   stripePublishableKey?: string;
   stripeSecretKey?: string;
+
+  // Salon & Academy Contact
+  salonPhone?: string;
+  salonSecondaryPhone?: string;
+  salonEmail?: string;
+  salonAddress?: string;
+  salonOpeningHours?: string;
+  salonInstagram?: string;
+
+  // Top Announcement Banner
+  bannerEnabled?: boolean;
+  bannerText?: string;
+  bannerButtonText?: string;
+  bannerButtonLink?: string;
+  bannerStyle?: 'gold' | 'emerald' | 'dark';
+
+  // Seminar Bookings & Capacity Rules
+  showRemainingSeats?: boolean;
+  enableWaitlist?: boolean;
+  checkoutHoldMinutes?: number;
+  maxTicketsPerOrder?: number;
+  lowCapacityThreshold?: number;
+
+  // Notifications & Alerts
+  adminNotifyEmail?: string;
+  notifyOnNewOrder?: boolean;
+  notifyOnNewInquiry?: boolean;
+  notifyOnLowCapacity?: boolean;
+  sendTicketEmailToParticipant?: boolean;
+  sendReminderBeforeSeminar?: boolean;
+
+  // Invoicing & Legal
+  invoicePrefix?: string;
+  currency?: string;
+  invoiceDueDays?: number;
+  showIbanOnReceipts?: boolean;
+  invoiceNoteText?: string;
 }
+
+export const DEFAULT_ADMIN_SETTINGS: AdminSecuritySettings = {
+  sessionTimeoutMinutes: 60,
+  maxFailedAttempts: 5,
+  lockoutDurationMinutes: 15,
+  requireTwoFactorDemo: false,
+  stripeMode: 'live',
+  stripePublishableKey: 'pk_live_51UQoDZHAmh46e1VBb3RxsHk6XPTQg6ttug0vwDCux9p7Bxgva79oiJm2gvsUNzJfCPEMaoc9bb0MC0HEbhyjzixa008QwAoWJr',
+  stripeSecretKey: '',
+
+  salonPhone: '+421 915 869 758',
+  salonSecondaryPhone: '+421 908 261 740',
+  salonEmail: 'hair.riccardo@gmail.com',
+  salonAddress: 'J. Kármána 1727/30, 984 01 Lučenec, Slovenská republika',
+  salonOpeningHours: 'Pondelok – Piatok: 09:00 – 18:00, Sobota: Na objednávku, Nedeľa: Zatvorené',
+  salonInstagram: '@hair_salon_riccardo',
+
+  bannerEnabled: false,
+  bannerText: 'Nové termíny masterclass seminárov Richarda Čonku 2026 sú v predaji.',
+  bannerButtonText: 'Zobraziť termíny',
+  bannerButtonLink: '/seminare',
+  bannerStyle: 'gold',
+
+  showRemainingSeats: true,
+  enableWaitlist: true,
+  checkoutHoldMinutes: 15,
+  maxTicketsPerOrder: 2,
+  lowCapacityThreshold: 2,
+
+  adminNotifyEmail: 'hair.riccardo@gmail.com',
+  notifyOnNewOrder: true,
+  notifyOnNewInquiry: true,
+  notifyOnLowCapacity: true,
+  sendTicketEmailToParticipant: true,
+  sendReminderBeforeSeminar: true,
+
+  invoicePrefix: 'RIC-2026-',
+  currency: 'EUR',
+  invoiceDueDays: 7,
+  showIbanOnReceipts: true,
+  invoiceNoteText: 'Dodávateľ nie je platiteľom DPH podľa § 4 zákona o DPH. Úhrada za účasť na odbornom kaderníckom seminári Hair Salon Riccardo & Academy.'
+};
 
 const STORAGE_KEYS = {
   AUTH_TOKEN: 'riccardo_admin_token',
@@ -1048,36 +1130,30 @@ class AdminStore {
 
   public getSettings(): AdminSecuritySettings {
     if (typeof window === 'undefined') {
-      return {
-        sessionTimeoutMinutes: 60,
-        maxFailedAttempts: 5,
-        lockoutDurationMinutes: 15,
-        requireTwoFactorDemo: false,
-      };
+      return { ...DEFAULT_ADMIN_SETTINGS };
     }
     try {
       const data = localStorage.getItem(STORAGE_KEYS.SETTINGS);
-      return data
-        ? JSON.parse(data)
-        : {
-            sessionTimeoutMinutes: 60,
-            maxFailedAttempts: 5,
-            lockoutDurationMinutes: 15,
-            requireTwoFactorDemo: false,
-          };
-    } catch {
+      if (!data) return { ...DEFAULT_ADMIN_SETTINGS };
+      const parsed = JSON.parse(data);
       return {
-        sessionTimeoutMinutes: 60,
-        maxFailedAttempts: 5,
-        lockoutDurationMinutes: 15,
-        requireTwoFactorDemo: false,
+        ...DEFAULT_ADMIN_SETTINGS,
+        ...parsed,
+        stripeMode: 'live'
       };
+    } catch {
+      return { ...DEFAULT_ADMIN_SETTINGS };
     }
   }
 
-  public saveSettings(settings: AdminSecuritySettings) {
+  public saveSettings(
+    settings: AdminSecuritySettings,
+    auditAction = 'Aktualizácia systémových nastavení',
+    auditDetails = 'Uloženie zmien v konfigurácii systému'
+  ) {
     localStorage.setItem(STORAGE_KEYS.SETTINGS, JSON.stringify(settings));
-    this.addAuditLog('settings', 'Aktualizácia bezpečnostných nastavení', `Časový limit relácie: ${settings.sessionTimeoutMinutes} minút, Max pokusov: ${settings.maxFailedAttempts}.`, 'Admin');
+    const activeUser = this.getActiveUser();
+    this.addAuditLog('settings', auditAction, auditDetails, activeUser ? activeUser.name : 'Admin');
     this.notify();
   }
 
@@ -1155,8 +1231,9 @@ class AdminStore {
     localStorage.setItem(STORAGE_KEYS.PARTICIPANTS, JSON.stringify(SEED_PARTICIPANTS));
     localStorage.setItem(STORAGE_KEYS.PORTFOLIO, JSON.stringify(PORTFOLIO_DATA));
     localStorage.setItem(STORAGE_KEYS.INQUIRIES, JSON.stringify(SEED_INQUIRIES));
+    localStorage.setItem(STORAGE_KEYS.SETTINGS, JSON.stringify(DEFAULT_ADMIN_SETTINGS));
     localStorage.setItem(STORAGE_KEYS.CREDENTIALS_HASH, DEFAULT_PASSWORD_HASH);
-    this.addAuditLog('settings', 'Reset na predvolené údaje', 'Všetky údaje boli obnovené na pôvodné výrobné nastavenia.', 'Admin');
+    this.addAuditLog('settings', 'Reset na predvolené údaje', 'Všetky údaje a nastavenia boli obnovené na pôvodné výrobné nastavenia.', 'Admin');
     this.notify();
   }
 }
