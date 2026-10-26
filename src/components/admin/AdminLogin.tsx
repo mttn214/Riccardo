@@ -145,29 +145,9 @@ export const AdminLogin: React.FC<AdminLoginProps> = ({ onLoginSuccess }) => {
                     setUsername(e.target.value);
                     if (error) setError('');
                   }}
-                  placeholder="napr. hair.riccardo@gmail.com"
+                  placeholder="Zadajte prihlasovací email alebo meno"
                   className="w-full bg-zinc-900 focus:bg-zinc-850 text-white pl-10 pr-4 py-3.5 rounded-xl text-sm focus:outline-none focus:ring-1 focus:ring-white/20 transition-all disabled:opacity-50"
                 />
-              </div>
-
-              {/* Quick Account Fill Pills */}
-              <div className="flex flex-wrap items-center gap-1.5 pt-1">
-                <button
-                  type="button"
-                  onClick={() => setUsername('hair.riccardo@gmail.com')}
-                  className="text-[11px] font-mono px-2 py-0.5 rounded-md bg-zinc-900 hover:bg-zinc-800 text-zinc-400 hover:text-white transition-colors cursor-pointer"
-                  title="Kliknite pre vyplnenie emailu"
-                >
-                  hair.riccardo@gmail.com
-                </button>
-                <button
-                  type="button"
-                  onClick={() => setUsername('mattino.business@gmail.com')}
-                  className="text-[11px] font-mono px-2 py-0.5 rounded-md bg-zinc-900 hover:bg-zinc-800 text-zinc-400 hover:text-white transition-colors cursor-pointer"
-                  title="Kliknite pre vyplnenie emailu"
-                >
-                  mattino.business@gmail.com
-                </button>
               </div>
             </div>
 
