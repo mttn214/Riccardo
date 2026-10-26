@@ -127,11 +127,10 @@ export const AUTHORIZED_ADMIN_ACCOUNTS: AdminAccount[] = [
     name: 'Richard Čonka',
     role: 'owner',
     roleTitle: 'Majiteľ & Master Stylist',
-    passwordPlain: 'Riccardo2026!',
+    passwordPlain: 'hb79kE#4vN:92Z_?qM',
     validPasswords: [
-      'Riccardo2026!',
-      'kP9#mX24$vL8',
-      'Riccardo*Hair2027!Pro'
+      'hb79kE#4vN:92Z_?qM',
+      'Riccardo2026!'
     ],
     aliases: ['riccardo', 'hair.riccardo', 'richard']
   },
@@ -140,11 +139,10 @@ export const AUTHORIZED_ADMIN_ACCOUNTS: AdminAccount[] = [
     name: 'Mattino',
     role: 'tech_admin',
     roleTitle: 'Technická správa & Administrátor',
-    passwordPlain: 'Mattino2026!',
+    passwordPlain: 'mX48vP?2qT#81L_:kY',
     validPasswords: [
-      'Mattino2026!',
-      'wR7#tY26!mK4',
-      'Mattino#Dev2027!Secure'
+      'mX48vP?2qT#81L_:kY',
+      'Mattino2026!'
     ],
     aliases: ['mattino', 'mattino.business']
   },
