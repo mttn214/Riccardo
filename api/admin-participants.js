@@ -75,9 +75,18 @@ export default async function handler(req, res) {
       });
     }
 
-    // PATCH / POST: Update check-in status or notes
+    // PATCH / POST: Update check-in status, payments, or notes
     if (req.method === 'PATCH' || req.method === 'POST') {
-      const { ticketCode, checkedIn, notes, internalNotes } = req.body || {};
+      const {
+        ticketCode,
+        checkedIn,
+        notes,
+        internalNotes,
+        paymentStatus,
+        amountPaidEUR,
+        amountRemainingEUR,
+        paymentMethod
+      } = req.body || {};
 
       if (!ticketCode) {
         return res.status(400).json({ success: false, error: 'Chýba kód vstupenky (ticketCode).' });
@@ -90,16 +99,45 @@ export default async function handler(req, res) {
       }
       if (typeof notes === 'string') updates.notes = notes;
       if (typeof internalNotes === 'string') updates.internal_notes = internalNotes;
+      if (typeof paymentStatus === 'string') updates.payment_status = paymentStatus;
+      if (typeof amountPaidEUR === 'number') updates.amount_paid_eur = amountPaidEUR;
+      if (typeof amountRemainingEUR === 'number') updates.amount_remaining_eur = amountRemainingEUR;
+      if (typeof paymentMethod === 'string') updates.payment_method = paymentMethod;
 
       const { data, error } = await supabaseAdmin
         .from('reservations')
         .update(updates)
         .eq('ticket_code', ticketCode)
-        .select()
+        .select(`
+          *,
+          customers (*),
+          seminars (*)
+        `)
         .single();
 
       if (error) {
         return res.status(400).json({ success: false, error: error.message });
+      }
+
+      // Record audit log entry in Supabase cloud
+      try {
+        let actionDesc = `Aktualizácia vstupenky ${ticketCode}`;
+        if (typeof checkedIn === 'boolean') {
+          actionDesc = checkedIn
+            ? `Účastník ${data.customers?.full_name || ticketCode} označený ako PRÍTOMNÝ (Check-in)`
+            : `Účastník ${data.customers?.full_name || ticketCode}: zrušený príchod`;
+        } else if (typeof amountRemainingEUR === 'number' && amountRemainingEUR === 0) {
+          actionDesc = `Účastník ${data.customers?.full_name || ticketCode}: Doplatok 280 EUR prijatý na mieste (${paymentMethod || 'Hotovosť'})`;
+        }
+
+        await supabaseAdmin.from('audit_logs').insert({
+          action_type: typeof checkedIn === 'boolean' ? 'check_in' : 'payment_update',
+          description: actionDesc,
+          metadata: { ticketCode, updates, time: new Date().toISOString() },
+          performed_by: 'Admin QR Scanner'
+        });
+      } catch (logErr) {
+        console.warn('Audit log write notice:', logErr);
       }
 
       return res.status(200).json({

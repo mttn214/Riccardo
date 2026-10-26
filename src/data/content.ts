@@ -692,6 +692,12 @@ export const ACADEMY_FAQ_DATA: FAQItem[] = [
     category: "Rezervácia",
     question: "Aké sú platobné a storno podmienky?",
     answer: "Miesto je záväzne rezervované po úhrade zálohy (100 €). Doplatok sa hradí v deň konania. V prípade nepredvídaných okolností je možné rezerváciu bezplatne previesť na kolegu alebo kolegyňu z vášho salónu."
+  },
+  {
+    id: "faq-7",
+    category: "Rezervácia",
+    question: "Je možné vystaviť faktúru na firmu alebo salón (IČO a DIČ)?",
+    answer: "Áno, v druhom kroku rezervácie stačí zakliknúť 'Fakturovať na firmu / salón' a zadať IČO, DIČ a obchodné meno. Systém automaticky zaeviduje fakturačné údaje pre účtovníctvo vášho salónu od prevádzkovateľa ZETEREM s.r.o."
   }
 ];
 

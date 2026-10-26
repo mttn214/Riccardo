@@ -26,8 +26,14 @@ import {
   UserX,
   Sparkles,
   ShieldCheck,
-  X
+  X,
+  Camera,
+  Banknote,
+  FileDown,
+  Loader2
 } from 'lucide-react';
+import { generateLuxuryTicketPDF } from '../../services/ticketService';
+import { AdminQRScannerModal } from './AdminQRScannerModal';
 
 interface AdminParticipantsTabProps {
   initialSeminarId?: string | null;
@@ -45,6 +51,8 @@ export const AdminParticipantsTab: React.FC<AdminParticipantsTabProps> = ({
   const [selectedParticipant, setSelectedParticipant] = useState<Participant | null>(null);
   const [editingNotes, setEditingNotes] = useState<string>('');
   const [isEditingNotes, setIsEditingNotes] = useState<boolean>(false);
+  const [isQRScannerOpen, setIsQRScannerOpen] = useState<boolean>(false);
+  const [isGeneratingPDF, setIsGeneratingPDF] = useState<boolean>(false);
 
   // Active seminar object if specific seminar selected
   const activeSeminar = seminars.find((s) => s.id === selectedSeminarId);
@@ -59,6 +67,7 @@ export const AdminParticipantsTab: React.FC<AdminParticipantsTabProps> = ({
     // Status filter
     if (statusFilter === 'full' && !p.paymentStatus.includes('Plná suma')) return false;
     if (statusFilter === 'deposit' && !p.paymentStatus.includes('záloha')) return false;
+    if (statusFilter === 'due' && (p.amountRemainingEUR || 0) <= 0) return false;
     if (statusFilter === 'transfer' && !p.paymentStatus.includes('prevod')) return false;
     if (statusFilter === 'checkedIn' && !p.checkedIn) return false;
 
@@ -103,6 +112,48 @@ export const AdminParticipantsTab: React.FC<AdminParticipantsTabProps> = ({
     store.updateParticipant(updated);
     setSelectedParticipant(updated);
     setIsEditingNotes(false);
+  };
+
+  // Download Luxury PDF Ticket for participant
+  const handleDownloadTicketPDF = async (part: Participant) => {
+    setIsGeneratingPDF(true);
+    try {
+      await generateLuxuryTicketPDF({
+        confirmationCode: part.ticketCode,
+        seminarTitle: part.seminarTitle,
+        dates: part.seminarDates,
+        city: part.seminarCity,
+        venue: 'Atelier Hair Salon Riccardo, Lučenec',
+        attendeeName: part.fullName,
+        salonName: part.salonName,
+        email: part.email,
+        tierName: part.tierName,
+        amountPaidEUR: part.amountPaidEUR,
+        paymentMethod: part.paymentMethod,
+        paymentStatus: part.paymentStatus
+      });
+    } catch (err) {
+      console.error('Failed to generate PDF ticket:', err);
+      alert('Chyba pri generovaní PDF vstupenky.');
+    } finally {
+      setIsGeneratingPDF(false);
+    }
+  };
+
+  // Settle balance in drawer with Supabase sync
+  const handleSettleBalanceInDrawer = (part: Participant) => {
+    const remaining = part.amountRemainingEUR || 280;
+    if (window.confirm(`Označiť doplatok ${remaining} € ako prijatý na mieste pre účastníka ${part.fullName}? Údaj sa okamžite zapíše do Supabase cloudu.`)) {
+      store.settleBalance(part.id, 'Hotovosť na mieste');
+      const updated = {
+        ...part,
+        amountPaidEUR: part.tierPriceEUR || 380,
+        amountRemainingEUR: 0,
+        paymentStatus: 'Uhradené (Plná suma - doplatok na mieste)' as any,
+        paymentMethod: 'Hotovosť na mieste'
+      };
+      setSelectedParticipant(updated);
+    }
   };
 
   // Export to CSV
@@ -186,6 +237,16 @@ export const AdminParticipantsTab: React.FC<AdminParticipantsTabProps> = ({
         <div className="flex items-center gap-2.5 flex-wrap">
           <button
             type="button"
+            onClick={() => setIsQRScannerOpen(true)}
+            className="px-4 py-2.5 rounded-xl bg-amber-400 hover:bg-amber-300 text-black text-xs font-bold transition-all active:scale-95 shadow-lg flex items-center gap-1.5 cursor-pointer"
+            title="Otvoriť QR Skener a overenie vstupeniek"
+          >
+            <Camera className="w-4 h-4 text-black" />
+            <span>QR Skener & Check-in</span>
+          </button>
+
+          <button
+            type="button"
             onClick={handleExportCSV}
             className="px-3.5 py-2.5 rounded-xl bg-zinc-900 hover:bg-zinc-800 border border-zinc-800 text-zinc-300 text-xs font-medium transition-colors flex items-center gap-1.5 cursor-pointer"
             title="Exportovať do CSV / Excelu"
@@ -255,6 +316,7 @@ export const AdminParticipantsTab: React.FC<AdminParticipantsTabProps> = ({
             <option value="all">Všetky stavy ({filteredParticipants.length})</option>
             <option value="full">Plne uhradené</option>
             <option value="deposit">Uhradená záloha (100 €)</option>
+            <option value="due">Iba doplatky na mieste (280 €)</option>
             <option value="transfer">Čaká na prevod / faktúru</option>
             <option value="checkedIn">Prítomní na kurze</option>
           </select>
@@ -652,6 +714,30 @@ export const AdminParticipantsTab: React.FC<AdminParticipantsTabProps> = ({
               )}
             </div>
 
+            {/* Quick Actions in Drawer */}
+            <div className="flex flex-wrap items-center gap-2 pt-2">
+              {selectedParticipant.amountRemainingEUR > 0 && (
+                <button
+                  type="button"
+                  onClick={() => handleSettleBalanceInDrawer(selectedParticipant)}
+                  className="px-4 py-2.5 rounded-xl bg-amber-400 hover:bg-amber-300 text-black font-bold text-xs flex items-center gap-1.5 transition-all active:scale-95 shadow-md"
+                >
+                  <Banknote className="w-4 h-4" />
+                  <span>Prijať doplatok {selectedParticipant.amountRemainingEUR} € na mieste</span>
+                </button>
+              )}
+
+              <button
+                type="button"
+                onClick={() => handleDownloadTicketPDF(selectedParticipant)}
+                disabled={isGeneratingPDF}
+                className="px-4 py-2.5 rounded-xl bg-zinc-900 hover:bg-zinc-850 border border-zinc-700 text-zinc-200 hover:text-white font-medium text-xs flex items-center gap-1.5 transition-colors"
+              >
+                {isGeneratingPDF ? <Loader2 className="w-3.5 h-3.5 animate-spin" /> : <FileDown className="w-3.5 h-3.5 text-zinc-400" />}
+                <span>Stiahnuť VIP PDF Vstupenku</span>
+              </button>
+            </div>
+
             {/* Check-In Action Button */}
             <div className="pt-2 flex flex-col sm:flex-row items-center justify-between gap-3 border-t border-zinc-850">
               <button
@@ -660,7 +746,7 @@ export const AdminParticipantsTab: React.FC<AdminParticipantsTabProps> = ({
                 className={`w-full sm:w-auto px-5 py-2.5 rounded-xl text-xs font-semibold flex items-center justify-center gap-2 cursor-pointer transition-all ${
                   selectedParticipant.checkedIn
                     ? 'bg-zinc-800 hover:bg-zinc-700 text-zinc-200'
-                    : 'bg-blue-600 hover:bg-blue-500 text-white shadow-lg'
+                    : 'bg-emerald-600 hover:bg-emerald-500 text-white shadow-lg'
                 }`}
               >
                 {selectedParticipant.checkedIn ? (
@@ -687,6 +773,12 @@ export const AdminParticipantsTab: React.FC<AdminParticipantsTabProps> = ({
           </div>
         </div>
       )}
+
+      {/* QR Scanner & Cloud Check-in Modal */}
+      <AdminQRScannerModal
+        isOpen={isQRScannerOpen}
+        onClose={() => setIsQRScannerOpen(false)}
+      />
     </div>
   );
 };

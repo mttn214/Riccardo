@@ -27,10 +27,12 @@ import {
   Lock,
   ChevronRight,
   Sun,
-  Moon
+  Moon,
+  Camera
 } from 'lucide-react';
 import { Link } from 'react-router-dom';
 import { useAdminTheme } from '../../context/AdminThemeContext';
+import { AdminQRScannerModal } from './AdminQRScannerModal';
 
 type AdminTab = 'dashboard' | 'courses' | 'participants' | 'portfolio' | 'inquiries' | 'settings';
 
@@ -45,6 +47,7 @@ export const AdminLayout: React.FC = () => {
   const [seminarToEdit, setSeminarToEdit] = useState<Seminar | null>(null);
   const [isAddParticipantOpen, setIsAddParticipantOpen] = useState(false);
   const [participantFilterSeminarId, setParticipantFilterSeminarId] = useState<string | null>(null);
+  const [isQRScannerOpen, setIsQRScannerOpen] = useState(false);
 
   const unreadInquiries = inquiries.filter((i) => i.status === 'unread').length;
 
@@ -227,6 +230,17 @@ export const AdminLayout: React.FC = () => {
           </div>
 
           <div className="flex items-center gap-2.5 sm:gap-3">
+            {/* Quick QR Check-in trigger */}
+            <button
+              type="button"
+              onClick={() => setIsQRScannerOpen(true)}
+              className="px-3 py-1.5 rounded-xl bg-amber-400 hover:bg-amber-300 text-black text-xs font-bold transition-all active:scale-95 shadow-md flex items-center gap-1.5 cursor-pointer"
+              title="Otvoriť QR Skener prezenčnej kontroly"
+            >
+              <Camera className="w-3.5 h-3.5 text-black" />
+              <span className="hidden sm:inline">QR Check-in</span>
+            </button>
+
             <span className="text-[11px] font-mono text-emerald-400 bg-emerald-950/50 px-2.5 py-1 rounded-full flex items-center gap-1.5">
               <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse" />
               <span>Relácia aktívna</span>
@@ -385,6 +399,12 @@ export const AdminLayout: React.FC = () => {
         isOpen={isAddParticipantOpen}
         onClose={() => setIsAddParticipantOpen(false)}
         defaultSeminarId={participantFilterSeminarId || seminars[0]?.id}
+      />
+
+      {/* QR Scanner & Check-in Modal */}
+      <AdminQRScannerModal
+        isOpen={isQRScannerOpen}
+        onClose={() => setIsQRScannerOpen(false)}
       />
     </div>
   );

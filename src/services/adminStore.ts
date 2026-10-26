@@ -713,9 +713,11 @@ class AdminStore {
   public toggleCheckIn(participantId: string): boolean {
     const list = this.getParticipants();
     let newStatus = false;
+    let targetTicketCode = '';
     const updated = list.map((p) => {
-      if (p.id === participantId) {
+      if (p.id === participantId || p.ticketCode === participantId) {
         newStatus = !p.checkedIn;
+        targetTicketCode = p.ticketCode;
         return {
           ...p,
           checkedIn: newStatus,
@@ -725,7 +727,7 @@ class AdminStore {
       return p;
     });
     localStorage.setItem(STORAGE_KEYS.PARTICIPANTS, JSON.stringify(updated));
-    const target = list.find((p) => p.id === participantId);
+    const target = list.find((p) => p.id === participantId || p.ticketCode === participantId);
     this.addAuditLog(
       'participant',
       newStatus ? 'Prezenčná kontrola: Prítomný' : 'Prezenčná kontrola: Zrušená',
@@ -733,7 +735,82 @@ class AdminStore {
       'Admin'
     );
     this.notify();
+
+    // Async sync to Supabase Cloud
+    if (targetTicketCode) {
+      fetch('/api/admin-participants', {
+        method: 'PATCH',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          ticketCode: targetTicketCode,
+          checkedIn: newStatus
+        })
+      }).catch((e) => console.warn('Supabase check-in sync notice:', e));
+    }
+
     return newStatus;
+  }
+
+  public settleBalance(participantId: string, paymentMethod: string = 'Hotovosť na mieste'): boolean {
+    const list = this.getParticipants();
+    let targetTicketCode = '';
+    let updatedParticipant: Participant | null = null;
+
+    const updated = list.map((p) => {
+      if (p.id === participantId || p.ticketCode === participantId) {
+        targetTicketCode = p.ticketCode;
+        const total = p.tierPriceEUR || 380;
+        updatedParticipant = {
+          ...p,
+          amountPaidEUR: total,
+          amountRemainingEUR: 0,
+          paymentStatus: 'Uhradené (Plná suma - doplatok na mieste)' as any,
+          paymentMethod: paymentMethod
+        };
+        return updatedParticipant;
+      }
+      return p;
+    });
+
+    if (!updatedParticipant) return false;
+
+    localStorage.setItem(STORAGE_KEYS.PARTICIPANTS, JSON.stringify(updated));
+    this.addAuditLog(
+      'participant',
+      'Prijatý doplatok na mieste',
+      `Účastník "${(updatedParticipant as Participant).fullName}" uhradil doplatok ${paymentMethod}. Vstupenka ${targetTicketCode} je 100% uhradená.`,
+      'Admin'
+    );
+    this.notify();
+
+    // Async sync to Supabase Cloud
+    if (targetTicketCode) {
+      fetch('/api/admin-participants', {
+        method: 'PATCH',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          ticketCode: targetTicketCode,
+          paymentStatus: 'Uhradené (Plná suma - doplatok na mieste)',
+          amountPaidEUR: (updatedParticipant as Participant).amountPaidEUR,
+          amountRemainingEUR: 0,
+          paymentMethod: paymentMethod
+        })
+      }).catch((e) => console.warn('Supabase settle balance sync notice:', e));
+    }
+
+    return true;
+  }
+
+  public lookupParticipant(query: string): Participant | undefined {
+    const clean = query.trim().toLowerCase();
+    if (!clean) return undefined;
+    const list = this.getParticipants();
+    return list.find((p) => 
+      p.ticketCode.toLowerCase() === clean ||
+      p.id.toLowerCase() === clean ||
+      p.email.toLowerCase() === clean ||
+      p.fullName.toLowerCase().includes(clean)
+    );
   }
 
   public deleteParticipant(id: string) {

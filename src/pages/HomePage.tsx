@@ -138,7 +138,7 @@ export const HomePage: React.FC<HomePageProps> = ({ onOpenBooking, onSelectPortf
                       {featuredSeminar.description}
                     </p>
 
-                    <div className="space-y-2.5 py-4 text-xs sm:text-sm text-zinc-300">
+                    <div className="space-y-2 py-4 text-xs sm:text-sm text-zinc-300">
                       <div className="flex items-center gap-2">
                         <span className="w-1.5 h-1.5 rounded-full bg-white flex-shrink-0" />
                         <span>Prísna kapacita 6 kaderníkov pre garanciu osobnej spätnej väzby</span>
@@ -151,17 +151,26 @@ export const HomePage: React.FC<HomePageProps> = ({ onOpenBooking, onSelectPortf
                         <span className="w-1.5 h-1.5 rounded-full bg-white flex-shrink-0" />
                         <span>Termokefa Riccardo, pracovné skriptá a certifikát v cene</span>
                       </div>
+                      <div className="flex items-center gap-2">
+                        <span className="w-1.5 h-1.5 rounded-full bg-white flex-shrink-0" />
+                        <span>Záloha iba 100 € (doplatok 280 € na mieste) alebo plná úhrada online</span>
+                      </div>
                     </div>
                   </div>
 
                   <div className="pt-2 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
                     <div>
                       <span className="text-[10px] uppercase text-zinc-500 block font-medium">
-                        Plná účasť (All-Inclusive)
+                        All-Inclusive účasť (Možnosť zálohy 100 €)
                       </span>
-                      <span className="text-2xl sm:text-3xl font-semibold text-white">
-                        {formatPrice(featuredSeminar.tiers[0]?.priceEUR || 380)}
-                      </span>
+                      <div className="flex items-baseline gap-2">
+                        <span className="text-2xl sm:text-3xl font-semibold text-white">
+                          {formatPrice(featuredSeminar.tiers[0]?.priceEUR || 380)}
+                        </span>
+                        <span className="text-xs text-amber-400 font-medium">
+                          alebo záloha 100 €
+                        </span>
+                      </div>
                     </div>
 
                     <div className="flex flex-wrap items-center gap-3">

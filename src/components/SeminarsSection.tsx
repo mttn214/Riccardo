@@ -101,18 +101,22 @@ export const SeminarsSection: React.FC<SeminarsSectionProps> = ({
                   </p>
 
                   {/* Highlights list */}
-                  <div className="space-y-2.5 py-4 text-xs sm:text-sm text-zinc-300">
+                  <div className="space-y-2 py-4 text-xs sm:text-sm text-zinc-300">
                     <div className="flex items-center gap-2">
                       <span className="w-1.5 h-1.5 rounded-full bg-white flex-shrink-0" />
                       <span><strong>Prísna kapacita:</strong> Iba 6 kaderníkov pre 100% individuálny prístup</span>
                     </div>
                     <div className="flex items-center gap-2">
                       <span className="w-1.5 h-1.5 rounded-full bg-white flex-shrink-0" />
-                      <span><strong>Prax na modelkách:</strong> Osobné nastavenie napínania a uhlov od Richarda</span>
+                      <span><strong>Prax na modelkách:</strong> Osobné nastavenie biomechaniky rúk a uhlov od Richarda</span>
                     </div>
                     <div className="flex items-center gap-2">
                       <span className="w-1.5 h-1.5 rounded-full bg-white flex-shrink-0" />
                       <span><strong>V cene:</strong> Originálna termálna kefa Riccardo, manuál a certifikát</span>
+                    </div>
+                    <div className="flex items-center gap-2">
+                      <span className="w-1.5 h-1.5 rounded-full bg-white flex-shrink-0" />
+                      <span><strong>Fakturácia:</strong> Možnosť vystavenia daňového dokladu na salón (IČO / DIČ)</span>
                     </div>
                   </div>
                 </div>
@@ -121,11 +125,16 @@ export const SeminarsSection: React.FC<SeminarsSectionProps> = ({
                 <div className="pt-2 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
                   <div>
                     <span className="text-[10px] uppercase text-zinc-500 block font-medium">
-                      Plná účasť s praxou (All-Inclusive)
+                      All-Inclusive účasť (Možnosť zálohy 100 €)
                     </span>
-                    <span className="text-2xl sm:text-3xl font-semibold text-white">
-                      {formatPrice(featuredSeminar.tiers[0]?.priceEUR || 380, currency)}
-                    </span>
+                    <div className="flex items-baseline gap-2">
+                      <span className="text-2xl sm:text-3xl font-semibold text-white">
+                        {formatPrice(featuredSeminar.tiers[0]?.priceEUR || 380, currency)}
+                      </span>
+                      <span className="text-xs text-amber-400 font-medium">
+                        alebo záloha 100 €
+                      </span>
+                    </div>
                   </div>
 
                   <div className="flex items-center gap-3 w-full sm:w-auto">
