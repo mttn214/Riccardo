@@ -111,6 +111,42 @@ function hashString(str: string): string {
 const DEFAULT_USERNAME = 'admin';
 const DEFAULT_PASSWORD_HASH = hashString('admin:riccardo2026!');
 
+export interface AdminAccount {
+  email: string;
+  name: string;
+  role: 'owner' | 'tech_admin';
+  roleTitle: string;
+  passwordPlain: string;
+  aliases: string[];
+}
+
+export const AUTHORIZED_ADMIN_ACCOUNTS: AdminAccount[] = [
+  {
+    email: 'hair.riccardo@gmail.com',
+    name: 'Richard Čonka',
+    role: 'owner',
+    roleTitle: 'Majiteľ & Master Stylist',
+    passwordPlain: 'Riccardo*Hair2027!Pro',
+    aliases: ['riccardo', 'hair.riccardo', 'richard']
+  },
+  {
+    email: 'mattino.business@gmail.com',
+    name: 'Mattino',
+    role: 'tech_admin',
+    roleTitle: 'Technická správa & Administrátor',
+    passwordPlain: 'Mattino#Dev2027!Secure',
+    aliases: ['mattino', 'mattino.business']
+  },
+  {
+    email: 'admin',
+    name: 'Hlavný správca',
+    role: 'tech_admin',
+    roleTitle: 'Systémový administrátor',
+    passwordPlain: 'riccardo2026!',
+    aliases: ['admin@hairsalonriccardo.sk']
+  }
+];
+
 // Realistic Seed Participants for initial load
 const SEED_PARTICIPANTS: Participant[] = [
   {
@@ -460,13 +496,42 @@ class AdminStore {
     const cleanUser = username.trim().toLowerCase();
     const cleanPass = password.trim();
     const inputHash = hashString(`${cleanUser}:${cleanPass}`);
-    const storedHash = localStorage.getItem(STORAGE_KEYS.CREDENTIALS_HASH) || DEFAULT_PASSWORD_HASH;
 
-    // Direct match check (supports default credentials or updated ones)
-    const isDefault = cleanUser === 'admin' && cleanPass === 'riccardo2026!';
-    const isHashMatch = inputHash === storedHash;
+    // Find account by primary email or registered alias
+    const matchedAccount = AUTHORIZED_ADMIN_ACCOUNTS.find(
+      acc => acc.email.toLowerCase() === cleanUser || acc.aliases.some(a => a.toLowerCase() === cleanUser)
+    );
 
-    if (isDefault || isHashMatch) {
+    let isMatch = false;
+    let accountName = cleanUser;
+    let accountEmail = cleanUser;
+    let accountRole = 'tech_admin';
+    let accountRoleTitle = 'Správca portálu';
+
+    if (matchedAccount) {
+      accountName = matchedAccount.name;
+      accountEmail = matchedAccount.email;
+      accountRole = matchedAccount.role;
+      accountRoleTitle = matchedAccount.roleTitle;
+
+      // Check if custom password was saved for this email
+      const customHash = localStorage.getItem(`riccardo_creds_${matchedAccount.email.toLowerCase()}`);
+      if (customHash) {
+        isMatch = inputHash === customHash;
+      } else {
+        isMatch = cleanPass === matchedAccount.passwordPlain;
+      }
+    } else {
+      // Fallback for default admin
+      const storedHash = localStorage.getItem(STORAGE_KEYS.CREDENTIALS_HASH) || DEFAULT_PASSWORD_HASH;
+      if (cleanUser === 'admin' && (cleanPass === 'riccardo2026!' || inputHash === storedHash)) {
+        isMatch = true;
+        accountName = 'Hlavný správca';
+        accountEmail = 'admin';
+      }
+    }
+
+    if (isMatch) {
       // Success
       localStorage.removeItem(STORAGE_KEYS.FAILED_ATTEMPTS);
       localStorage.removeItem(STORAGE_KEYS.LOCKOUT_UNTIL);
@@ -477,8 +542,14 @@ class AdminStore {
 
       localStorage.setItem(STORAGE_KEYS.AUTH_TOKEN, token);
       localStorage.setItem(STORAGE_KEYS.AUTH_EXPIRY, expiry.toString());
+      localStorage.setItem('riccardo_active_user', JSON.stringify({
+        email: accountEmail,
+        name: accountName,
+        role: accountRole,
+        roleTitle: accountRoleTitle
+      }));
 
-      this.addAuditLog('auth', 'Úspešné prihlásenie správcu', `Používateľ "${cleanUser}" sa úspešne prihlásil do administrácie.`, cleanUser);
+      this.addAuditLog('auth', 'Úspešné prihlásenie správcu', `${accountName} (${accountEmail}) sa úspešne prihlásil do administrácie.`, accountName);
       this.notify();
       return { success: true };
     } else {
@@ -502,16 +573,31 @@ class AdminStore {
       this.notify();
       return {
         success: false,
-        error: `Nesprávne používateľské meno alebo heslo. (Zostáva ${settings.maxFailedAttempts - attempts} pokusov pred uzamknutím).`
+        error: `Nesprávne prihlasovacie meno alebo heslo. (Zostáva ${settings.maxFailedAttempts - attempts} pokusov pred uzamknutím).`
       };
     }
   }
 
+  public getActiveUser(): { email: string; name: string; role: string; roleTitle: string } {
+    if (typeof window === 'undefined') {
+      return { email: 'hair.riccardo@gmail.com', name: 'Richard Čonka', role: 'owner', roleTitle: 'Majiteľ & Master Stylist' };
+    }
+    const raw = localStorage.getItem('riccardo_active_user');
+    if (raw) {
+      try {
+        return JSON.parse(raw);
+      } catch {}
+    }
+    return { email: 'hair.riccardo@gmail.com', name: 'Richard Čonka', role: 'owner', roleTitle: 'Majiteľ & Master Stylist' };
+  }
+
   public logout() {
     if (typeof window === 'undefined') return;
+    const user = this.getActiveUser();
     localStorage.removeItem(STORAGE_KEYS.AUTH_TOKEN);
     localStorage.removeItem(STORAGE_KEYS.AUTH_EXPIRY);
-    this.addAuditLog('auth', 'Odhlásenie správcu', 'Používateľ sa manuálne odhlásil z administrácie.', 'Admin');
+    localStorage.removeItem('riccardo_active_user');
+    this.addAuditLog('auth', 'Odhlásenie správcu', `Používateľ ${user.name} (${user.email}) sa manuálne odhlásil z administrácie.`, user.name);
     this.notify();
   }
 
@@ -534,17 +620,32 @@ class AdminStore {
       return { success: false, error: 'Nové heslo musí obsahovať minimálne 8 znakov.' };
     }
 
-    const storedHash = localStorage.getItem(STORAGE_KEYS.CREDENTIALS_HASH) || DEFAULT_PASSWORD_HASH;
-    const oldHash = hashString(`admin:${oldPassword.trim()}`);
-    const isOldDefault = oldPassword.trim() === 'riccardo2026!';
+    const activeUser = this.getActiveUser();
+    const cleanUser = activeUser.email.toLowerCase();
+    const oldPass = oldPassword.trim();
+    const customUserHash = localStorage.getItem(`riccardo_creds_${cleanUser}`);
 
-    if (!isOldDefault && oldHash !== storedHash) {
+    let isOldValid = false;
+    const account = AUTHORIZED_ADMIN_ACCOUNTS.find(
+      acc => acc.email.toLowerCase() === cleanUser || acc.aliases.some(a => a.toLowerCase() === cleanUser)
+    );
+
+    if (customUserHash) {
+      isOldValid = hashString(`${cleanUser}:${oldPass}`) === customUserHash;
+    } else if (account) {
+      isOldValid = oldPass === account.passwordPlain;
+    } else {
+      isOldValid = oldPass === 'riccardo2026!';
+    }
+
+    if (!isOldValid) {
       return { success: false, error: 'Pôvodné heslo je nesprávne.' };
     }
 
-    const newHash = hashString(`admin:${newPassword.trim()}`);
+    const newHash = hashString(`${cleanUser}:${newPassword.trim()}`);
+    localStorage.setItem(`riccardo_creds_${cleanUser}`, newHash);
     localStorage.setItem(STORAGE_KEYS.CREDENTIALS_HASH, newHash);
-    this.addAuditLog('settings', 'Zmena hesla správcu', 'Bezpečnostné heslo pre administrátorský účet bolo úspešne zmenené.', 'Admin');
+    this.addAuditLog('settings', 'Zmena hesla správcu', `Bezpečnostné heslo pre účet "${activeUser.name}" (${activeUser.email}) bolo úspešne zmenené.`, activeUser.name);
     this.notify();
     return { success: true };
   }

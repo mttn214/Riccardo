@@ -41,6 +41,7 @@ export const AdminLayout: React.FC = () => {
   const { seminars, participants, inquiries, portfolio, store } = useAdminStore();
   const [activeTab, setActiveTab] = useState<AdminTab>('dashboard');
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
+  const activeUser = store.getActiveUser();
 
   // Modals state
   const [isAddSeminarOpen, setIsAddSeminarOpen] = useState(false);
@@ -163,6 +164,23 @@ export const AdminLayout: React.FC = () => {
               );
             })}
           </nav>
+        </div>
+
+        {/* Active Logged-in User Badge */}
+        <div className="p-3 rounded-2xl bg-zinc-900/60 border border-zinc-800/80">
+          <div className="flex items-center gap-2.5">
+            <div className="w-8 h-8 rounded-full bg-white text-black font-bold text-xs flex items-center justify-center shrink-0">
+              {activeUser.name.slice(0, 1)}
+            </div>
+            <div className="min-w-0 flex-1">
+              <p className="text-xs font-semibold text-white truncate">{activeUser.name}</p>
+              <p className="text-[10px] text-zinc-400 font-mono truncate">{activeUser.email}</p>
+            </div>
+          </div>
+          <div className="mt-2 pt-2 border-t border-zinc-800/60 flex items-center justify-between text-[10px] text-zinc-400">
+            <span className="truncate">{activeUser.roleTitle}</span>
+            <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 shrink-0" title="Aktívna relácia" />
+          </div>
         </div>
 
         {/* Sidebar Footer */}

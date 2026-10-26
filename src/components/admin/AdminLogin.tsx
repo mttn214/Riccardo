@@ -125,11 +125,13 @@ export const AdminLogin: React.FC<AdminLoginProps> = ({ onLoginSuccess }) => {
           )}
 
           <form onSubmit={handleSubmit} className="space-y-4">
-            {/* Username */}
+            {/* Username / Email */}
             <div className="space-y-1.5">
-              <label className="text-xs font-medium text-zinc-300 block">
-                Používateľské meno
-              </label>
+              <div className="flex items-center justify-between text-xs">
+                <label className="font-medium text-zinc-300 block">
+                  Email alebo prihlasovacie meno
+                </label>
+              </div>
               <div className="relative">
                 <div className="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none text-zinc-500">
                   <User className="w-4 h-4" />
@@ -143,9 +145,29 @@ export const AdminLogin: React.FC<AdminLoginProps> = ({ onLoginSuccess }) => {
                     setUsername(e.target.value);
                     if (error) setError('');
                   }}
-                  placeholder="Zadajte používateľské meno"
+                  placeholder="napr. hair.riccardo@gmail.com"
                   className="w-full bg-zinc-900 focus:bg-zinc-850 text-white pl-10 pr-4 py-3.5 rounded-xl text-sm focus:outline-none focus:ring-1 focus:ring-white/20 transition-all disabled:opacity-50"
                 />
+              </div>
+
+              {/* Quick Account Fill Pills */}
+              <div className="flex flex-wrap items-center gap-1.5 pt-1">
+                <button
+                  type="button"
+                  onClick={() => setUsername('hair.riccardo@gmail.com')}
+                  className="text-[11px] font-mono px-2 py-0.5 rounded-md bg-zinc-900 hover:bg-zinc-800 text-zinc-400 hover:text-white transition-colors cursor-pointer"
+                  title="Kliknite pre vyplnenie emailu"
+                >
+                  hair.riccardo@gmail.com
+                </button>
+                <button
+                  type="button"
+                  onClick={() => setUsername('mattino.business@gmail.com')}
+                  className="text-[11px] font-mono px-2 py-0.5 rounded-md bg-zinc-900 hover:bg-zinc-800 text-zinc-400 hover:text-white transition-colors cursor-pointer"
+                  title="Kliknite pre vyplnenie emailu"
+                >
+                  mattino.business@gmail.com
+                </button>
               </div>
             </div>
 
