@@ -143,9 +143,15 @@ export const Footer: React.FC = () => {
 
         {/* Bottom Bar */}
         <div className="pt-8 flex flex-col sm:flex-row items-center justify-between gap-4 text-zinc-500">
-          <p className="text-zinc-500 text-xs">
-            © {new Date().getFullYear()} Hair Salon Riccardo. Všetky práva vyhradené.
-          </p>
+          <div className="flex flex-wrap items-center gap-3 text-xs">
+            <p className="text-zinc-500">
+              © {new Date().getFullYear()} Hair Salon Riccardo. Všetky práva vyhradené.
+            </p>
+            <span className="text-zinc-800 hidden sm:inline">•</span>
+            <Link to="/admin" className="text-zinc-600 hover:text-zinc-400 transition-colors">
+              Správa portálu
+            </Link>
+          </div>
 
           <button
             onClick={scrollToTop}
