@@ -30,7 +30,8 @@ import {
   processStripeCardPayment,
   createStripePaymentRequest,
   mountStripePaymentRequestButton,
-  STRIPE_TEST_CARD
+  STRIPE_TEST_CARD,
+  DEFAULT_STRIPE_LIVE_KEY
 } from '../services/stripeService';
 import { adminStore } from '../services/adminStore';
 import { generateLuxuryTicketPDF } from '../services/ticketService';
@@ -540,27 +541,131 @@ export const ReservationModal: React.FC<ReservationModalProps> = ({
     lastClickedWallet.current = 'google';
     setStripeError('');
 
-    if (!canGooglePay) {
-      setStripeError('Google Pay nie je v tomto prehliadači podporované. Na zariadeniach Apple použite prosím Apple Pay alebo platobnú kartu nižšie.');
-      return;
+    // Explicit check for Safari on Apple devices
+    const isSafariOnApple = typeof window !== 'undefined' && 
+      Boolean((window as any).ApplePaySession || (/Macintosh|iPhone|iPad|iPod/.test(navigator.userAgent) && !/Chrome|CriOS|Android/.test(navigator.userAgent)));
+
+    // 1. If Google Pay Web SDK is loaded, use official Google Pay sheet
+    if (typeof window !== 'undefined' && (window as any).google?.payments?.api?.PaymentsClient) {
+      try {
+        setIsProcessingPayment(true);
+        setPaymentStatusText('Otváram Google Pay peňaženku...');
+
+        const stripeConfig = adminStore.getStripeConfig();
+        const publishableKey = stripeConfig.publishableKey || DEFAULT_STRIPE_LIVE_KEY;
+
+        const paymentsClient = new (window as any).google.payments.api.PaymentsClient({
+          environment: publishableKey.startsWith('pk_live_') ? 'PRODUCTION' : 'TEST'
+        });
+
+        const paymentDataRequest = {
+          apiVersion: 2,
+          apiVersionMinor: 0,
+          allowedPaymentMethods: [
+            {
+              type: 'CARD',
+              parameters: {
+                allowedAuthMethods: ['PAN_ONLY', 'CRYPTOGRAM_3DS'],
+                allowedCardNetworks: ['MASTERCARD', 'VISA', 'AMEX']
+              },
+              tokenizationSpecification: {
+                type: 'PAYMENT_GATEWAY',
+                parameters: {
+                  gateway: 'stripe',
+                  'stripe:version': '2024-04-10',
+                  'stripe:publishableKey': publishableKey
+                }
+              }
+            }
+          ],
+          transactionInfo: {
+            totalPriceStatus: 'FINAL',
+            totalPrice: amountToPayNow.toString(),
+            currencyCode: 'EUR',
+            countryCode: 'SK'
+          },
+          merchantInfo: {
+            merchantName: 'Hair Salon Riccardo / ZETEREM s.r.o.'
+          }
+        };
+
+        const paymentData = await paymentsClient.loadPaymentData(paymentDataRequest);
+        setPaymentStatusText('Spracovávam autorizáciu Google Pay...');
+
+        let tokenId = '';
+        const rawToken = paymentData?.paymentMethodData?.tokenizationData?.token;
+        if (rawToken) {
+          try {
+            const parsed = JSON.parse(rawToken);
+            tokenId = parsed.id || rawToken;
+          } catch {
+            tokenId = rawToken;
+          }
+        }
+
+        if (!tokenId) {
+          throw new Error('Nepodarilo sa získať platobný token z Google Pay.');
+        }
+
+        const apiRes = await fetch('/api/pay', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            amountEUR: amountToPayNow,
+            tokenId,
+            customerName: formData.fullName,
+            customerEmail: formData.email,
+            customerPhone: formData.phone,
+            seminarTitle: selectedSeminar.title,
+            ticketId: confirmationCode,
+            paymentType: 'google_pay',
+            customSecretKey: stripeConfig.secretKey || undefined
+          })
+        });
+
+        const data = await apiRes.json();
+        if (data.success) {
+          await completeReservation({
+            methodTitle: 'Google Pay (Biometrická autorizácia)',
+            paymentStatus: 'Autorizované a uhradené cez Google Pay',
+            stripeTokenId: tokenId,
+            stripePaymentIntentId: data.paymentIntentId,
+            receiptUrl: data.receiptUrl || null
+          });
+          return;
+        } else {
+          throw new Error(data.error || 'Zlyhala autorizácia Google Pay platby v Stripe.');
+        }
+      } catch (gpayErr: any) {
+        setIsProcessingPayment(false);
+        setPaymentStatusText('');
+        if (gpayErr?.statusCode === 'CANCELED' || gpayErr?.message?.includes('cancel') || gpayErr?.message?.includes('abort')) {
+          return;
+        }
+        console.warn('Google Pay Web SDK notice:', gpayErr);
+      }
     }
 
-    let pr = stripePaymentRequest;
-    if (pr) {
+    // 2. Non-Apple/non-Safari device (Android or Chrome): Try browser PaymentRequest
+    if (!isSafariOnApple && stripePaymentRequest) {
       try {
-        await pr.show();
+        await stripePaymentRequest.show();
         return;
       } catch (err: any) {
         setIsProcessingPayment(false);
         setPaymentStatusText('');
         if (err?.message && !err.message.includes('abort') && !err.message.includes('cancel')) {
-          setStripeError('Google Pay nie je v tomto prehliadači aktívne alebo nemá priradenú kartu. Môžete zadať údaje platobnej karty nižšie.');
+          setStripeError('Google Pay dialóg bol prerušený. Môžete okamžite zaplatiť platobnou kartou nižšie.');
         }
         return;
       }
     }
 
-    setStripeError('Google Pay vyžaduje podporovaný prehliadač s kartou v Google účte. Môžete okamžite zaplatiť platobnou kartou nižšie.');
+    // 3. Apple/Safari device where Google Pay SDK is not active:
+    // CRITICAL: NEVER call stripePaymentRequest.show() here, as that would trigger Apple Pay!
+    setIsProcessingPayment(false);
+    setPaymentStatusText('');
+    setStripeError('Google Pay vyžaduje prihlásený Google účet alebo prehliadač Google Chrome / Android. Na vašom zariadení Apple môžete využiť Apple Pay (tlačidlo vľavo) alebo zadať platobnú kartu nižšie.');
   };
 
   // Handle Apple Pay payment execution
@@ -568,8 +673,9 @@ export const ReservationModal: React.FC<ReservationModalProps> = ({
     lastClickedWallet.current = 'apple';
     setStripeError('');
 
-    if (!canApplePay) {
-      setStripeError('Apple Pay je podporované iba na zariadeniach Apple (iPhone, iPad, Mac) v prehliadači Safari.');
+    const isAppleDevice = typeof window !== 'undefined' && (/Macintosh|iPhone|iPad|iPod/.test(navigator.userAgent) || Boolean((window as any).ApplePaySession));
+    if (!isAppleDevice) {
+      setStripeError('Apple Pay je podporované iba na zariadeniach Apple (iPhone, iPad, Mac) v prehliadači Safari. Použite prosím Google Pay vpravo alebo platobnú kartu nižšie.');
       return;
     }
 
@@ -1123,67 +1229,41 @@ export const ReservationModal: React.FC<ReservationModalProps> = ({
                 </div>
               )}
 
-              {/* Smart Digital Wallet (Platform-native Apple Pay / Google Pay) */}
-              {(canApplePay || canGooglePay) && (
-                <div className="space-y-4 pt-1">
-                  {canApplePay && canGooglePay ? (
-                    <div className="grid grid-cols-2 gap-3">
-                      <button
-                        type="button"
-                        onClick={handleProcessApplePayPayment}
-                        disabled={isProcessingPayment}
-                        className="h-14 rounded-2xl bg-black text-white hover:bg-zinc-900 active:scale-[0.98] transition-all flex items-center justify-center cursor-pointer shadow-xl ring-1 ring-white/20 hover:ring-white/40 disabled:opacity-50"
-                        style={{ minHeight: '52px' }}
-                        aria-label="Apple Pay"
-                      >
-                        <ApplePayLogo className="h-7 w-auto text-white" />
-                      </button>
+              {/* Digital Wallets: Side-by-side Apple Pay & Google Pay */}
+              <div className="space-y-4 pt-1">
+                <div className="grid grid-cols-2 gap-3">
+                  <button
+                    type="button"
+                    onClick={handleProcessApplePayPayment}
+                    disabled={isProcessingPayment}
+                    className="h-14 rounded-2xl bg-black text-white hover:bg-zinc-900 active:scale-[0.98] transition-all flex items-center justify-center cursor-pointer shadow-xl ring-1 ring-white/20 hover:ring-white/40 disabled:opacity-50"
+                    style={{ minHeight: '52px' }}
+                    aria-label="Apple Pay"
+                  >
+                    <ApplePayLogo className="h-7 w-auto text-white" />
+                  </button>
 
-                      <button
-                        type="button"
-                        onClick={handleProcessGooglePayPayment}
-                        disabled={isProcessingPayment}
-                        className="h-14 rounded-2xl bg-black text-white hover:bg-zinc-900 active:scale-[0.98] transition-all flex items-center justify-center cursor-pointer shadow-xl ring-1 ring-white/20 hover:ring-white/40 disabled:opacity-50"
-                        style={{ minHeight: '52px' }}
-                        aria-label="Google Pay"
-                      >
-                        <GooglePayLogo className="h-6 w-auto" lightText={true} />
-                      </button>
-                    </div>
-                  ) : canApplePay ? (
-                    <button
-                      type="button"
-                      onClick={handleProcessApplePayPayment}
-                      disabled={isProcessingPayment}
-                      className="w-full h-14 rounded-2xl bg-black text-white hover:bg-zinc-900 active:scale-[0.98] transition-all flex items-center justify-center cursor-pointer shadow-xl ring-1 ring-white/20 hover:ring-white/40 disabled:opacity-50"
-                      style={{ minHeight: '52px' }}
-                      aria-label="Apple Pay"
-                    >
-                      <ApplePayLogo className="h-7 w-auto text-white" />
-                    </button>
-                  ) : (
-                    <button
-                      type="button"
-                      onClick={handleProcessGooglePayPayment}
-                      disabled={isProcessingPayment}
-                      className="w-full h-14 rounded-2xl bg-black text-white hover:bg-zinc-900 active:scale-[0.98] transition-all flex items-center justify-center cursor-pointer shadow-xl ring-1 ring-white/20 hover:ring-white/40 disabled:opacity-50"
-                      style={{ minHeight: '52px' }}
-                      aria-label="Google Pay"
-                    >
-                      <GooglePayLogo className="h-6 w-auto" lightText={true} />
-                    </button>
-                  )}
-
-                  <div className="relative flex items-center justify-center">
-                    <div className="absolute inset-0 flex items-center">
-                      <div className="w-full border-t border-zinc-800/80" />
-                    </div>
-                    <span className="relative px-4 bg-zinc-950 text-xs text-zinc-500 font-medium">
-                      alebo zaplatiť platobnou kartou
-                    </span>
-                  </div>
+                  <button
+                    type="button"
+                    onClick={handleProcessGooglePayPayment}
+                    disabled={isProcessingPayment}
+                    className="h-14 rounded-2xl bg-black text-white hover:bg-zinc-900 active:scale-[0.98] transition-all flex items-center justify-center cursor-pointer shadow-xl ring-1 ring-white/20 hover:ring-white/40 disabled:opacity-50"
+                    style={{ minHeight: '52px' }}
+                    aria-label="Google Pay"
+                  >
+                    <GooglePayLogo className="h-6 w-auto" lightText={true} />
+                  </button>
                 </div>
-              )}
+
+                <div className="relative flex items-center justify-center">
+                  <div className="absolute inset-0 flex items-center">
+                    <div className="w-full border-t border-zinc-800/80" />
+                  </div>
+                  <span className="relative px-4 bg-zinc-950 text-xs text-zinc-500 font-medium">
+                    alebo zaplatiť platobnou kartou
+                  </span>
+                </div>
+              </div>
 
               {/* Clean Card Payment Form */}
               <div className="space-y-3.5">
