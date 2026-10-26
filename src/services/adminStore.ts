@@ -1081,32 +1081,29 @@ class AdminStore {
     this.notify();
   }
 
-  public getStripeConfig(): { mode: 'test' | 'live'; publishableKey: string; secretKey: string } {
+  public getStripeConfig(): { mode: 'live'; publishableKey: string; secretKey: string } {
     const s = this.getSettings();
     const defaultLivePk = 'pk_live_51UQoDZHAmh46e1VBb3RxsHk6XPTQg6ttug0vwDCux9p7Bxgva79oiJm2gvsUNzJfCPEMaoc9bb0MC0HEbhyjzixa008QwAoWJr';
 
-    const mode = s.stripeMode || 'live';
     let publishableKey = s.stripePublishableKey || defaultLivePk;
     let secretKey = s.stripeSecretKey || '';
 
-    if (mode === 'live') {
-      if (!publishableKey || publishableKey.startsWith('pk_test_')) {
-        publishableKey = defaultLivePk;
-      }
+    if (!publishableKey || publishableKey.startsWith('pk_test_')) {
+      publishableKey = defaultLivePk;
     }
 
     return {
-      mode,
+      mode: 'live',
       publishableKey,
       secretKey
     };
   }
 
-  public saveStripeConfig(config: { mode: 'test' | 'live'; publishableKey: string; secretKey: string }) {
+  public saveStripeConfig(config: { mode?: 'test' | 'live'; publishableKey: string; secretKey: string }) {
     const s = this.getSettings();
     const updated: AdminSecuritySettings = {
       ...s,
-      stripeMode: config.mode,
+      stripeMode: 'live',
       stripePublishableKey: config.publishableKey.trim(),
       stripeSecretKey: config.secretKey.trim()
     };
@@ -1114,7 +1111,7 @@ class AdminStore {
     this.addAuditLog(
       'settings',
       'Konfigurácia Stripe platobnej brány',
-      `Režim: ${config.mode.toUpperCase()}, Publishable Key: ${config.publishableKey ? config.publishableKey.slice(0, 12) + '...' : 'predvolený'}.`,
+      `Režim: LIVE, Publishable Key: ${config.publishableKey ? config.publishableKey.slice(0, 12) + '...' : 'predvolený'}.`,
       'Admin'
     );
   }

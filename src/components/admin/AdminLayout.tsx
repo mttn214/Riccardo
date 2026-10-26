@@ -185,26 +185,6 @@ export const AdminLayout: React.FC = () => {
 
         {/* Sidebar Footer */}
         <div className="pt-4 space-y-2">
-          {/* Theme Quick Toggle */}
-          <button
-            type="button"
-            onClick={toggleTheme}
-            className="w-full py-2.5 px-3 rounded-xl bg-zinc-900/60 hover:bg-zinc-800 text-zinc-300 hover:text-white text-xs font-medium flex items-center justify-between transition-colors cursor-pointer"
-            title="Prepnúť režim zobrazenia"
-          >
-            <span className="flex items-center gap-2">
-              {theme === 'light' ? (
-                <Moon className="w-3.5 h-3.5 text-zinc-600" />
-              ) : (
-                <Sun className="w-3.5 h-3.5 text-amber-400" />
-              )}
-              <span>{theme === 'light' ? 'Tmavý režim' : 'Svetlý režim'}</span>
-            </span>
-            <span className="text-[10px] font-mono text-zinc-500 uppercase tracking-wider">
-              {theme === 'light' ? 'Svetlý' : 'Tmavý'}
-            </span>
-          </button>
-
           <Link
             to="/"
             target="_blank"
@@ -310,25 +290,6 @@ export const AdminLayout: React.FC = () => {
         {/* Mobile Dropdown Navigation */}
         {isMobileMenuOpen && (
           <div className="lg:hidden bg-zinc-950 p-4 space-y-2">
-            {/* Mobile Theme Toggle */}
-            <button
-              type="button"
-              onClick={toggleTheme}
-              className="w-full py-2.5 px-3 rounded-xl text-xs font-medium flex items-center justify-between bg-zinc-900 text-zinc-300 cursor-pointer"
-            >
-              <div className="flex items-center gap-2">
-                {theme === 'light' ? (
-                  <Moon className="w-4 h-4 text-zinc-400" />
-                ) : (
-                  <Sun className="w-4 h-4 text-amber-400" />
-                )}
-                <span>Režim: {theme === 'light' ? 'Svetlý moderný' : 'Tmavý luxusný'}</span>
-              </div>
-              <span className="text-[10px] font-mono text-zinc-400 uppercase tracking-wider">
-                Prepnúť
-              </span>
-            </button>
-
             {navItems.map((item) => {
               const Icon = item.icon;
               const isActive = activeTab === item.id;

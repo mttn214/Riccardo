@@ -16,16 +16,10 @@ import {
   Building2,
   FileText,
   Search,
-  CreditCard,
-  Check,
-  Zap,
-  Sun,
-  Moon
+  CreditCard
 } from 'lucide-react';
-import { useAdminTheme } from '../../context/AdminThemeContext';
 
 export const AdminSettingsTab: React.FC = () => {
-  const { theme, setTheme } = useAdminTheme();
   const { settings, auditLogs, store } = useAdminStore();
 
   // Password change state
@@ -42,9 +36,8 @@ export const AdminSettingsTab: React.FC = () => {
   const [lockoutMinutes, setLockoutMinutes] = useState(settings.lockoutDurationMinutes);
   const [settingsSuccess, setSettingsSuccess] = useState(false);
 
-  // Stripe Gateway Configuration state
+  // Stripe Gateway Configuration state (Trvalo živý režim - Live Production)
   const stripeConfig = store.getStripeConfig();
-  const [stripeMode, setStripeMode] = useState<'test' | 'live'>(stripeConfig.mode);
   const [stripePk, setStripePk] = useState(stripeConfig.publishableKey);
   const [stripeSk, setStripeSk] = useState(stripeConfig.secretKey);
   const [showStripeSecret, setShowStripeSecret] = useState(false);
@@ -99,7 +92,7 @@ export const AdminSettingsTab: React.FC = () => {
   const handleSaveStripeGateway = (e: React.FormEvent) => {
     e.preventDefault();
     store.saveStripeConfig({
-      mode: stripeMode,
+      mode: 'live',
       publishableKey: stripePk,
       secretKey: stripeSk
     });
@@ -180,12 +173,8 @@ export const AdminSettingsTab: React.FC = () => {
               </p>
             </div>
           </div>
-          <span className={`text-[10px] font-mono uppercase px-3 py-1 rounded-full ${
-            stripeMode === 'live'
-              ? 'bg-emerald-500/10 text-emerald-300 ring-1 ring-emerald-500/20'
-              : 'bg-amber-500/10 text-amber-300 ring-1 ring-amber-500/20'
-          }`}>
-            Režim: {stripeMode === 'live' ? 'Živý (Live)' : 'Testovací (Sandbox)'}
+          <span className="text-[10px] font-mono uppercase px-3 py-1 rounded-full bg-emerald-500/10 text-emerald-300 ring-1 ring-emerald-500/20">
+            Trvalý živý režim (Live Production)
           </span>
         </div>
 
@@ -196,64 +185,44 @@ export const AdminSettingsTab: React.FC = () => {
           </div>
         )}
 
-        <form onSubmit={handleSaveStripeGateway} className="space-y-4 text-xs pt-1">
-          {/* Mode switch */}
-          <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-            <button
-              type="button"
-              onClick={() => setStripeMode('test')}
-              className={`p-3.5 rounded-2xl text-left transition-all cursor-pointer ${
-                stripeMode === 'test'
-                  ? 'bg-zinc-800 text-white font-medium shadow'
-                  : 'bg-zinc-950/60 text-zinc-400 hover:text-white hover:bg-zinc-900/60'
-              }`}
-            >
-              <div className="font-semibold text-xs text-white">Testovací režim (Test Mode)</div>
-              <p className="text-[11px] text-zinc-400 mt-0.5">
-                Pre testovanie platieb s testovacou kartou (4242...). Stripe odmieta reálne karty.
-              </p>
-            </button>
-
-            <button
-              type="button"
-              onClick={() => setStripeMode('live')}
-              className={`p-3.5 rounded-2xl text-left transition-all cursor-pointer ${
-                stripeMode === 'live'
-                  ? 'bg-emerald-950/60 text-emerald-200 font-medium shadow ring-1 ring-emerald-500/30'
-                  : 'bg-zinc-950/60 text-zinc-400 hover:text-white hover:bg-zinc-900/60'
-              }`}
-            >
-              <div className="font-semibold text-xs text-white flex items-center gap-1.5">
-                <span>Živý režim (Live Production)</span>
-                <span className="text-[10px] font-mono px-1.5 py-0.5 rounded bg-emerald-500/20 text-emerald-300">Skutočné platby</span>
-              </div>
-              <p className="text-[11px] text-zinc-400 mt-0.5">
-                Stiahne reálne peniaze z kariet a Apple Pay klientov na účet ZETEREM s.r.o.
-              </p>
-            </button>
+        {/* Live Mode Notice */}
+        <div className="p-4 rounded-2xl bg-emerald-950/20 border border-emerald-500/20 text-xs text-zinc-300 flex items-start gap-3">
+          <div className="p-2 rounded-xl bg-emerald-500/10 text-emerald-400 shrink-0 mt-0.5">
+            <CheckCircle2 className="w-4 h-4" />
           </div>
+          <div className="space-y-1">
+            <div className="font-semibold text-white flex items-center gap-2">
+              <span>Výhradne živá produkčná prevádzka (Live Mode)</span>
+              <span className="text-[10px] font-mono px-1.5 py-0.5 rounded bg-emerald-500/20 text-emerald-300 uppercase tracking-wider">Aktívne</span>
+            </div>
+            <p className="text-[11px] text-zinc-400 leading-relaxed">
+              Testovací režim bol trvalo vyradený. Všetky transakcie z Apple Pay, Google Pay a platobných kariet prebiehajú v reálnom čase a platby sú pripisované priamo na bankový účet spoločnosti ZETEREM s.r.o.
+            </p>
+          </div>
+        </div>
 
+        <form onSubmit={handleSaveStripeGateway} className="space-y-4 text-xs pt-1">
           {/* Keys inputs */}
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
             <div className="space-y-1">
               <label className="text-zinc-300 font-medium block">
-                Stripe Publishable Key ({stripeMode === 'live' ? 'pk_live_...' : 'pk_test_...'})
+                Stripe Publishable Key (pk_live_...)
               </label>
               <input
                 type="text"
                 value={stripePk}
                 onChange={(e) => setStripePk(e.target.value)}
-                placeholder={stripeMode === 'live' ? 'pk_live_51...' : 'pk_test_51...'}
+                placeholder="pk_live_51..."
                 className="w-full bg-zinc-950/80 text-white p-3 rounded-xl border-0 focus:ring-1 focus:ring-white/20 font-mono text-xs outline-none"
               />
               <span className="text-[10px] text-zinc-500 block">
-                Verejný kľúč použitý na webe pre inicializáciu Stripe.js a Apple Pay.
+                Verejný kľúč použitý na webe pre inicializáciu Stripe.js, Apple Pay a Google Pay.
               </span>
             </div>
 
             <div className="space-y-1">
               <label className="text-zinc-300 font-medium flex justify-between">
-                <span>Stripe Secret Key ({stripeMode === 'live' ? 'sk_live_...' : 'sk_test_...'})</span>
+                <span>Stripe Secret Key (sk_live_...)</span>
                 <button
                   type="button"
                   onClick={() => setShowStripeSecret(!showStripeSecret)}
@@ -266,7 +235,7 @@ export const AdminSettingsTab: React.FC = () => {
                 type={showStripeSecret ? 'text' : 'password'}
                 value={stripeSk}
                 onChange={(e) => setStripeSk(e.target.value)}
-                placeholder={stripeMode === 'live' ? 'sk_live_51...' : 'sk_test_51...'}
+                placeholder="sk_live_51..."
                 className="w-full bg-zinc-950/80 text-white p-3 rounded-xl border-0 focus:ring-1 focus:ring-white/20 font-mono text-xs outline-none"
               />
               <span className="text-[10px] text-zinc-500 block">
@@ -287,80 +256,6 @@ export const AdminSettingsTab: React.FC = () => {
             </button>
           </div>
         </form>
-      </div>
-
-      {/* Theme Preference Section */}
-      <div className="p-6 rounded-3xl bg-zinc-900/40 space-y-4">
-        <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2">
-          <div className="flex items-center gap-2.5">
-            <div className="p-2 rounded-xl bg-white/10 text-white">
-              {theme === 'light' ? <Sun className="w-4 h-4 text-amber-400" /> : <Moon className="w-4 h-4 text-zinc-300" />}
-            </div>
-            <div>
-              <h2 className="text-sm font-semibold text-white">Vzhľad a motív administrácie</h2>
-              <p className="text-[11px] text-zinc-400">
-                Vyberte si medzi prémiovým tmavým luxusným motívom a čistým svetlým režimom.
-              </p>
-            </div>
-          </div>
-          <span className="text-[10px] font-mono uppercase px-3 py-1 rounded-full bg-white/5 text-zinc-300">
-            Aktívny: {theme === 'light' ? 'Svetlý režim' : 'Tmavý režim'}
-          </span>
-        </div>
-
-        <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 pt-1">
-          {/* Dark Mode Option */}
-          <button
-            type="button"
-            onClick={() => setTheme('dark')}
-            className={`p-4 rounded-2xl text-left transition-all cursor-pointer flex items-start gap-3.5 ${
-              theme === 'dark'
-                ? 'bg-zinc-800 text-white ring-1 ring-white/30 shadow-lg'
-                : 'bg-zinc-950/60 text-zinc-400 hover:text-white hover:bg-zinc-900/60'
-            }`}
-          >
-            <div className="p-2.5 rounded-xl bg-black text-white shrink-0 mt-0.5">
-              <Moon className="w-4 h-4" />
-            </div>
-            <div className="space-y-1">
-              <div className="flex items-center gap-2 font-semibold text-xs text-white">
-                <span>Tmavý luxusný režim</span>
-                {theme === 'dark' && (
-                  <span className="text-[10px] font-mono px-1.5 py-0.5 rounded bg-emerald-500/20 text-emerald-300">Aktívny</span>
-                )}
-              </div>
-              <p className="text-[11px] text-zinc-400 leading-relaxed">
-                Prémiový nočný štýl Hair Salon Riccardo. Chráni zrak pri práci vo večerných hodinách a šetrí displej.
-              </p>
-            </div>
-          </button>
-
-          {/* Light Mode Option */}
-          <button
-            type="button"
-            onClick={() => setTheme('light')}
-            className={`p-4 rounded-2xl text-left transition-all cursor-pointer flex items-start gap-3.5 ${
-              theme === 'light'
-                ? 'bg-zinc-100 text-zinc-900 ring-1 ring-zinc-400 shadow-lg'
-                : 'bg-zinc-950/60 text-zinc-400 hover:text-white hover:bg-zinc-900/60'
-            }`}
-          >
-            <div className="p-2.5 rounded-xl bg-white text-zinc-900 border border-zinc-200 shrink-0 mt-0.5 shadow-sm">
-              <Sun className="w-4 h-4 text-amber-500" />
-            </div>
-            <div className="space-y-1">
-              <div className="flex items-center gap-2 font-semibold text-xs text-zinc-900">
-                <span>Svetlý moderný režim</span>
-                {theme === 'light' && (
-                  <span className="text-[10px] font-mono px-1.5 py-0.5 rounded bg-emerald-500/20 text-emerald-700">Aktívny</span>
-                )}
-              </div>
-              <p className="text-[11px] text-zinc-500 leading-relaxed">
-                Čisté biele a neutrálne tóny v štýle Apple rozhrania. Maximálna čitateľnosť tabuliek a zoznamov účastníkov cez deň.
-              </p>
-            </div>
-          </button>
-        </div>
       </div>
 
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
