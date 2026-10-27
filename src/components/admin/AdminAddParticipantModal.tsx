@@ -173,7 +173,7 @@ export const AdminAddParticipantModal: React.FC<AdminAddParticipantModalProps> =
                 required
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
-                placeholder="michaela@salon.sk"
+                placeholder="vas@email.sk"
                 className="w-full bg-zinc-900 border border-zinc-800 text-white p-2.5 rounded-xl focus:outline-none"
               />
             </div>
@@ -188,7 +188,7 @@ export const AdminAddParticipantModal: React.FC<AdminAddParticipantModalProps> =
                 required
                 value={phone}
                 onChange={(e) => setPhone(e.target.value)}
-                placeholder="+421 905 123 456"
+                placeholder="+421 9xx xxx xxx"
                 className="w-full bg-zinc-900 border border-zinc-800 text-white p-2.5 rounded-xl focus:outline-none font-mono"
               />
             </div>
