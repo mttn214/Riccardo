@@ -12,7 +12,8 @@ export const PortfolioSection: React.FC<PortfolioSectionProps> = ({ onSelectItem
   const categories = [
     'Všetky diela',
     'Umenie Fúkanej & Styling',
-    'Precízne Strihy'
+    'Precízne Strihy',
+    'Balayage & Farba'
   ];
 
   const filteredItems = PORTFOLIO_DATA.filter((item) => {

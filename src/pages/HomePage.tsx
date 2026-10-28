@@ -309,18 +309,18 @@ export const HomePage: React.FC<HomePageProps> = ({ onOpenBooking, onSelectPortf
                 {[
                   {
                     img: '/images/riccardo/hda_winners_group_hires.jpg',
-                    title: 'Víťazný ceremoniál na pódiu',
-                    subtitle: 'Richard Čonka a ocenení víťazi s trofejami'
+                    title: 'Pódium víťazov CSHA',
+                    subtitle: 'Richard Čonka s víťaznou soškou kaderníckych Oskarov'
                   },
                   {
-                    img: '/images/riccardo/richard_conka_stage_award.jpg',
-                    title: 'Galavečer Forum Karlín',
-                    subtitle: 'Craft The Future • Slávnostná sála Praha'
+                    img: '/images/riccardo/salon_gallery/salon_photo_41.jpg',
+                    title: 'Červený koberec & Galavečer',
+                    subtitle: 'Richard Čonka a prehliadkový tím na červenom koberci'
                   },
                   {
-                    img: '/images/riccardo/hda_gala_atmosphere.jpg',
-                    title: 'Atmosféra & Galashow',
-                    subtitle: 'Finálový večer kaderníckych Oskarov'
+                    img: '/images/riccardo/salon_gallery/salon_photo_48.jpg',
+                    title: 'Finále módnej galashow',
+                    subtitle: 'Couture večerné róby a autorský styling na javisku'
                   }
                 ].map((item, idx) => (
                   <div key={idx} className="group relative aspect-[16/10] rounded-2xl overflow-hidden bg-zinc-900 border border-zinc-800">
