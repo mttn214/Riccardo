@@ -14,7 +14,7 @@ export interface Seminar {
   country: string;
   venue: string;
   dates: string;
-  category: 'Umenie Fúkanej' | 'Precízny Strih' | 'Balayage & Blond';
+  category: 'Umenie Fúkanej' | 'Precízny Strih' | 'Balayage & Blond' | 'Overenie Platby';
   duration: string;
   totalSeats: number;
   availableSeats: number;
@@ -295,6 +295,52 @@ export const SEMINARS_DATA: Seminar[] = [
           "Práca na vlastnej modelke s materiálom v cene",
           "Receptár blond formulácií",
           "Certifikát Master Colorist"
+        ]
+      }
+    ]
+  },
+  {
+    id: "sem-overenie-platby-live",
+    title: "Testovacie overenie platobnej brány (Stripe Live)",
+    city: "Lučenec",
+    country: "Slovensko",
+    venue: "Atelier Riccardo",
+    dates: "Okamžité overenie (Live)",
+    category: "Overenie Platby",
+    duration: "10 min",
+    totalSeats: 100,
+    availableSeats: 99,
+    image: "/images/riccardo/salon_house.jpg",
+    description: "Položka s minimálnou sumou 0,50 € povolenou platobnou bránou Stripe na otestovanie Apple Pay, Google Pay, platobnej karty a notifikácií.",
+    learningOutcomes: [
+      "Overenie autorizácie cez Stripe Live",
+      "Otestovanie Apple Pay a Google Pay",
+      "Vystavenie VIP vstupenky s QR kódom",
+      "Doručenie e-mailovej notifikácie"
+    ],
+    schedule: [
+      {
+        day: "Krok 1",
+        morning: "Výber položky a zadanie kontaktných údajov",
+        afternoon: "Platba kartou alebo peňaženkou"
+      }
+    ],
+    includedItems: [
+      "Overenie platobnej brány",
+      "Digitálna VIP vstupenka v PDF",
+      "Potvrdenie na e-mail"
+    ],
+    tiers: [
+      {
+        id: "tier-test-live",
+        name: "Testovacia platba (Stripe Live)",
+        priceEUR: 0.50,
+        description: "Minimálna suma povolená platobnou bránou Stripe pre overenie reálnej transakcie.",
+        recommended: true,
+        features: [
+          "Platba 0,50 € cez Apple Pay / Google Pay / Kartu",
+          "Okamžité vystavenie VIP vstupenky s QR kódom",
+          "Doručenie notifikácie do e-mailovej schránky"
         ]
       }
     ]

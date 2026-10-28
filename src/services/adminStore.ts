@@ -750,7 +750,14 @@ class AdminStore {
     if (typeof window === 'undefined') return SEMINARS_DATA;
     try {
       const data = localStorage.getItem(STORAGE_KEYS.SEMINARS);
-      return data ? JSON.parse(data) : SEMINARS_DATA;
+      if (!data) return SEMINARS_DATA;
+      const parsed: Seminar[] = JSON.parse(data);
+      for (const sysSem of SEMINARS_DATA) {
+        if (!parsed.some((s) => s.id === sysSem.id)) {
+          parsed.push(sysSem);
+        }
+      }
+      return parsed;
     } catch {
       return SEMINARS_DATA;
     }

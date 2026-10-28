@@ -189,7 +189,7 @@ export const ReservationModal: React.FC<ReservationModalProps> = ({
   if (addOnAudit) totalPackagePriceEUR += auditPrice;
 
   // Amount to be paid in step 3
-  const amountToPayNow = paymentOption === 'deposit' ? 100 : totalPackagePriceEUR;
+  const amountToPayNow = (paymentOption === 'deposit' && totalPackagePriceEUR > 100) ? 100 : totalPackagePriceEUR;
 
   // Unified Reservation Completion Handler
   const completeReservation = async ({
@@ -741,48 +741,50 @@ export const ReservationModal: React.FC<ReservationModalProps> = ({
               </div>
 
               {/* Payment Mode Selection — Clean Luxury Segmented Selector */}
-              <div className="space-y-3">
-                <label className="text-xs uppercase tracking-wider text-zinc-400 font-medium block">
-                  Možnosť úhrady
-                </label>
-                <div className="grid grid-cols-2 gap-3">
-                  <button
-                    type="button"
-                    onClick={() => setPaymentOption('full')}
-                    className={`p-4 rounded-2xl flex flex-col items-center justify-center gap-1.5 transition-all text-center cursor-pointer ${
-                      paymentOption === 'full'
-                        ? 'bg-white text-black shadow-lg ring-1 ring-white'
-                        : 'bg-zinc-900/60 text-zinc-400 hover:text-white hover:bg-zinc-850 border border-zinc-800'
-                    }`}
-                  >
-                    <span className="text-xs sm:text-sm font-semibold">Celá suma</span>
-                    <span className={`text-base sm:text-lg font-bold ${paymentOption === 'full' ? 'text-black' : 'text-white'}`}>
-                      {totalPackagePriceEUR} €
-                    </span>
-                    <span className={`text-[10px] ${paymentOption === 'full' ? 'text-zinc-600' : 'text-zinc-500'}`}>
-                      Bezstarostný príchod
-                    </span>
-                  </button>
+              {totalPackagePriceEUR > 100 && (
+                <div className="space-y-3">
+                  <label className="text-xs uppercase tracking-wider text-zinc-400 font-medium block">
+                    Možnosť úhrady
+                  </label>
+                  <div className="grid grid-cols-2 gap-3">
+                    <button
+                      type="button"
+                      onClick={() => setPaymentOption('full')}
+                      className={`p-4 rounded-2xl flex flex-col items-center justify-center gap-1.5 transition-all text-center cursor-pointer ${
+                        paymentOption === 'full'
+                          ? 'bg-white text-black shadow-lg ring-1 ring-white'
+                          : 'bg-zinc-900/60 text-zinc-400 hover:text-white hover:bg-zinc-850 border border-zinc-800'
+                      }`}
+                    >
+                      <span className="text-xs sm:text-sm font-semibold">Celá suma</span>
+                      <span className={`text-base sm:text-lg font-bold ${paymentOption === 'full' ? 'text-black' : 'text-white'}`}>
+                        {totalPackagePriceEUR} €
+                      </span>
+                      <span className={`text-[10px] ${paymentOption === 'full' ? 'text-zinc-600' : 'text-zinc-500'}`}>
+                        Bezstarostný príchod
+                      </span>
+                    </button>
 
-                  <button
-                    type="button"
-                    onClick={() => setPaymentOption('deposit')}
-                    className={`p-4 rounded-2xl flex flex-col items-center justify-center gap-1.5 transition-all text-center cursor-pointer ${
-                      paymentOption === 'deposit'
-                        ? 'bg-white text-black shadow-lg ring-1 ring-white'
-                        : 'bg-zinc-900/60 text-zinc-400 hover:text-white hover:bg-zinc-850 border border-zinc-800'
-                    }`}
-                  >
-                    <span className="text-xs sm:text-sm font-semibold">Iba záloha</span>
-                    <span className={`text-base sm:text-lg font-bold ${paymentOption === 'deposit' ? 'text-black' : 'text-white'}`}>
-                      100 €
-                    </span>
-                    <span className={`text-[10px] ${paymentOption === 'deposit' ? 'text-zinc-600' : 'text-zinc-500'}`}>
-                      Doplatok {totalPackagePriceEUR - 100} € na mieste
-                    </span>
-                  </button>
+                    <button
+                      type="button"
+                      onClick={() => setPaymentOption('deposit')}
+                      className={`p-4 rounded-2xl flex flex-col items-center justify-center gap-1.5 transition-all text-center cursor-pointer ${
+                        paymentOption === 'deposit'
+                          ? 'bg-white text-black shadow-lg ring-1 ring-white'
+                          : 'bg-zinc-900/60 text-zinc-400 hover:text-white hover:bg-zinc-850 border border-zinc-800'
+                      }`}
+                    >
+                      <span className="text-xs sm:text-sm font-semibold">Iba záloha</span>
+                      <span className={`text-base sm:text-lg font-bold ${paymentOption === 'deposit' ? 'text-black' : 'text-white'}`}>
+                        100 €
+                      </span>
+                      <span className={`text-[10px] ${paymentOption === 'deposit' ? 'text-zinc-600' : 'text-zinc-500'}`}>
+                        Doplatok {totalPackagePriceEUR - 100} € na mieste
+                      </span>
+                    </button>
+                  </div>
                 </div>
-              </div>
+              )}
 
             </div>
           )}
