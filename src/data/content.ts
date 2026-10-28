@@ -148,7 +148,7 @@ export const SEMINARS_DATA: Seminar[] = [
     duration: "2 dni (14 hodín intenzívnej praxe)",
     totalSeats: 6,
     availableSeats: 2,
-    image: "/images/riccardo/gallery/riccardo_art_23.jpg",
+    image: "/images/riccardo/richard_conka_hda_3.jpg",
     secondaryImage: "/images/riccardo/gallery/riccardo_art_58.jpg",
     description: "Vlajkový autorský masterclass Richarda Čonku. Komorná skupina maximálne 6 kaderníkov pre garanciu osobnej korekcie každého ťahu kefou. Získate kontrolu nad dynamikou tepla, nadvihnutím od korienkov a zrkadlovo hladkým pohybom bez krepovatenia.",
     learningOutcomes: [

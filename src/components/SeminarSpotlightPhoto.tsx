@@ -84,7 +84,7 @@ export const SeminarSpotlightPhoto: React.FC<SeminarSpotlightPhotoProps> = ({
         <div className="absolute top-4 right-4 z-30">
           <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-black/75 backdrop-blur-md text-[10px] font-mono tracking-wider text-zinc-300 border border-white/10 shadow-lg">
             <Eye className="w-3 h-3 text-amber-400" />
-            <span>{activeTab === 'action' ? 'Technika fúkanej' : 'Ateliér Lučenec'}</span>
+            <span>{activeTab === 'action' ? 'Autorské dielo' : 'Ateliér Lučenec'}</span>
           </span>
         </div>
       )}
@@ -105,7 +105,7 @@ export const SeminarSpotlightPhoto: React.FC<SeminarSpotlightPhotoProps> = ({
                   : 'text-zinc-400 hover:text-white'
               }`}
             >
-              Technika v akcii
+              Autorské dielo
             </button>
             <button
               type="button"
@@ -124,7 +124,7 @@ export const SeminarSpotlightPhoto: React.FC<SeminarSpotlightPhotoProps> = ({
           </div>
 
           <span className="hidden sm:inline-block text-[10px] text-zinc-400 font-mono tracking-wide px-2.5 py-1 rounded-full bg-black/60 backdrop-blur-md border border-white/5">
-            Prejdite myšou pre náhľad
+            Prejdite myšou pre pohľad do ateliéru
           </span>
         </div>
       )}
