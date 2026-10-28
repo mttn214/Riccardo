@@ -19,15 +19,15 @@ export default async function handler(req, res) {
 
   try {
     const data = req.body || {};
-    const customerEmail = data.email || data['Email odosielatela'] || data['Email zakaznika'];
-    const customerName = data.name || data['Meno a priezvisko'] || 'Zaujemca';
-    const ticketCode = data['Kod vstupenky'] || data.ticketCode || 'RIC-VIP';
-    const seminarTitle = data['Nazov seminara'] || data.seminarTitle || 'Masterclass';
-    const seminarDates = data['Termin konania'] || data.seminarDates || '';
-    const venue = data['Miesto konania'] || data.venue || 'Atelier Hair Salon Riccardo, J. Karmana 1727/30, 984 01 Lucenec';
-    const amount = data['Uhradena suma teraz'] || data['Uhradena suma'] || data.amountPaidEUR || '380 EUR';
+    const customerEmail = data.email || data['Email odosielateľa'] || data['Email odosielatela'] || data['Email zákazníka'] || data['Email zakaznika'];
+    const customerName = data.name || data['Meno a priezvisko'] || 'Vážený zákazník';
+    const ticketCode = data['Kód vstupenky'] || data['Kod vstupenky'] || data.ticketCode || 'RIC-VIP';
+    const seminarTitle = data['Názov seminára'] || data['Nazov seminara'] || data.seminarTitle || 'Umenie fúkanej: Architektúra objemu & Trvácnosť';
+    const seminarDates = data['Termín konania'] || data['Termin konania'] || data.seminarDates || 'Nedeľa, 15. marec 2026 (09:30 – 17:30)';
+    const venue = data['Miesto konania'] || data.venue || 'Ateliér Hair Salon Riccardo, J. Kármána 1727/30, 984 01 Lučenec';
+    const amount = data['Uhradená suma teraz'] || data['Uhradena suma teraz'] || data['Uhradená suma'] || data['Uhradena suma'] || data.amountPaidEUR || '380 €';
 
-    const isContact = data.formType === 'Kontaktna sprava';
+    const isContact = data.formType === 'Kontaktná správa' || data.formType === 'Kontaktna sprava';
     const isWaitlist = data.formType === 'VIP Waitlist';
     const isTestMode = Boolean(data.testMode);
 
@@ -35,7 +35,7 @@ export default async function handler(req, res) {
     let emailSubject = '';
 
     if (isTestMode && data.type === 'stripe_receipt') {
-      emailSubject = `Doklad o platbe - Hair Salon Riccardo (${amount})`;
+      emailSubject = `Doklad o platbe — Hair Salon Riccardo (${amount})`;
       htmlContent = generateStripeReceiptEmail({
         customerName,
         customerEmail,
@@ -45,10 +45,10 @@ export default async function handler(req, res) {
         receiptUrl: data.receiptUrl
       });
     } else if (isContact || isWaitlist) {
-      emailSubject = `Hair Salon Riccardo - ${isContact ? 'Kontaktna sprava' : 'VIP Waitlist'}: ${customerName}`;
+      emailSubject = `Hair Salon Riccardo — ${isContact ? 'Kontaktná správa' : 'VIP Waitlist'}: ${customerName}`;
       htmlContent = generateContactEmail(data);
     } else {
-      emailSubject = `Potvrdenie rezervacie a VIP Masterpass - Hair Salon Riccardo (${ticketCode})`;
+      emailSubject = `Potvrdenie rezervácie & VIP Masterpass — Hair Salon Riccardo (${ticketCode})`;
       htmlContent = generateLuxuryReservationEmail({
         customerName,
         customerEmail,

@@ -1,20 +1,20 @@
 /**
  * Luxury Email Templates and Dispatcher for Hair Salon Riccardo
  * Operator: ZETEREM s.r.o.
- * Strictly no FormSubmit.
+ * Strictly no FormSubmit. Full Slovak diacritics and warm personal gratitude.
  */
 
 export function generateLuxuryReservationEmail(data) {
   const ticketCode = data.ticketCode || 'RIC-2026-LUC-4821';
-  const seminarTitle = data.seminarTitle || 'Umenie fukanej: Architektura objemu a Trvacnost';
-  const seminarDates = data.seminarDates || 'Nedela, 15. Marec 2026 (09:30 - 17:30)';
-  const venue = data.venue || 'Atelier Hair Salon Riccardo, J. Karmana 1727/30, 984 01 Lucenec';
-  const customerName = data.customerName || 'Vazeny zakaznik';
+  const seminarTitle = data.seminarTitle || 'Umenie fúkanej: Architektúra objemu & Trvácnosť';
+  const seminarDates = data.seminarDates || 'Nedeľa, 15. marec 2026 (09:30 – 17:30)';
+  const venue = data.venue || 'Ateliér Hair Salon Riccardo, J. Kármána 1727/30, 984 01 Lučenec';
+  const customerName = data.customerName || 'Vážený zákazník';
   const amountPaid = typeof data.amountPaidEUR === 'number' 
-    ? `${data.amountPaidEUR} EUR` 
+    ? `${data.amountPaidEUR} €` 
     : data.amountPaidEUR 
-      ? `${data.amountPaidEUR}`.replace(/€/g, '').replace(/EUR/g, '').trim() + ' EUR' 
-      : '380 EUR';
+      ? `${data.amountPaidEUR}`.replace(/€/g, '').replace(/EUR/g, '').trim() + ' €' 
+      : '380 €';
   const qrUrl = `https://api.qrserver.com/v1/create-qr-code/?size=200x200&data=${encodeURIComponent(ticketCode)}&color=000000&bgcolor=ffffff`;
   const logoUrl = 'https://hairsalonriccardo.vercel.app/images/riccardo/official_logo_transparent.png';
 
@@ -23,7 +23,7 @@ export function generateLuxuryReservationEmail(data) {
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Potvrdenie rezervacie - Hair Salon Riccardo</title>
+  <title>Potvrdenie rezervácie — Hair Salon Riccardo</title>
   <style>
     body {
       margin: 0;
@@ -60,23 +60,26 @@ export function generateLuxuryReservationEmail(data) {
             Hair Salon Riccardo
           </div>
           <div style="font-size: 11px; color: #71717a; margin-top: 2px;">
-            Atelier Richarda Conku / Lucenec
+            Ateliér Richarda Čonku • Lučenec
           </div>
         </td>
       </tr>
 
-      <!-- Personal Greeting Card -->
+      <!-- Personal Greeting & Warm Gratitude Card -->
       <tr>
-        <td style="padding: 0 40px 28px;">
+        <td style="padding: 0 40px 24px;">
           <div style="background: rgba(255, 255, 255, 0.02); border: 1px solid rgba(255, 255, 255, 0.06); border-radius: 16px; padding: 22px 24px;">
             <div style="font-size: 11px; font-weight: 700; letter-spacing: 1.5px; color: #34d399; text-transform: uppercase; margin-bottom: 8px;">
-              REZERVACIA USPESNA / MIESTO GARANTOVANE
+              REZERVÁCIA ÚSPEŠNÁ • MIESTO GARANTOVANÉ
             </div>
-            <div style="font-size: 18px; font-weight: 600; color: #ffffff; margin-bottom: 8px;">
-              Vazeny/a ${customerName},
+            <div style="font-size: 18px; font-weight: 600; color: #ffffff; margin-bottom: 10px;">
+              Vážený/á ${customerName},
             </div>
-            <div style="font-size: 13px; line-height: 1.6; color: #a1a1aa;">
-              Vasa rezervacia miesta na autorskom masterclasse bola uspesne prijata a zaregistrovana. Tesime sa na vasu osobnu ucast v nasom atelieri.
+            <div style="font-size: 13px; line-height: 1.6; color: #a1a1aa; margin-bottom: 14px;">
+              ďakujeme vám za prejavenú dôveru a úhradu rezervácie na autorskom masterclasse v našom ateliéri. Veľmi si vážime vaše rozhodnutie posunúť svoje kadernícke zručnosti na vyššiu úroveň.
+            </div>
+            <div style="font-size: 13px; line-height: 1.6; color: #d4d4d8; background: rgba(197, 160, 89, 0.08); border-left: 3px solid #c5a059; padding: 10px 14px; border-radius: 6px;">
+              Vaša rezervácia bola úspešne prijatá a vaše miesto v ateliéri máte 100 % garantované. Tešíme sa na spoločný inšpiratívny deň plný praxe a profesionálneho know-how.
             </div>
           </div>
         </td>
@@ -90,7 +93,7 @@ export function generateLuxuryReservationEmail(data) {
             <table role="presentation" width="100%" cellpadding="0" cellspacing="0">
               <tr>
                 <td style="font-size: 10px; font-weight: 800; letter-spacing: 2px; color: #c5a059; text-transform: uppercase;">
-                  OFICIALNY VIP MASTERPASS
+                  OFICIÁLNY VIP MASTERPASS
                 </td>
                 <td align="right" style="font-family: monospace; font-size: 13px; font-weight: 700; color: #ffffff; background: rgba(197, 160, 89, 0.2); padding: 4px 10px; border-radius: 8px; border: 1px solid rgba(197, 160, 89, 0.4);">
                   ${ticketCode}
@@ -102,19 +105,19 @@ export function generateLuxuryReservationEmail(data) {
               ${seminarTitle}
             </div>
             <div style="font-size: 12px; color: #c5a059; margin-bottom: 22px;">
-              Lektor: Richard Conka (Vitaz Czech & Slovak Hairdressing Awards)
+              Lektor: Richard Čonka (Víťaz Czech & Slovak Hairdressing Awards)
             </div>
 
             <!-- Details Table -->
             <table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="border-top: 1px dashed rgba(197, 160, 89, 0.3); padding-top: 18px; margin-top: 18px;">
               <tr>
                 <td width="50%" valign="top" style="padding-bottom: 14px;">
-                  <div style="font-size: 10px; text-transform: uppercase; color: #71717a; font-weight: 600; margin-bottom: 3px;">Termin a Cas</div>
+                  <div style="font-size: 10px; text-transform: uppercase; color: #71717a; font-weight: 600; margin-bottom: 3px;">Termín & Čas</div>
                   <div style="font-size: 13px; font-weight: 600; color: #ffffff;">${seminarDates}</div>
                 </td>
                 <td width="50%" valign="top" style="padding-bottom: 14px;">
                   <div style="font-size: 10px; text-transform: uppercase; color: #71717a; font-weight: 600; margin-bottom: 3px;">Kapacita</div>
-                  <div style="font-size: 13px; font-weight: 600; color: #ffffff;">Limitovane (6 ucastnikov)</div>
+                  <div style="font-size: 13px; font-weight: 600; color: #ffffff;">Limitované (6 účastníkov)</div>
                 </td>
               </tr>
               <tr>
@@ -123,8 +126,8 @@ export function generateLuxuryReservationEmail(data) {
                   <div style="font-size: 13px; font-weight: 600; color: #ffffff;">${venue}</div>
                 </td>
                 <td width="50%" valign="top" style="padding-bottom: 14px;">
-                  <div style="font-size: 10px; text-transform: uppercase; color: #71717a; font-weight: 600; margin-bottom: 3px;">Stav uhrady</div>
-                  <div style="font-size: 13px; font-weight: 600; color: #34d399;">Uhradene (${amountPaid})</div>
+                  <div style="font-size: 10px; text-transform: uppercase; color: #71717a; font-weight: 600; margin-bottom: 3px;">Stav úhrady</div>
+                  <div style="font-size: 13px; font-weight: 600; color: #34d399;">Uhradené (${amountPaid})</div>
                 </td>
               </tr>
             </table>
@@ -135,7 +138,7 @@ export function generateLuxuryReservationEmail(data) {
                 <img src="${qrUrl}" alt="QR Vstupenka" width="130" height="130" style="display: block; width: 130px; height: 130px;">
               </div>
               <div style="font-size: 10px; font-family: monospace; color: #71717a; margin-top: 8px;">
-                Predlozte tento QR kod alebo kod <strong style="color: #ffffff;">${ticketCode}</strong> pri vstupe
+                Predložte tento QR kód alebo kód <strong style="color: #ffffff;">${ticketCode}</strong> pri vstupe
               </div>
             </div>
 
@@ -147,32 +150,44 @@ export function generateLuxuryReservationEmail(data) {
       <tr>
         <td style="padding: 0 40px 32px;">
           <div style="font-size: 13px; font-weight: 700; color: #ffffff; margin-bottom: 12px; letter-spacing: -0.2px;">
-            Dolezite informacie k vasmu prichodu
+            Dôležité informácie k vášmu príchodu
           </div>
 
           <table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="font-size: 12px; line-height: 1.6; color: #a1a1aa;">
             <tr>
-              <td style="padding: 6px 0; vertical-align: top;" width="20">-</td>
-              <td style="padding: 6px 0;"><strong style="color: #ffffff;">Harmonogram dna:</strong> Prichod o 09:15 na rannu kavu a registraciu. Skolenie prebieha od 09:30 do 17:30 s prestavkou na obed o 13:00.</td>
+              <td style="padding: 6px 0; vertical-align: top;" width="20">•</td>
+              <td style="padding: 6px 0;"><strong style="color: #ffffff;">Harmonogram dňa:</strong> Príchod o 09:15 na rannú kávu a registráciu. Školenie prebieha od 09:30 do 17:30 s prestávkou na teplý obed o 13:00.</td>
             </tr>
             <tr>
-              <td style="padding: 6px 0; vertical-align: top;" width="20">-</td>
-              <td style="padding: 6px 0;"><strong style="color: #ffffff;">Parkovanie:</strong> Priamo pred rodinnym domom atelieru na ulici J. Karmana 1727/30 je bezplatne parkovisko vyhradene pre ucastnikov.</td>
+              <td style="padding: 6px 0; vertical-align: top;" width="20">•</td>
+              <td style="padding: 6px 0;"><strong style="color: #ffffff;">Parkovanie:</strong> Priamo pred rodinným domom ateliéru na ulici J. Kármána 1727/30 je bezplatné parkovisko vyhradené pre účastníkov.</td>
             </tr>
             <tr>
-              <td style="padding: 6px 0; vertical-align: top;" width="20">-</td>
-              <td style="padding: 6px 0;"><strong style="color: #ffffff;">V cene seminara:</strong> Modelka na prakticku cast, premiova vlasova kozmetika a spotrebny material, teply obed, celodenny catering a certifikat Master Stylist.</td>
+              <td style="padding: 6px 0; vertical-align: top;" width="20">•</td>
+              <td style="padding: 6px 0;"><strong style="color: #ffffff;">V cene seminára:</strong> Živá modelka na praktickú časť, prémiová vlasová kozmetika a spotrebný materiál, teplý obed, celodenný catering a certifikát Master Stylist.</td>
             </tr>
             <tr>
-              <td style="padding: 6px 0; vertical-align: top;" width="20">-</td>
-              <td style="padding: 6px 0;"><strong style="color: #ffffff;">Co si priniest:</strong> Vlastne oblubene fukacie kefy, spony a stylingove naradie, s ktorym sa vam najlepsie pracuje.</td>
+              <td style="padding: 6px 0; vertical-align: top;" width="20">•</td>
+              <td style="padding: 6px 0;"><strong style="color: #ffffff;">Čo si priniesť:</strong> Vlastné obľúbené fúkacie kefy, spony a stylingové náradie, s ktorým sa vám najlepšie pracuje.</td>
             </tr>
           </table>
 
           <div style="text-align: center; margin-top: 24px;">
             <a href="https://maps.google.com/maps?q=Hair+Salon+Riccardo,+J.+K%C3%A1rm%C3%A1na+1727%2F30,+Lu%C4%8Denec" target="_blank" style="display: inline-block; padding: 12px 28px; background: #ffffff; color: #000000; font-size: 12px; font-weight: 700; border-radius: 9999px; text-decoration: none;">
-              Otvorit trasu v Google Maps
+              Otvoriť trasu v Google Maps
             </a>
+          </div>
+        </td>
+      </tr>
+
+      <!-- Warm Closing Sign-off -->
+      <tr>
+        <td style="padding: 0 40px 28px; text-align: center;">
+          <div style="font-size: 13px; color: #a1a1aa; line-height: 1.6;">
+            S úctou a priateľským pozdravom,
+          </div>
+          <div style="font-size: 15px; font-weight: 700; color: #ffffff; margin-top: 4px;">
+            Richard Čonka & tím Hair Salon Riccardo
           </div>
         </td>
       </tr>
@@ -181,13 +196,13 @@ export function generateLuxuryReservationEmail(data) {
       <tr>
         <td style="padding: 24px 40px; background-color: #08080a; border-top: 1px solid #1c1c22; text-align: center; font-size: 11px; color: #52525b; line-height: 1.6;">
           <div style="font-weight: 600; color: #71717a; margin-bottom: 4px;">
-            Prevadzkovatel a Organizator vzdelavania:
+            Prevádzkovateľ & Organizátor vzdelávania:
           </div>
           <div>
-            ZETEREM s.r.o. / J. Karmana 1727/30, 984 01 Lucenec
+            ZETEREM s.r.o. • J. Kármána 1727/30, 984 01 Lučenec
           </div>
           <div>
-            ICO: 56 312 871 / DIC: 2122262973 / Neplatitel DPH
+            IČO: 56 312 871 • DIČ: 2122262973 • Neplatiteľ DPH
           </div>
           <div style="margin-top: 8px; color: #3f3f46;">
             Priamy kontakt: +421 915 869 758 | hair.riccardo@gmail.com
@@ -202,15 +217,15 @@ export function generateLuxuryReservationEmail(data) {
 }
 
 export function generateStripeReceiptEmail(data) {
-  const customerName = data.customerName || 'Vazeny zakaznik';
+  const customerName = data.customerName || 'Vážený zákazník';
   const amountPaid = typeof data.amountPaidEUR === 'number' 
-    ? `${data.amountPaidEUR} EUR` 
+    ? `${data.amountPaidEUR} €` 
     : data.amountPaidEUR 
-      ? `${data.amountPaidEUR}`.replace(/€/g, '').replace(/EUR/g, '').trim() + ' EUR' 
-      : '380 EUR';
-  const seminarTitle = data.seminarTitle || 'Umenie fukanej: Architektura objemu a Trvacnost';
+      ? `${data.amountPaidEUR}`.replace(/€/g, '').replace(/EUR/g, '').trim() + ' €' 
+      : '380 €';
+  const seminarTitle = data.seminarTitle || 'Umenie fúkanej: Architektúra objemu & Trvácnosť';
   const dateFormatted = new Date().toLocaleDateString('sk-SK', { day: 'numeric', month: 'long', year: 'numeric' });
-  const paymentMethod = data.paymentMethod || 'Apple Pay / Platobna karta';
+  const paymentMethod = data.paymentMethod || 'Apple Pay / Platobná karta';
   const receiptId = data.stripePaymentIntentId || `pi_live_${Date.now().toString(36)}`;
   const receiptUrl = data.receiptUrl || '#';
 
@@ -219,7 +234,7 @@ export function generateStripeReceiptEmail(data) {
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Doklad o platbe - Stripe / Hair Salon Riccardo</title>
+  <title>Doklad o platbe — Stripe / Hair Salon Riccardo</title>
   <style>
     body {
       margin: 0;
@@ -254,14 +269,21 @@ export function generateStripeReceiptEmail(data) {
       <tr>
         <td style="padding: 32px; text-align: center; background-color: #fafbfc; border-bottom: 1px solid #f0f3f7;">
           <div style="font-size: 12px; text-transform: uppercase; letter-spacing: 1px; color: #697386; margin-bottom: 6px;">
-            Platba uspesna
+            Platba úspešná
           </div>
           <div style="font-size: 36px; font-weight: 700; color: #1a1f36;">
             ${amountPaid}
           </div>
           <div style="font-size: 13px; color: #697386; margin-top: 6px;">
-            Uhradene dna ${dateFormatted}
+            Uhradené dňa ${dateFormatted}
           </div>
+        </td>
+      </tr>
+
+      <!-- Gratitude note -->
+      <tr>
+        <td style="padding: 16px 32px; background-color: #ffffff; border-bottom: 1px solid #f0f3f7; font-size: 13px; color: #4f566b; line-height: 1.5;">
+          Ďakujeme za vašu úhradu. Vaša platba za vzdelávanie v Hair Salon Riccardo bola úspešne spracovaná cez zabezpečenú platobnú bránu Stripe.
         </td>
       </tr>
 
@@ -271,7 +293,7 @@ export function generateStripeReceiptEmail(data) {
           <table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="font-size: 13px; color: #4f566b;">
             <tr>
               <td style="padding: 10px 0; border-bottom: 1px solid #f0f3f7;">
-                <strong style="color: #1a1f36;">Polozka</strong>
+                <strong style="color: #1a1f36;">Položka</strong>
               </td>
               <td align="right" style="padding: 10px 0; border-bottom: 1px solid #f0f3f7;">
                 <strong style="color: #1a1f36;">Suma</strong>
@@ -280,26 +302,26 @@ export function generateStripeReceiptEmail(data) {
             <tr>
               <td style="padding: 14px 0; border-bottom: 1px solid #f0f3f7;">
                 <div style="font-weight: 600; color: #1a1f36;">${seminarTitle}</div>
-                <div style="font-size: 12px; color: #697386; margin-top: 2px;">Zakaznik: ${customerName}</div>
+                <div style="font-size: 12px; color: #697386; margin-top: 2px;">Zákazník: ${customerName}</div>
               </td>
               <td align="right" style="padding: 14px 0; border-bottom: 1px solid #f0f3f7; font-weight: 600; color: #1a1f36;">
                 ${amountPaid}
               </td>
             </tr>
             <tr>
-              <td style="padding: 10px 0; color: #697386;">Sposob platby</td>
+              <td style="padding: 10px 0; color: #697386;">Spôsob platby</td>
               <td align="right" style="padding: 10px 0; color: #1a1f36; font-weight: 500;">${paymentMethod}</td>
             </tr>
             <tr>
-              <td style="padding: 10px 0; color: #697386;">Stav autorizacie</td>
-              <td align="right" style="padding: 10px 0; color: #00a651; font-weight: 600;">Autorizovane (Succeeded)</td>
+              <td style="padding: 10px 0; color: #697386;">Stav autorizácie</td>
+              <td align="right" style="padding: 10px 0; color: #00a651; font-weight: 600;">Autorizované (Succeeded)</td>
             </tr>
           </table>
 
           ${receiptUrl && receiptUrl !== '#' ? `
           <div style="text-align: center; margin-top: 24px;">
             <a href="${receiptUrl}" target="_blank" style="display: inline-block; padding: 10px 22px; background: #635bff; color: #ffffff; font-size: 13px; font-weight: 600; border-radius: 6px; text-decoration: none;">
-              Zobrazit online doklad v Stripe
+              Zobraziť online doklad v Stripe
             </a>
           </div>` : ''}
         </td>
@@ -308,9 +330,9 @@ export function generateStripeReceiptEmail(data) {
       <!-- Stripe & Merchant Footer -->
       <tr>
         <td style="padding: 20px 32px; background-color: #fafbfc; border-top: 1px solid #f0f3f7; font-size: 11px; color: #8792a2; text-align: center; line-height: 1.5;">
-          <div>Prijemca platby: ZETEREM s.r.o. / ICO: 56 312 871 / DIC: 2122262973</div>
-          <div>J. Karmana 1727/30, 984 01 Lucenec / hair.riccardo@gmail.com</div>
-          <div style="margin-top: 6px; color: #a3acb9;">Spracovane cez zabezpecenu platobnu branu Stripe.</div>
+          <div>Príjemca platby: ZETEREM s.r.o. • IČO: 56 312 871 • DIČ: 2122262973</div>
+          <div>J. Kármána 1727/30, 984 01 Lučenec • hair.riccardo@gmail.com</div>
+          <div style="margin-top: 6px; color: #a3acb9;">Spracované cez zabezpečenú platobnú bránu Stripe.</div>
         </td>
       </tr>
 
@@ -321,38 +343,38 @@ export function generateStripeReceiptEmail(data) {
 }
 
 export function generateContactEmail(data) {
-  const customerName = data.name || data['Meno a priezvisko'] || 'Zaujemca';
-  const customerEmail = data.email || data['Email odosielatela'] || 'Neuvedene';
-  const customerPhone = data.phone || data['Telefon'] || 'Neuvedene';
-  const subjectText = data['Predmet spravy'] || data.subject || 'Sprava z webu';
-  const messageText = data['Text spravy'] || data.message || '';
+  const customerName = data.name || data['Meno a priezvisko'] || 'Záujemca';
+  const customerEmail = data.email || data['Email odosielateľa'] || 'Neuvedené';
+  const customerPhone = data.phone || data['Telefón'] || 'Neuvedené';
+  const subjectText = data['Predmet správy'] || data.subject || 'Správa z webu';
+  const messageText = data['Text správy'] || data.message || '';
   const dateFormatted = new Date().toLocaleString('sk-SK');
 
   return `<!DOCTYPE html>
 <html lang="sk">
 <head>
   <meta charset="utf-8">
-  <title>Nova kontaktna sprava - Hair Salon Riccardo</title>
+  <title>Nová kontaktná správa — Hair Salon Riccardo</title>
 </head>
 <body style="margin: 0; padding: 30px 10px; background-color: #050507; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; color: #e4e4e7;">
   <center>
     <table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="max-width: 580px; margin: 0 auto; background-color: #0e0e12; border-radius: 18px; border: 1px solid #27272a; padding: 28px;">
       <tr>
         <td style="font-size: 11px; font-weight: 700; letter-spacing: 2px; color: #c5a059; text-transform: uppercase;">
-          HAIR SALON RICCARDO / KONTAKT
+          HAIR SALON RICCARDO • KONTAKT
         </td>
       </tr>
       <tr>
         <td style="font-size: 18px; font-weight: 700; color: #ffffff; padding: 10px 0 16px;">
-          Nova sprava od: ${customerName}
+          Nová správa od: ${customerName}
         </td>
       </tr>
       <tr>
         <td style="font-size: 13px; line-height: 1.6; color: #a1a1aa; border-top: 1px solid #27272a; padding-top: 16px;">
-          <div><strong>Odosielatel:</strong> ${customerName} &lt;${customerEmail}&gt;</div>
-          <div><strong>Telefon:</strong> ${customerPhone}</div>
+          <div><strong>Odosielateľ:</strong> ${customerName} &lt;${customerEmail}&gt;</div>
+          <div><strong>Telefón:</strong> ${customerPhone}</div>
           <div><strong>Predmet:</strong> ${subjectText}</div>
-          <div><strong>Datum:</strong> ${dateFormatted}</div>
+          <div><strong>Dátum:</strong> ${dateFormatted}</div>
           <div style="margin-top: 16px; padding: 14px; background: #14141a; border-radius: 10px; border: 1px solid #27272a; color: #ffffff;">
             ${messageText.replace(/\\n/g, '<br>')}
           </div>

@@ -16,10 +16,14 @@ export interface LuxuryEmailData {
 export function generateLuxuryEmailHtml(data: LuxuryEmailData): string {
   const ticketCode = data.ticketCode || 'RIC-2026-LUC-4821';
   const seminarTitle = data.seminarTitle || 'Umenie fúkanej: Architektúra objemu & Trvácnosť';
-  const seminarDates = data.seminarDates || 'Nedeľa, 15. Marec 2026 (09:30 – 17:30)';
-  const venue = data.venue || 'Atelier Hair Salon Riccardo, J. Kármána 1727/30, 984 01 Lučenec';
+  const seminarDates = data.seminarDates || 'Nedeľa, 15. marec 2026 (09:30 – 17:30)';
+  const venue = data.venue || 'Ateliér Hair Salon Riccardo, J. Kármána 1727/30, 984 01 Lučenec';
   const customerName = data.customerName || 'Vážený zákazník';
-  const amountPaid = typeof data.amountPaidEUR === 'number' ? `${data.amountPaidEUR} €` : data.amountPaidEUR ? `${data.amountPaidEUR}`.replace(/€/g, '').trim() + ' €' : '380 €';
+  const amountPaid = typeof data.amountPaidEUR === 'number' 
+    ? `${data.amountPaidEUR} €` 
+    : data.amountPaidEUR 
+      ? `${data.amountPaidEUR}`.replace(/€/g, '').replace(/EUR/g, '').trim() + ' €' 
+      : '380 €';
   const qrUrl = `https://api.qrserver.com/v1/create-qr-code/?size=200x200&data=${encodeURIComponent(ticketCode)}&color=000000&bgcolor=ffffff`;
   const logoUrl = 'https://hairsalonriccardo.vercel.app/images/riccardo/official_logo_transparent.png';
 
@@ -70,18 +74,21 @@ export function generateLuxuryEmailHtml(data: LuxuryEmailData): string {
         </td>
       </tr>
 
-      <!-- Personal Greeting Card -->
+      <!-- Personal Greeting & Warm Gratitude Card -->
       <tr>
-        <td style="padding: 0 40px 28px;">
+        <td style="padding: 0 40px 24px;">
           <div style="background: rgba(255, 255, 255, 0.02); border: 1px solid rgba(255, 255, 255, 0.06); border-radius: 16px; padding: 22px 24px;">
             <div style="font-size: 11px; font-weight: 700; letter-spacing: 1.5px; color: #34d399; text-transform: uppercase; margin-bottom: 8px;">
               REZERVÁCIA ÚSPEŠNÁ • MIESTO GARANTOVANÉ
             </div>
-            <div style="font-size: 18px; font-weight: 600; color: #ffffff; margin-bottom: 8px;">
+            <div style="font-size: 18px; font-weight: 600; color: #ffffff; margin-bottom: 10px;">
               Vážený/á ${customerName},
             </div>
-            <div style="font-size: 13px; line-height: 1.6; color: #a1a1aa;">
-              Vaša rezervácia miesta na autorskom masterclasse bola úspešne prijatá a zaregistrovaná. Tešíme sa na vašu osobnú účasť v našom ateliéri.
+            <div style="font-size: 13px; line-height: 1.6; color: #a1a1aa; margin-bottom: 14px;">
+              ďakujeme vám za prejavenú dôveru a úhradu rezervácie na autorskom masterclasse v našom ateliéri. Veľmi si vážime vaše rozhodnutie posunúť svoje kadernícke zručnosti na vyššiu úroveň.
+            </div>
+            <div style="font-size: 13px; line-height: 1.6; color: #d4d4d8; background: rgba(197, 160, 89, 0.08); border-left: 3px solid #c5a059; padding: 10px 14px; border-radius: 6px;">
+              Vaša rezervácia bola úspešne prijatá a vaše miesto v ateliéri máte 100 % garantované. Tešíme sa na spoločný inšpiratívny deň plný praxe a profesionálneho know-how.
             </div>
           </div>
         </td>
@@ -158,7 +165,7 @@ export function generateLuxuryEmailHtml(data: LuxuryEmailData): string {
           <table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="font-size: 12px; line-height: 1.6; color: #a1a1aa;">
             <tr>
               <td style="padding: 6px 0; vertical-align: top;" width="20">•</td>
-              <td style="padding: 6px 0;"><strong style="color: #ffffff;">Harmonogram dňa:</strong> Príchod o 09:15 na rannú kávu a registráciu. Školenie prebieha od 09:30 do 17:30 s prestávkou na obed o 13:00.</td>
+              <td style="padding: 6px 0;"><strong style="color: #ffffff;">Harmonogram dňa:</strong> Príchod o 09:15 na rannú kávu a registráciu. Školenie prebieha od 09:30 do 17:30 s prestávkou na teplý obed o 13:00.</td>
             </tr>
             <tr>
               <td style="padding: 6px 0; vertical-align: top;" width="20">•</td>
@@ -166,7 +173,7 @@ export function generateLuxuryEmailHtml(data: LuxuryEmailData): string {
             </tr>
             <tr>
               <td style="padding: 6px 0; vertical-align: top;" width="20">•</td>
-              <td style="padding: 6px 0;"><strong style="color: #ffffff;">V cene seminára:</strong> Modelka na praktickú časť, prémiová vlasová kozmetika a spotrebný materiál, teplý obed, celodenný catering a certifikát Master Stylist.</td>
+              <td style="padding: 6px 0;"><strong style="color: #ffffff;">V cene seminára:</strong> Živá modelka na praktickú časť, prémiová vlasová kozmetika a spotrebný materiál, teplý obed, celodenný catering a certifikát Master Stylist.</td>
             </tr>
             <tr>
               <td style="padding: 6px 0; vertical-align: top;" width="20">•</td>
@@ -176,8 +183,20 @@ export function generateLuxuryEmailHtml(data: LuxuryEmailData): string {
 
           <div style="text-align: center; margin-top: 24px;">
             <a href="https://maps.google.com/maps?q=Hair+Salon+Riccardo,+J.+K%C3%A1rm%C3%A1na+1727%2F30,+Lu%C4%8Denec" target="_blank" style="display: inline-block; padding: 12px 28px; background: #ffffff; color: #000000; font-size: 12px; font-weight: 700; border-radius: 9999px; text-decoration: none;">
-              Otvoriť trasu v Google Maps ↗
+              Otvoriť trasu v Google Maps
             </a>
+          </div>
+        </td>
+      </tr>
+
+      <!-- Warm Closing Sign-off -->
+      <tr>
+        <td style="padding: 0 40px 28px; text-align: center;">
+          <div style="font-size: 13px; color: #a1a1aa; line-height: 1.6;">
+            S úctou a priateľským pozdravom,
+          </div>
+          <div style="font-size: 15px; font-weight: 700; color: #ffffff; margin-top: 4px;">
+            Richard Čonka & tím Hair Salon Riccardo
           </div>
         </td>
       </tr>

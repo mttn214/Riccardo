@@ -147,11 +147,11 @@ export default async function handler(req, res) {
     try {
       const { generateStripeReceiptEmail } = await import('./lib/luxuryEmail.js');
       const emailHtml = generateStripeReceiptEmail({
-        customerName: customerName || 'Zakaznik',
+        customerName: customerName || 'Vážený zákazník',
         customerEmail,
-        seminarTitle: seminarTitle || 'Masterclass',
+        seminarTitle: seminarTitle || 'Umenie fúkanej: Architektúra objemu & Trvácnosť',
         amountPaidEUR: amountEUR,
-        paymentMethod: paymentType || 'Stripe',
+        paymentMethod: paymentType || 'Apple Pay / Platobná karta',
         stripePaymentIntentId: paymentIntent.id,
         receiptUrl
       });
@@ -164,7 +164,7 @@ export default async function handler(req, res) {
         await resend.emails.send({
           from: process.env.EMAIL_FROM || 'Hair Salon Riccardo <onboarding@resend.dev>',
           to: recipients,
-          subject: `Doklad o uhrade - Hair Salon Riccardo (${amountEUR} EUR)`,
+          subject: `Doklad o úhrade — Hair Salon Riccardo (${amountEUR} €)`,
           html: emailHtml
         });
       }

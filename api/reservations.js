@@ -110,9 +110,9 @@ export default async function handler(req, res) {
         customerEmail: email,
         customerPhone: phone,
         ticketCode,
-        seminarTitle: 'Umenie fukanej: Architektura objemu a Trvacnost',
-        seminarDates: 'Nedela, 15. Marec 2026 (09:30 - 17:30)',
-        venue: 'Atelier Hair Salon Riccardo, J. Karmana 1727/30, 984 01 Lucenec',
+        seminarTitle: 'Umenie fúkanej: Architektúra objemu & Trvácnosť',
+        seminarDates: 'Nedeľa, 15. marec 2026 (09:30 – 17:30)',
+        venue: 'Ateliér Hair Salon Riccardo, J. Kármána 1727/30, 984 01 Lučenec',
         amountPaidEUR: amountPaidEUR || 380
       });
 
@@ -124,7 +124,7 @@ export default async function handler(req, res) {
         await resend.emails.send({
           from: process.env.EMAIL_FROM || 'Hair Salon Riccardo <onboarding@resend.dev>',
           to: recipients,
-          subject: `Potvrdenie rezervacie a VIP Masterpass - Hair Salon Riccardo (${ticketCode})`,
+          subject: `Potvrdenie rezervácie & VIP Masterpass — Hair Salon Riccardo (${ticketCode})`,
           html: emailHtml
         });
       }
