@@ -6,6 +6,7 @@ import { formatPrice } from '../utils/currency';
 import { ArrowUpRight, Check, Trophy, MoveHorizontal, Star, CheckCircle2, ChevronLeft, ChevronRight, Bell, MapPin, Building2 } from 'lucide-react';
 import { GoogleIcon, FacebookIcon } from '../components/SocialIcons';
 import { WaitlistModal } from '../components/WaitlistModal';
+import { SeminarSpotlightPhoto } from '../components/SeminarSpotlightPhoto';
 
 interface HomePageProps {
   onOpenBooking: () => void;
@@ -108,18 +109,14 @@ export const HomePage: React.FC<HomePageProps> = ({ onOpenBooking, onSelectPortf
           {featuredSeminar && (
             <div className="rounded-3xl bg-zinc-950 border border-zinc-800/80 overflow-hidden shadow-2xl">
               <div className="grid grid-cols-1 lg:grid-cols-12">
-                <div className="lg:col-span-5 relative min-h-[340px] sm:min-h-[400px] bg-zinc-900 overflow-hidden">
-                  <img
-                    src={featuredSeminar.image}
-                    alt={featuredSeminar.title}
-                    className="w-full h-full object-cover object-center transition-transform duration-700 hover:scale-105"
+                <div className="lg:col-span-5 relative">
+                  <SeminarSpotlightPhoto
+                    primaryImage={featuredSeminar.image}
+                    secondaryImage={featuredSeminar.secondaryImage}
+                    title={featuredSeminar.title}
+                    availableSeats={featuredSeminar.availableSeats}
+                    totalSeats={featuredSeminar.totalSeats}
                   />
-                  <div className="absolute top-4 left-4">
-                    <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-black/80 backdrop-blur-md text-[11px] font-medium text-white shadow-lg">
-                      <span className="w-1.5 h-1.5 rounded-full bg-amber-400" />
-                      Zostávajú posledné {featuredSeminar.availableSeats} miesta z 6
-                    </span>
-                  </div>
                 </div>
 
                 <div className="lg:col-span-7 p-8 sm:p-12 flex flex-col justify-between space-y-6">

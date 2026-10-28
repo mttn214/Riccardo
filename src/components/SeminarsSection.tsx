@@ -3,6 +3,7 @@ import { SEMINARS_DATA, Seminar } from '../data/content';
 import { Currency, formatPrice } from '../utils/currency';
 import { ArrowUpRight, Check, Users, Clock, MapPin, Sparkles } from 'lucide-react';
 import { sendFormNotification } from '../services/formService';
+import { SeminarSpotlightPhoto } from './SeminarSpotlightPhoto';
 
 interface SeminarsSectionProps {
   currency: Currency;
@@ -64,21 +65,14 @@ export const SeminarsSection: React.FC<SeminarsSectionProps> = ({
             <div className="grid grid-cols-1 lg:grid-cols-12">
               
               {/* Photo Side (5 cols) */}
-              <div className="lg:col-span-5 relative min-h-[320px] lg:min-h-full bg-zinc-900 overflow-hidden">
-                <img
-                  src={featuredSeminar.image}
-                  alt={featuredSeminar.title}
-                  className="w-full h-full object-cover object-center transition-transform duration-700 hover:scale-105"
+              <div className="lg:col-span-5 relative">
+                <SeminarSpotlightPhoto
+                  primaryImage={featuredSeminar.image}
+                  secondaryImage={featuredSeminar.secondaryImage}
+                  title={featuredSeminar.title}
+                  availableSeats={featuredSeminar.availableSeats}
+                  totalSeats={featuredSeminar.totalSeats}
                 />
-                <div className="absolute inset-0 bg-gradient-to-t from-zinc-950 via-transparent to-transparent lg:hidden" />
-                
-                {/* Live urgency chip */}
-                <div className="absolute top-4 left-4">
-                  <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-black/80 backdrop-blur-md text-[11px] font-medium text-white shadow-lg">
-                    <span className="w-1.5 h-1.5 rounded-full bg-amber-400" />
-                    Zostávajú posledné {featuredSeminar.availableSeats} miesta
-                  </span>
-                </div>
               </div>
 
               {/* Details Side (7 cols) */}

@@ -116,9 +116,9 @@ export const AdminLayout: React.FC = () => {
             </div>
             <div className="flex items-center gap-3 pt-0.5">
               <img
-                src="/images/riccardo/official_logo_square.png"
+                src="/images/riccardo/official_logo_dark_square.png"
                 alt="Hair Salon Riccardo"
-                className="w-10 h-10 rounded-full object-contain bg-white p-0.5 border border-zinc-700/80 shadow-md shrink-0"
+                className="w-10 h-10 rounded-full object-contain bg-zinc-950 p-0.5 border border-zinc-800 shadow-md shrink-0"
               />
               <div className="min-w-0">
                 <h2 className="text-xs font-bold tracking-wider text-white uppercase block leading-tight truncate">

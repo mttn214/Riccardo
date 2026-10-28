@@ -19,6 +19,7 @@ export interface Seminar {
   totalSeats: number;
   availableSeats: number;
   image: string;
+  secondaryImage?: string;
   description: string;
   learningOutcomes: string[];
   schedule: { day: string; morning: string; afternoon: string }[];
@@ -89,7 +90,7 @@ export const STYLIST_PROFILE = {
   heroImage: "/images/riccardo/gallery/riccardo_art_56.jpg",
   stageImage: "/images/riccardo/richard_conka_stage_award.jpg",
   winnersGroupImage: "/images/riccardo/hda_winners_group_hires.jpg",
-  logoImage: "/images/riccardo/official_logo_square.png",
+  logoImage: "/images/riccardo/official_logo_dark_square.png",
   portraitImage: "/images/riccardo/gallery/riccardo_art_37.jpg",
   stats: [
     { label: "Rokov skúseností", value: "14+" },
@@ -147,7 +148,8 @@ export const SEMINARS_DATA: Seminar[] = [
     duration: "2 dni (14 hodín intenzívnej praxe)",
     totalSeats: 6,
     availableSeats: 2,
-    image: "/images/riccardo/gallery/riccardo_art_58.jpg",
+    image: "/images/riccardo/gallery/riccardo_art_23.jpg",
+    secondaryImage: "/images/riccardo/gallery/riccardo_art_58.jpg",
     description: "Vlajkový autorský masterclass Richarda Čonku. Komorná skupina maximálne 6 kaderníkov pre garanciu osobnej korekcie každého ťahu kefou. Získate kontrolu nad dynamikou tepla, nadvihnutím od korienkov a zrkadlovo hladkým pohybom bez krepovatenia.",
     learningOutcomes: [
       "Správna biomechanika a ergonómia rúk pri napínaní prameňa",

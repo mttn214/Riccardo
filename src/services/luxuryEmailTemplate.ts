@@ -25,7 +25,7 @@ export function generateLuxuryEmailHtml(data: LuxuryEmailData): string {
       ? `${data.amountPaidEUR}`.replace(/€/g, '').replace(/EUR/g, '').trim() + ' €' 
       : '380 €';
   const qrUrl = `https://api.qrserver.com/v1/create-qr-code/?size=200x200&data=${encodeURIComponent(ticketCode)}&color=000000&bgcolor=ffffff`;
-  const logoUrl = 'https://hairsalonriccardo.vercel.app/images/riccardo/official_logo_transparent.png';
+  const logoUrl = 'https://hairsalonriccardo.vercel.app/images/riccardo/official_logo_dark_square.png';
 
   return `<!DOCTYPE html>
 <html lang="sk">

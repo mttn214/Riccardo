@@ -41,9 +41,9 @@ export const Footer: React.FC = () => {
           <div className="md:col-span-4 space-y-4">
             <Link to="/" className="inline-flex items-center gap-3 group">
               <img
-                src="/images/riccardo/official_logo_square.png"
+                src="/images/riccardo/official_logo_dark_square.png"
                 alt="Hair Salon Riccardo"
-                className="w-9 h-9 rounded-full object-contain bg-white p-0.5 border border-zinc-800 group-hover:border-zinc-600 transition-colors"
+                className="w-9 h-9 rounded-full object-contain bg-zinc-950 border border-zinc-800 group-hover:border-zinc-600 transition-colors shadow-md"
               />
               <span className="font-semibold tracking-[0.2em] text-white uppercase text-sm block">
                 RICCARDO

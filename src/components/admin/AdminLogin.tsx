@@ -80,9 +80,9 @@ export const AdminLogin: React.FC<AdminLoginProps> = ({ onLoginSuccess }) => {
         <div className="text-center space-y-2">
           <div className="flex justify-center mb-3">
             <img
-              src="/images/riccardo/official_logo_square.png"
+              src="/images/riccardo/official_logo_dark_square.png"
               alt="Hair Salon Riccardo"
-              className="w-16 h-16 rounded-full object-contain bg-white p-1 border border-zinc-700/80 shadow-2xl"
+              className="w-16 h-16 rounded-full object-contain bg-zinc-950 p-1 border border-zinc-800 shadow-2xl"
             />
           </div>
 

@@ -81,9 +81,9 @@ export const ContactSection: React.FC = () => {
           <div className="lg:col-span-5 space-y-8">
             <div className="flex items-center gap-4 pb-4 border-b border-zinc-850">
               <img
-                src="/images/riccardo/official_logo_square.png"
+                src="/images/riccardo/official_logo_dark_square.png"
                 alt="Hair Salon Riccardo"
-                className="w-14 h-14 rounded-full object-contain bg-white p-1 border border-zinc-700 shadow-xl"
+                className="w-14 h-14 rounded-full object-contain bg-zinc-950 border border-zinc-800 shadow-xl"
               />
               <div>
                 <h3 className="text-base font-semibold text-white tracking-tight">Hair Salon Riccardo</h3>
