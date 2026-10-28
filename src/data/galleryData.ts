@@ -67,11 +67,11 @@ export const SEMINAR_GALLERY_PHOTOS: GalleryPhoto[] = [
   },
   {
     id: "sem-gal-8",
-    image: "/images/riccardo/gallery/riccardo_art_78.jpg",
-    title: "Spätná väzba a tímová edukácia",
+    image: "/images/riccardo/gallery/riccardo_art_07.jpg",
+    title: "Tímová príprava a backstage styling",
     category: "Školenia",
     subcategory: "Akadémia Lučenec",
-    description: "Intenzívna tímová konzultácia s asistentmi a študentmi akadémie."
+    description: "Zákulisná spolupráca a precízna príprava modeliek pred autorskou prehliadkou."
   }
 ];
 
