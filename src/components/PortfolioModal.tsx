@@ -48,13 +48,13 @@ export const PortfolioModal: React.FC<PortfolioModalProps> = ({
 
   return (
     <div
-      className="fixed inset-0 z-50 flex items-center justify-center p-3 sm:p-8 bg-black/95 backdrop-blur-2xl animate-fadeIn cursor-zoom-out select-none"
+      className="fixed inset-0 z-50 flex items-center justify-center p-3 sm:p-8 bg-black/50 backdrop-blur-md animate-fadeIn cursor-zoom-out select-none"
       onClick={onClose}
     >
       {/* Floating Top Close Button */}
       <button
         onClick={onClose}
-        className="fixed top-5 right-5 sm:top-7 sm:right-7 z-50 p-3 rounded-full bg-zinc-900/80 hover:bg-zinc-800 text-zinc-300 hover:text-white border border-white/10 backdrop-blur-xl transition-all shadow-2xl cursor-pointer"
+        className="fixed top-5 right-5 sm:top-7 sm:right-7 z-50 p-3 rounded-full bg-black/60 hover:bg-black/90 text-white/90 hover:text-white border border-white/20 backdrop-blur-md transition-all shadow-xl cursor-pointer"
         aria-label="Zatvoriť zväčšenú fotografiu"
       >
         <X className="w-5 h-5" />
@@ -63,7 +63,7 @@ export const PortfolioModal: React.FC<PortfolioModalProps> = ({
       {/* Enlarged Photo Container */}
       {item.hasBeforeAfter && item.beforeImage ? (
         <div
-          className="relative max-w-4xl w-full aspect-[4/3] sm:aspect-[16/10] max-h-[88vh] rounded-3xl overflow-hidden shadow-[0_30px_90px_rgba(0,0,0,0.95)] border border-white/10 cursor-ew-resize"
+          className="relative max-w-4xl w-full aspect-[4/3] sm:aspect-[16/10] max-h-[88vh] rounded-2xl sm:rounded-3xl overflow-hidden shadow-[0_25px_70px_rgba(0,0,0,0.8)] border border-white/15 cursor-ew-resize"
           onClick={(e) => e.stopPropagation()}
           onMouseDown={() => setIsDragging(true)}
           onMouseUp={() => setIsDragging(false)}
@@ -117,17 +117,11 @@ export const PortfolioModal: React.FC<PortfolioModalProps> = ({
           className="relative max-h-[90vh] max-w-[92vw] flex items-center justify-center cursor-zoom-out"
           onClick={onClose}
         >
-          {/* Ambient volumetric backlight glow */}
-          <div
-            className="absolute inset-0 bg-cover bg-center filter blur-3xl opacity-20 scale-110 pointer-events-none"
-            style={{ backgroundImage: `url(${item.image})` }}
-          />
-
           {/* Full High-Resolution Photo */}
           <img
             src={item.image}
             alt={item.title}
-            className="relative z-10 max-h-[88vh] max-w-[92vw] w-auto h-auto object-contain rounded-2xl sm:rounded-3xl shadow-[0_30px_100px_rgba(0,0,0,0.95)] border border-white/10 transition-transform duration-300 hover:scale-[1.01]"
+            className="relative z-10 max-h-[88vh] max-w-[92vw] w-auto h-auto object-contain rounded-2xl sm:rounded-3xl shadow-[0_25px_80px_rgba(0,0,0,0.85)] border border-white/15 transition-transform duration-300 hover:scale-[1.01]"
           />
         </div>
       )}
