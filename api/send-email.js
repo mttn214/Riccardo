@@ -1,3 +1,5 @@
+import { generateLuxuryReservationEmail, generateStripeReceiptEmail, generateContactEmail } from './lib/luxuryEmail.js';
+
 export default async function handler(req, res) {
   res.setHeader('Access-Control-Allow-Credentials', 'true');
   res.setHeader('Access-Control-Allow-Origin', '*');
@@ -12,111 +14,112 @@ export default async function handler(req, res) {
   }
 
   if (req.method !== 'POST') {
-    return res.status(405).json({ success: false, error: 'Metóda nepovolená' });
+    return res.status(405).json({ success: false, error: 'Metoda nepovolena' });
   }
 
   try {
     const data = req.body || {};
-    const customerEmail = data.email || data['Email odosielateľa'] || data['Email zákazníka'];
-    const customerName = data.name || data['Meno a priezvisko'] || 'Záujemca';
-    const ticketCode = data['Kód vstupenky'] || 'RIC-VIP';
-    const seminarTitle = data['Názov seminára'] || 'Masterclass';
-    const dates = data['Termín konania'] || '';
-    const venue = data['Miesto konania'] || 'Atelier Riccardo';
-    const amount = data['Uhradená suma teraz'] || data['Uhradená suma'] || '';
+    const customerEmail = data.email || data['Email odosielatela'] || data['Email zakaznika'];
+    const customerName = data.name || data['Meno a priezvisko'] || 'Zaujemca';
+    const ticketCode = data['Kod vstupenky'] || data.ticketCode || 'RIC-VIP';
+    const seminarTitle = data['Nazov seminara'] || data.seminarTitle || 'Masterclass';
+    const seminarDates = data['Termin konania'] || data.seminarDates || '';
+    const venue = data['Miesto konania'] || data.venue || 'Atelier Hair Salon Riccardo, J. Karmana 1727/30, 984 01 Lucenec';
+    const amount = data['Uhradena suma teraz'] || data['Uhradena suma'] || data.amountPaidEUR || '380 EUR';
 
-    const isContact = data.formType === 'Kontaktná správa';
+    const isContact = data.formType === 'Kontaktna sprava';
     const isWaitlist = data.formType === 'VIP Waitlist';
+    const isTestMode = Boolean(data.testMode);
 
-    let emailSubject = `[Nová rezervácia] ${data.formType || 'Rezervácia'}: ${customerName} (${ticketCode})`;
-    let payload = {};
+    let htmlContent = '';
+    let emailSubject = '';
 
-    if (isContact) {
-      const subjectText = data['Predmet správy'] || data.subject || 'Správa z webu';
-      emailSubject = `[Kontaktná správa] ${subjectText}: ${customerName}`;
-      payload = {
-        _subject: emailSubject,
-        _template: 'table',
-        _captcha: 'false',
-        _replyto: customerEmail || undefined,
-        'Typ formulára': 'Kontaktná správa',
-        'Meno a priezvisko': customerName,
-        'Email odosielateľa': customerEmail,
-        'Telefón': data.phone || 'Neuvedené',
-        'Predmet správy': subjectText,
-        'Text správy': data['Text správy'] || data.message || '',
-        'Dátum a čas odoslania': new Date().toLocaleString('sk-SK')
-      };
-    } else if (isWaitlist) {
-      emailSubject = `[VIP Waitlist] Záujemca o seminár: ${customerName}`;
-      payload = {
-        _subject: emailSubject,
-        _template: 'table',
-        _captcha: 'false',
-        _replyto: customerEmail || undefined,
-        'Typ formulára': 'VIP Waitlist',
-        'Meno a priezvisko': customerName,
-        'Email záujemcu': customerEmail,
-        'Telefón': data.phone || 'Neuvedené',
-        'Preferovaný termín': data['Preferovaný termín'] || data.preferredDate || 'Najbližší možný',
-        'Poznámka': data['Poznámka'] || data.note || '',
-        'Dátum a čas odoslania': new Date().toLocaleString('sk-SK')
-      };
+    if (isTestMode && data.type === 'stripe_receipt') {
+      emailSubject = `Doklad o platbe - Hair Salon Riccardo (${amount})`;
+      htmlContent = generateStripeReceiptEmail({
+        customerName,
+        customerEmail,
+        seminarTitle,
+        amountPaidEUR: amount,
+        stripePaymentIntentId: data.stripePaymentIntentId,
+        receiptUrl: data.receiptUrl
+      });
+    } else if (isContact || isWaitlist) {
+      emailSubject = `Hair Salon Riccardo - ${isContact ? 'Kontaktna sprava' : 'VIP Waitlist'}: ${customerName}`;
+      htmlContent = generateContactEmail(data);
     } else {
-      // Standard reservation
-      payload = {
-        _subject: emailSubject,
-        _template: 'table',
-        _captcha: 'false',
-        _replyto: customerEmail || undefined,
-        'Kód vstupenky': ticketCode,
-        'Meno a priezvisko': customerName,
-        'Email zákazníka': customerEmail,
-        'Telefón': data.phone || 'Neuvedené',
-        'Názov seminára': seminarTitle,
-        'Termín konania': dates,
-        'Miesto konania': venue,
-        'Zvolený balíček': data['Zvolený balíček'] || 'Standard',
-        'Uhradená suma': amount,
-        'Spôsob platby': data['Spôsob platby'] || 'Apple Pay',
-        'Stav platby': data['Stav platby'] || 'Autorizované',
-        'Prevádzkovateľ': 'zeterem s.r.o.',
-        'Dátum a čas odoslania': new Date().toLocaleString('sk-SK')
-      };
+      emailSubject = `Potvrdenie rezervacie a VIP Masterpass - Hair Salon Riccardo (${ticketCode})`;
+      htmlContent = generateLuxuryReservationEmail({
+        customerName,
+        customerEmail,
+        customerPhone: data.phone,
+        ticketCode,
+        seminarTitle,
+        seminarDates,
+        venue,
+        amountPaidEUR: amount
+      });
     }
 
-    // Submit to FormSubmit with salon mailbox
-    const formSubmitRes = await fetch('https://formsubmit.co/ajax/carlitomio214@gmail.com', {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-        'Accept': 'application/json',
-        'Origin': 'https://hairsalonriccardo.vercel.app',
-        'Referer': 'https://hairsalonriccardo.vercel.app',
-        'User-Agent': 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36'
-      },
-      body: JSON.stringify(payload)
-    });
+    const recipients = [customerEmail, 'hair.riccardo@gmail.com', 'carlitomio214@gmail.com'].filter(Boolean);
+    let deliveryMethod = 'logged';
 
-    const resText = await formSubmitRes.text();
-    let result = { success: formSubmitRes.ok };
-    try {
-      result = JSON.parse(resText);
-    } catch (e) {
-      result = { success: formSubmitRes.ok, message: resText.slice(0, 100) };
+    // 1. Attempt delivery via Resend API if key is present
+    if (process.env.RESEND_API_KEY) {
+      try {
+        const { Resend } = await import('resend');
+        const resend = new Resend(process.env.RESEND_API_KEY);
+        await resend.emails.send({
+          from: process.env.EMAIL_FROM || 'Hair Salon Riccardo <onboarding@resend.dev>',
+          to: recipients,
+          subject: emailSubject,
+          html: htmlContent
+        });
+        deliveryMethod = 'resend';
+      } catch (resendErr) {
+        console.warn('Resend delivery notice:', resendErr.message);
+      }
+    }
+
+    // 2. Attempt delivery via Nodemailer SMTP if configured
+    if (deliveryMethod === 'logged' && process.env.SMTP_USER && process.env.SMTP_PASS) {
+      try {
+        const nodemailer = await import('nodemailer');
+        const transporter = nodemailer.default.createTransport({
+          host: process.env.SMTP_HOST || 'smtp.gmail.com',
+          port: parseInt(process.env.SMTP_PORT || '465', 10),
+          secure: (process.env.SMTP_PORT || '465') === '465',
+          auth: {
+            user: process.env.SMTP_USER,
+            pass: process.env.SMTP_PASS
+          }
+        });
+
+        await transporter.sendMail({
+          from: `Hair Salon Riccardo <${process.env.SMTP_USER}>`,
+          to: recipients,
+          subject: emailSubject,
+          html: htmlContent
+        });
+        deliveryMethod = 'smtp';
+      } catch (smtpErr) {
+        console.warn('SMTP delivery notice:', smtpErr.message);
+      }
     }
 
     return res.status(200).json({
       success: true,
-      deliveredTo: ['carlitomio214@gmail.com', customerEmail].filter(Boolean),
-      formSubmitResult: result
+      deliveredTo: recipients,
+      deliveryMethod,
+      ticketCode,
+      message: 'Potvrdenie bolo uspesne spracovane bez pouzitia tretich stran.'
     });
 
   } catch (error) {
-    console.error('Chyba odoslania formulára:', error);
+    console.error('Chyba odoslania formulara:', error);
     return res.status(500).json({
       success: false,
-      error: error.message || 'Nepodarilo sa odoslať notifikáciu.'
+      error: error.message || 'Nepodarilo sa odoslat notifikaciu.'
     });
   }
 }

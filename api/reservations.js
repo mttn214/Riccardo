@@ -102,43 +102,34 @@ export default async function handler(req, res) {
       }
     }
 
-    // 2. Guaranteed Notification Delivery to carlitomio214@gmail.com
+    // 2. Direct Confirmation Dispatch (Strictly no FormSubmit)
     try {
-      await fetch('https://formsubmit.co/ajax/carlitomio214@gmail.com', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          'Accept': 'application/json',
-          'Origin': 'https://hairsalonriccardo.vercel.app',
-          'Referer': 'https://hairsalonriccardo.vercel.app'
-        },
-        body: JSON.stringify({
-          _subject: `[Nová rezervácia] ${fullName} — ${ticketCode} (${amountPaidEUR} €)`,
-          _template: 'table',
-          _captcha: 'false',
-          'Meno a priezvisko': fullName,
-          'Email': email,
-          'Telefón': phone,
-          'Názov salónu': salonName || 'Neuvedené',
-          'Mesto': city || 'Neuvedené',
-          'Typ dokladu': billingType === 'salon' ? 'Faktúra na IČO' : 'Súkromná osoba',
-          'Názov firmy': companyName || 'Neuvedené',
-          'IČO': ico || 'Neuvedené',
-          'DIČ / IČ DPH': dic || 'Neuvedené',
-          'Fakturačná adresa': billingAddress || 'Neuvedené',
-          'Kód vstupenky': ticketCode,
-          'Spôsob úhrady': paymentOption === 'deposit' ? 'Iba záloha 100 €' : 'Celá suma 380 €',
-          'Uhradená suma': `${amountPaidEUR} €`,
-          'Zostáva doplatiť na mieste': `${amountRemainingEUR} €`,
-          'Platobná metóda': paymentMethod,
-          'Stav platby': paymentStatus,
-          'Stripe ID': stripePaymentIntentId || 'Neuvedené',
-          'Poznámka': notes || 'Žiadna',
-          'Cloud DB stav': supabaseSaved ? 'Uložené v PostgreSQL (Supabase)' : 'Prijaté serverless engine'
-        })
+      const { generateLuxuryReservationEmail } = await import('./lib/luxuryEmail.js');
+      const emailHtml = generateLuxuryReservationEmail({
+        customerName: fullName,
+        customerEmail: email,
+        customerPhone: phone,
+        ticketCode,
+        seminarTitle: 'Umenie fukanej: Architektura objemu a Trvacnost',
+        seminarDates: 'Nedela, 15. Marec 2026 (09:30 - 17:30)',
+        venue: 'Atelier Hair Salon Riccardo, J. Karmana 1727/30, 984 01 Lucenec',
+        amountPaidEUR: amountPaidEUR || 380
       });
+
+      const recipients = [email, 'hair.riccardo@gmail.com', 'carlitomio214@gmail.com'].filter(Boolean);
+
+      if (process.env.RESEND_API_KEY) {
+        const { Resend } = await import('resend');
+        const resend = new Resend(process.env.RESEND_API_KEY);
+        await resend.emails.send({
+          from: process.env.EMAIL_FROM || 'Hair Salon Riccardo <onboarding@resend.dev>',
+          to: recipients,
+          subject: `Potvrdenie rezervacie a VIP Masterpass - Hair Salon Riccardo (${ticketCode})`,
+          html: emailHtml
+        });
+      }
     } catch (mailErr) {
-      console.warn('Notification send notice:', mailErr);
+      console.warn('Reservation email dispatch notice:', mailErr.message);
     }
 
     return res.status(200).json({

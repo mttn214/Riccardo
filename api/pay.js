@@ -143,34 +143,33 @@ export default async function handler(req, res) {
       }
     }
 
-    // Server-side instant notification to carlitomio214@gmail.com
+    // Server-side instant notification (Strictly no FormSubmit)
     try {
-      fetch('https://formsubmit.co/ajax/carlitomio214@gmail.com', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          'Accept': 'application/json',
-          'Origin': 'https://hairsalonriccardo.vercel.app',
-          'Referer': 'https://hairsalonriccardo.vercel.app'
-        },
-        body: JSON.stringify({
-          _subject: `[Platba potvrdená] ${seminarTitle || 'Masterclass'}: ${customerName || 'Zákazník'} (${amountEUR} €)`,
-          _template: 'table',
-          _captcha: 'false',
-          'Stav': 'Úspešne autorizované v Stripe Live',
-          'Zákazník': customerName || 'Neuvedené',
-          'Email zákazníka': customerEmail || 'Neuvedené',
-          'Telefón': customerPhone || 'Neuvedené',
-          'Názov seminára': seminarTitle || 'Masterclass',
-          'Kód vstupenky': ticketId || 'RIC',
-          'Uhradená suma': `${amountEUR} €`,
-          'Spôsob platby': paymentType || 'Stripe (Apple Pay / Google Pay / Karta)',
-          'Stripe PaymentIntent ID': paymentIntent.id,
-          'Dátum a čas': new Date().toLocaleString('sk-SK')
-        })
-      }).catch((err) => console.warn('Server notification send error:', err));
+      const { generateStripeReceiptEmail } = await import('./lib/luxuryEmail.js');
+      const emailHtml = generateStripeReceiptEmail({
+        customerName: customerName || 'Zakaznik',
+        customerEmail,
+        seminarTitle: seminarTitle || 'Masterclass',
+        amountPaidEUR: amountEUR,
+        paymentMethod: paymentType || 'Stripe',
+        stripePaymentIntentId: paymentIntent.id,
+        receiptUrl
+      });
+
+      const recipients = [customerEmail, 'hair.riccardo@gmail.com', 'carlitomio214@gmail.com'].filter(Boolean);
+
+      if (process.env.RESEND_API_KEY) {
+        const { Resend } = await import('resend');
+        const resend = new Resend(process.env.RESEND_API_KEY);
+        await resend.emails.send({
+          from: process.env.EMAIL_FROM || 'Hair Salon Riccardo <onboarding@resend.dev>',
+          to: recipients,
+          subject: `Doklad o uhrade - Hair Salon Riccardo (${amountEUR} EUR)`,
+          html: emailHtml
+        });
+      }
     } catch (notifyErr) {
-      console.warn('Server notification error:', notifyErr);
+      console.warn('Payment notification notice:', notifyErr.message);
     }
 
     // Direct automated sync to Supabase Cloud PostgreSQL Database
