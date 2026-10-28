@@ -244,7 +244,7 @@ const SEED_PARTICIPANTS: Participant[] = [
   {
     id: 'part-001',
     seminarId: 'sem-fukana-lucenec',
-    seminarTitle: 'Umenie Fúkanej & Signature Vlny: Masterclass',
+    seminarTitle: 'Signature Styling: Masterclass',
     seminarDates: '11. – 12. Január 2027',
     seminarCity: 'Lučenec',
     fullName: 'Katarína Nováková',
@@ -276,7 +276,7 @@ const SEED_PARTICIPANTS: Participant[] = [
   {
     id: 'part-002',
     seminarId: 'sem-fukana-lucenec',
-    seminarTitle: 'Umenie Fúkanej & Signature Vlny: Masterclass',
+    seminarTitle: 'Signature Styling: Masterclass',
     seminarDates: '11. – 12. Január 2027',
     seminarCity: 'Lučenec',
     fullName: 'Martin Kováč',
@@ -304,7 +304,7 @@ const SEED_PARTICIPANTS: Participant[] = [
   {
     id: 'part-003',
     seminarId: 'sem-fukana-lucenec',
-    seminarTitle: 'Umenie Fúkanej & Signature Vlny: Masterclass',
+    seminarTitle: 'Signature Styling: Masterclass',
     seminarDates: '11. – 12. Január 2027',
     seminarCity: 'Lučenec',
     fullName: 'Lucia Horváthová',
@@ -335,7 +335,7 @@ const SEED_PARTICIPANTS: Participant[] = [
   {
     id: 'part-004',
     seminarId: 'sem-fukana-lucenec',
-    seminarTitle: 'Umenie Fúkanej & Signature Vlny: Masterclass',
+    seminarTitle: 'Signature Styling: Masterclass',
     seminarDates: '11. – 12. Január 2027',
     seminarCity: 'Lučenec',
     fullName: 'Simona Vargová',
@@ -461,7 +461,7 @@ const SEED_INQUIRIES: InquiryMessage[] = [
     email: 'mihalikova.zuzana@gmail.com',
     phone: '+421 905 889 900',
     subject: 'Individuálny salónny tréning pre náš tím v Žiline',
-    message: 'Dobrý deň Riccardo, radi by sme dohodli celodenný uzavretý seminár fúkanej priamo v našom salóne v Žiline pre 5 kaderníčok. Aké máte voľné termíny na jar 2027?',
+    message: 'Dobrý deň Riccardo, radi by sme dohodli celodenný uzavretý seminár stylingu priamo v našom salóne v Žiline pre 5 kaderníčok. Aké máte voľné termíny na jar 2027?',
     submittedAt: '2026-10-15 18:30',
     status: 'unread'
   },
@@ -471,7 +471,7 @@ const SEED_INQUIRIES: InquiryMessage[] = [
     name: 'Barbora Kováčová',
     email: 'barbora.kovac@hairart.sk',
     phone: '+421 911 334 455',
-    seminarTitle: 'Umenie Fúkanej & Signature Vlny: Masterclass',
+    seminarTitle: 'Signature Styling: Masterclass',
     preferredCity: 'Bratislava / Lučenec',
     message: 'Prosím o zaradenie do VIP Waitlistu, keby sa uvoľnilo miesto na januárový termín.',
     submittedAt: '2026-10-14 20:15',

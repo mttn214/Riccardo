@@ -12,7 +12,7 @@ interface WaitlistModalProps {
 export const WaitlistModal: React.FC<WaitlistModalProps> = ({
   isOpen,
   onClose,
-  preferredTopic = 'Umenie fúkanej & Styling'
+  preferredTopic = 'Signature Styling'
 }) => {
   const [name, setName] = useState('');
   const [email, setEmail] = useState('');
@@ -211,7 +211,7 @@ export const WaitlistModal: React.FC<WaitlistModalProps> = ({
                   onChange={(e) => setTopic(e.target.value)}
                   className="w-full px-4 py-2.5 rounded-xl bg-zinc-900 border border-zinc-800 text-sm text-white focus:outline-none focus:border-zinc-500 transition-colors cursor-pointer"
                 >
-                  <option value="Umenie fúkanej & Signature Styling">Umenie fúkanej: Architektúra objemu (1 deň)</option>
+                  <option value="Signature Styling Masterclass">Signature Styling: Architektúra objemu (1 deň)</option>
                   <option value="Precízny strih & Geometria">Precízny strih & Geometria (2 dni)</option>
                   <option value="Balayage Alchemy & Blond tóny">Balayage Alchemy & AirTouch (2 dni)</option>
                   <option value="Všetky témy (Chcem notifikáciu na akýkoľvek drop)">Všetky témy (Chcem notifikáciu na akýkoľvek drop)</option>

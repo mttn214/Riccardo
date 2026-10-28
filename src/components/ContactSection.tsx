@@ -20,7 +20,7 @@ export const ContactSection: React.FC = () => {
   const faqs = [
     {
       q: "Musím si na praktický seminár doniesť vlastné pomôcky?",
-      a: "Na seminároch zabezpečujeme cvičné hlavy a stojany. Odporúčame si priniesť vlastné obľúbené nožnice, hrebene a fén. Na seminári 'Umenie fúkanej' dostáva každý účastník v cene našu špeciálnu termálnu kefu Riccardo."
+      a: "Na seminároch zabezpečujeme cvičné hlavy a stojany. Odporúčame si priniesť vlastné obľúbené nožnice, hrebene a fén. Na praktickom seminári stylingu dostáva každý účastník v cene našu špeciálnu termálnu kefu Riccardo."
     },
     {
       q: "Získam po ukončení seminára oficiálny certifikát?",

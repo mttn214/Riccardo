@@ -14,7 +14,7 @@ export interface Seminar {
   country: string;
   venue: string;
   dates: string;
-  category: 'Umenie Fúkanej' | 'Precízny Strih' | 'Balayage & Blond' | 'Overenie Platby';
+  category: 'Styling' | 'Strih' | 'Balayage & Blond' | 'Overenie Platby';
   duration: string;
   totalSeats: number;
   availableSeats: number;
@@ -30,7 +30,7 @@ export interface Seminar {
 export interface PortfolioItem {
   id: string;
   title: string;
-  category: 'Balayage & Farba' | 'Precízne Strihy' | 'Umenie Fúkanej & Styling' | 'Svadobné & Spoločenské';
+  category: 'Balayage & Farba' | 'Strih' | 'Styling' | 'Svadobné & Spoločenské';
   year: string;
   image: string;
   beforeImage?: string;
@@ -84,9 +84,9 @@ export const STYLIST_PROFILE = {
   instagramUrl: "https://www.instagram.com/hair_riccardo/",
   facebookUrl: "https://www.facebook.com/hairsalonriccardo",
   googleMapsUrl: "https://maps.google.com/?q=Hair+Salon+Riccardo+Lucenec",
-  bioHeadline: "Vášeň pre dokonalú fúkanú, geometriu strihu a žiarivé farby.",
-  bioDescription: "Richard Čonka (Riccardo) je uznávaný slovenský hairstylist, zakladateľ prestížneho Hair Salon Riccardo v Lučenci a nositeľ ocenenia Cena verejnosti SR na prestížnych Czech & Slovak Hairdressing Awards (kaderníckych Oskaroch v Prahe). Svojou ikonickou vzdelávacou sériou 'Umenie fúkanej' a majstrovskými seminármi inšpiruje kaderníkov po celom Slovensku a Česku.",
-  quote: "Vlasy nie sú len práca, sú architektúra v pohybe. Správna technika fúkanej a precízny strih dajú žene sebavedomie, ktoré zmení celú jej auru.",
+  bioHeadline: "Vášeň pre dokonalý styling, geometriu strihu a žiarivé farby.",
+  bioDescription: "Richard Čonka (Riccardo) je uznávaný slovenský hairstylist, zakladateľ prestížneho Hair Salon Riccardo v Lučenci a nositeľ ocenenia Cena verejnosti SR na prestížnych Czech & Slovak Hairdressing Awards (kaderníckych Oskaroch v Prahe). Svojimi autorskými masterclassmi a majstrovskými seminármi inšpiruje kaderníkov po celom Slovensku a Česku.",
+  quote: "Vlasy nie sú len práca, sú architektúra v pohybe. Správna technika stylingu a precízny strih dajú žene sebavedomie, ktoré zmení celú jej auru.",
   heroImage: "/images/riccardo/gallery/riccardo_art_56.jpg",
   stageImage: "/images/riccardo/richard_conka_stage_award.jpg",
   winnersGroupImage: "/images/riccardo/hda_winners_group_hires.jpg",
@@ -139,12 +139,12 @@ export const COMPANY_DETAILS = {
 export const SEMINARS_DATA: Seminar[] = [
   {
     id: "sem-umenie-fukanej-lucenec",
-    title: "Umenie fúkanej: Architektúra objemu & Trvácnosť",
+    title: "Architektúra objemu & Trvácnosť: Styling Masterclass",
     city: "Lučenec",
     country: "Slovensko",
     venue: "Atelier Hair Salon Riccardo, J. Kármána 30",
     dates: "16. – 17. November 2026",
-    category: "Umenie Fúkanej",
+    category: "Styling",
     duration: "2 dni (14 hodín intenzívnej praxe)",
     totalSeats: 6,
     availableSeats: 2,
@@ -154,24 +154,24 @@ export const SEMINARS_DATA: Seminar[] = [
     learningOutcomes: [
       "Správna biomechanika a ergonómia rúk pri napínaní prameňa",
       "Technika fixácie vlasu studeným vzduchom pre 72-hodinovú trvácnosť",
-      "Fúkané 'Riccardo Glam Waves' výhradne cez okrúhlu termálnu kefu bez kulmy",
+      "Styling 'Riccardo Glam Waves' výhradne cez okrúhlu termálnu kefu bez kulmy",
       "Práca s live modelkou a profesionálne fotenie pred sociálne siete"
     ],
     schedule: [
       {
         day: "1. Deň: Dynamika tepla, analýza vlasu & Live ukážky",
-        morning: "09:30 – 13:00: Úvod, rozbor štruktúry vlasu, produkty a live ukážka 2 fúkaných na živých modelkách.",
+        morning: "09:30 – 13:00: Úvod, rozbor štruktúry vlasu, produkty a live ukážka 2 premien na živých modelkách.",
         afternoon: "14:00 – 18:00: Praktický hands-on tréning na cvičných hlavách pod osobným dohľadom Richarda Čonku."
       },
       {
         day: "2. Deň: Práca na modelkách & Finálny styling",
-        morning: "09:30 – 13:00: Účastníci kompletne fúkajú živé modelky (objem a glamour vlny).",
+        morning: "09:30 – 13:00: Účastníci kompletne upravujú živé modelky (objem a glamour vlny).",
         afternoon: "14:00 – 17:30: Korekcia detailov, fotenie, odovzdanie certifikátov a toast."
       }
     ],
     includedItems: [
       "Termálna kefa z limitovanej edície Riccardo",
-      "Pracovné skriptá a manuál fúkania s detailnými postupmi",
+      "Pracovné skriptá a manuál stylingu s detailnými postupmi",
       "Oficiálny akreditovaný certifikát Riccardo Academy",
       "Gurmánsky obed a občerstvenie po oba dni",
       "Prístup do súkromnej WhatsApp skupiny absolventov pre spätnú väzbu"
@@ -201,7 +201,7 @@ export const SEMINARS_DATA: Seminar[] = [
     country: "Slovensko",
     venue: "Atelier Hair Salon Riccardo, J. Kármána 30",
     dates: "18. – 19. Január 2027",
-    category: "Precízny Strih",
+    category: "Strih",
     duration: "2 dni (16 hodín)",
     totalSeats: 6,
     availableSeats: 3,
@@ -265,18 +265,18 @@ export const SEMINARS_DATA: Seminar[] = [
       "AirTouch separácia pre 6-mesačný bezúdržbový odrast",
       "Zónové tónovanie a korekcia teplých podtónov",
       "Správne formulácie vyvíjačov a pH kontrola",
-      "Záverečná objemová fúkaná pre diamantový lesk"
+      "Záverečný objemový styling pre diamantový lesk"
     ],
     schedule: [
       {
         day: "1. Deň: Chémia zosvetľovania & AirTouch technika",
-        morning: "09:30 – 13:00: Teória pigmentov, live ukážka rozfúkavania na modelke.",
+        morning: "09:30 – 13:00: Teória pigmentov, live ukážka vzduchovej separácie na modelke.",
         afternoon: "14:00 – 18:00: Nácvik separácie prameňov na cvičných prameňoch."
       },
       {
         day: "2. Deň: Reálna transformácia na modelke",
         morning: "09:30 – 13:30: Účastníci kompletne zosvetľujú a tónujú vlastné modelky.",
-        afternoon: "14:30 – 17:30: Výsledný styling cez Umenie fúkanej a certifikácia."
+        afternoon: "14:30 – 17:30: Výsledný autorský styling a certifikácia."
       }
     ],
     includedItems: [
@@ -353,19 +353,19 @@ export const PORTFOLIO_DATA: PortfolioItem[] = [
   {
     id: "port-glamour-waves",
     title: "Hollywood Glamour Waves",
-    category: "Umenie Fúkanej & Styling",
+    category: "Styling",
     year: "2024",
     collection: "Salónna tvorba & Red Carpet",
     image: "/images/riccardo/gallery/riccardo_art_71.jpg",
-    description: "Ikonické hollywoodske vlny fúkané výhradne cez okrúhlu termálnu kefu bez použitia kulmy. Dokonalé prepojenie zrkadlového lesku, vzdušného objemu a hodvábneho pohybu vlasov.",
+    description: "Ikonické hollywoodske vlny vytvorené výhradne cez okrúhlu termálnu kefu bez použitia kulmy. Dokonalé prepojenie zrkadlového lesku, vzdušného objemu a hodvábneho pohybu vlasov.",
     technique: "Smerové napínanie prameňov pod 90-stupňovým uhlom, tepelná pamäť vlasu a fixácia chladným prúdom vzduchu.",
     toolsUsed: "Termálna keramická kefa Riccardo, iontový fén, leskový sprej s mikročasticami.",
-    awardsWon: "Podpisová technika masterclassu Umenie fúkanej"
+    awardsWon: "Podpisová technika autorského masterclassu"
   },
   {
     id: "port-pixie-precision",
     title: "Platinum Pixie Precision",
-    category: "Precízne Strihy",
+    category: "Strih",
     year: "2024",
     collection: "Geometrické krátke strihy",
     image: "/images/riccardo/gallery/riccardo_art_39.jpg",
@@ -387,7 +387,7 @@ export const PORTFOLIO_DATA: PortfolioItem[] = [
   {
     id: "port-crimson-bob",
     title: "Vibrant Crimson Geometric Bob",
-    category: "Precízne Strihy",
+    category: "Strih",
     year: "2024",
     collection: "Creative Color & Geometric Cut",
     image: "/images/riccardo/gallery/riccardo_art_15.jpg",
@@ -398,7 +398,7 @@ export const PORTFOLIO_DATA: PortfolioItem[] = [
   {
     id: "port-afro-coiffure",
     title: "Voluminous Afro Coiffure",
-    category: "Umenie Fúkanej & Styling",
+    category: "Styling",
     year: "2023",
     collection: "Editorial & Avant-Garde",
     image: "/images/riccardo/gallery/riccardo_art_35.jpg",
@@ -409,7 +409,7 @@ export const PORTFOLIO_DATA: PortfolioItem[] = [
   {
     id: "port-sunburst-curls",
     title: "Sunburst Curls & Styling",
-    category: "Umenie Fúkanej & Styling",
+    category: "Styling",
     year: "2024",
     collection: "Textúra & Prirodzený objem",
     image: "/images/riccardo/gallery/riccardo_art_67.jpg",
@@ -431,18 +431,18 @@ export const PORTFOLIO_DATA: PortfolioItem[] = [
   {
     id: "port-biker-texture",
     title: "Biker Glamour Texture",
-    category: "Umenie Fúkanej & Styling",
+    category: "Styling",
     year: "2024",
     collection: "Haute Coiffure & Módne kampane",
     image: "/images/riccardo/gallery/riccardo_art_04.jpg",
-    description: "Dramatický čiernobiely kontrast rockovej elegancie a bohatej ženskej hrivy vyfúkanej do absolútnej dokonalosti.",
-    technique: "Termálna fúkaná s maximálnym nadvihnutím od temena hlavy.",
+    description: "Dramatický čiernobiely kontrast rockovej elegancie a bohatej ženskej hrivy upravenej do absolútnej dokonalosti.",
+    technique: "Termálny styling s maximálnym nadvihnutím od temena hlavy.",
     toolsUsed: "Veľká okrúhla termokefa, objemová pena, lak s pamäťovým efektom."
   },
   {
     id: "port-sculptural-haute",
     title: "Sculptural Haute Coiffure",
-    category: "Umenie Fúkanej & Styling",
+    category: "Styling",
     year: "2023",
     collection: "Súťažný editoriál",
     image: "/images/riccardo/gallery/riccardo_art_76.jpg",
@@ -453,7 +453,7 @@ export const PORTFOLIO_DATA: PortfolioItem[] = [
   {
     id: "port-platinum-crop",
     title: "Platinový Geometrický Crop",
-    category: "Precízne Strihy",
+    category: "Strih",
     year: "2024",
     collection: "Moderné krátke línie",
     image: "/images/riccardo/gallery/riccardo_art_38.jpg",
@@ -464,19 +464,19 @@ export const PORTFOLIO_DATA: PortfolioItem[] = [
   {
     id: "port-salon-transformations",
     title: "Salónne transformácie",
-    category: "Precízne Strihy",
+    category: "Strih",
     year: "2024",
     collection: "Premeny z Lučenca",
     image: "/images/riccardo/gallery/riccardo_art_62.jpg",
     hasBeforeAfter: true,
     description: "Štvorica autentických transformácií z ateliéru Hair Salon Riccardo v Lučenci: blond bob, bohaté vlny, medený lesk a krátky crop.",
-    technique: "Individuálna diagnóza typu tváre, zosvetlenie s ochranou väzieb a finálna autorská fúkaná.",
+    technique: "Individuálna diagnóza typu tváre, zosvetlenie s ochranou väzieb a finálny autorský styling.",
     toolsUsed: "Kompletné salónne portfólio prémiových nástrojov Riccardo."
   },
   {
     id: "port-folklore-master",
     title: "Žitná Symfónia (CSHA Víťaz)",
-    category: "Precízne Strihy",
+    category: "Strih",
     year: "2023",
     collection: "Víťazná kolekcia Czech & Slovak Hairdressing Awards (Praha)",
     image: "/images/riccardo/gallery/riccardo_art_56.jpg",
@@ -581,11 +581,11 @@ export const TESTIMONIALS_DATA: Testimonial[] = [
     city: "Lučenec",
     source: "Google",
     sourceLabel: "Google Recenzia",
-    service: "Umenie fúkanej & Melír",
+    service: "Styling & Melír",
     verified: true,
     date: "Google Maps",
     relativeTime: "pred 2 týždňami",
-    quote: "Najlepší salón v Lučenci a širokom okolí. Richard je neskutočný profesionál, ktorý presne vie, čo vlasy potrebujú. Strih aj farba vždy predčia očakávania a fúkaná mi drží niekoľko dní v perfektnom stave bez krepovatenia. Úžasná priateľská a rodinná atmosféra.",
+    quote: "Najlepší salón v Lučenci a širokom okolí. Richard je neskutočný profesionál, ktorý presne vie, čo vlasy potrebujú. Strih aj farba vždy predčia očakávania a výsledný styling mi drží niekoľko dní v perfektnom stave bez krepovatenia. Úžasná priateľská a rodinná atmosféra.",
     rating: 5
   },
   {
@@ -679,11 +679,11 @@ export const TESTIMONIALS_DATA: Testimonial[] = [
     city: "Rimavská Sobota",
     source: "Google",
     sourceLabel: "Google Recenzia",
-    service: "Umenie fúkanej & Hĺbková kúra",
+    service: "Styling & Hĺbková kúra",
     verified: true,
     date: "Google Maps",
     relativeTime: "pred 3 mesiacmi",
-    quote: "Fúkaná od Richarda je zážitok. Vlasy majú neskutočný objem, lesk a pritom sú jemné na dotyk. Poradil mi aj domácu starostlivosť a šampóny, ktoré mi konečne dali vlasy dokopy. Určite odporúčam každému, kto hľadá prémiovú starostlivosť.",
+    quote: "Styling od Richarda je zážitok. Vlasy majú neskutočný objem, lesk a pritom sú jemné na dotyk. Poradil mi aj domácu starostlivosť a šampóny, ktoré mi konečne dali vlasy dokopy. Určite odporúčam každému, kto hľadá prémiovú starostlivosť.",
     rating: 5
   },
   {
@@ -707,7 +707,7 @@ export const TESTIMONIALS_DATA: Testimonial[] = [
     city: "Veľký Krtíš",
     source: "Google",
     sourceLabel: "Google Recenzia",
-    service: "Objemová fúkaná & Úprava dĺžok",
+    service: "Objemový styling & Úprava dĺžok",
     verified: true,
     date: "Google Maps",
     relativeTime: "pred 4 mesiacmi",
@@ -763,7 +763,7 @@ export const TESTIMONIALS_DATA: Testimonial[] = [
     city: "Bratislava / Lučenec",
     source: "Facebook",
     sourceLabel: "Facebook Odporúčanie",
-    service: "Styling & Fúkaná",
+    service: "Signature Styling",
     verified: true,
     date: "Facebook",
     relativeTime: "pred 6 mesiacmi",
@@ -775,7 +775,7 @@ export const TESTIMONIALS_DATA: Testimonial[] = [
 export const PAST_SEMINAR_RECAPS = [
   {
     city: "Lučenec",
-    edition: "Umenie fúkanej – Jesenný turnus",
+    edition: "Styling Masterclass – Jesenný turnus",
     attendees: 6,
     countriesRepresented: "SR & ČR",
     rating: "5.0 / 5.0",
@@ -808,7 +808,7 @@ export const ACADEMY_FAQ_DATA: FAQItem[] = [
     id: "faq-3",
     category: "Certifikácia",
     question: "Aký certifikát po absolvovaní seminára získam?",
-    answer: "Získate oficiálny tlačený certifikát Riccardo Academy s osobným podpisom Richarda Čonku, víťaza Czech & Slovak Hairdressing Awards. Certifikát potvrdzuje zvládnutie pokročilých techník fúkanej, strihu alebo balayage podľa štandardov oceneného ateliéru."
+    answer: "Získate oficiálny tlačený certifikát Riccardo Academy s osobným podpisom Richarda Čonku, víťaza Czech & Slovak Hairdressing Awards. Certifikát potvrdzuje zvládnutie pokročilých techník stylingu, strihu alebo balayage podľa štandardov oceneného ateliéru."
   },
   {
     id: "faq-4",
@@ -839,7 +839,7 @@ export const ACADEMY_FAQ_DATA: FAQItem[] = [
 export const PAST_SOLD_OUT_SEMINARS = [
   {
     id: "past-1",
-    title: "Umenie fúkanej & Signature Styling",
+    title: "Signature Styling Masterclass",
     date: "Október 2026",
     seatsTotal: 6,
     soldOutTime: "Vypredané za 4 hodiny",

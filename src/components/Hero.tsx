@@ -21,7 +21,7 @@ export const Hero: React.FC<HeroProps> = ({ onExploreSeminars, onExplorePortfoli
 
         {/* Large Clean Headline (Apple / Birne style) */}
         <h1 className="text-4xl sm:text-6xl md:text-7xl lg:text-[84px] font-semibold tracking-[-0.035em] leading-[1.05] max-w-4xl mb-6">
-          Umenie fúkanej. <br />
+          Umenie stylingu. <br />
           <span className="text-zinc-500 font-normal">Precíznosť formy.</span>
         </h1>
 
@@ -63,7 +63,7 @@ export const Hero: React.FC<HeroProps> = ({ onExploreSeminars, onExplorePortfoli
                 Najbližší autorský masterclass
               </span>
               <strong className="text-sm sm:text-base text-white font-medium">
-                Umenie fúkanej — Lučenec (16.–17. Nov 2026)
+                Architektúra stylingu — Lučenec (16.–17. Nov 2026)
               </strong>
             </div>
             <div className="text-right">

@@ -3,7 +3,7 @@ export interface GalleryPhoto {
   image: string;
   title: string;
   category: 'Školenia' | 'Súťaže' | 'Portfólio';
-  subcategory: 'Umenie fúkanej' | 'Precízny strih' | 'Balayage & Farba' | 'Avantgarda' | 'Gala & Prehliadky' | 'Akadémia Lučenec';
+  subcategory: 'Styling' | 'Strih' | 'Balayage & Farba' | 'Avantgarda' | 'Gala & Prehliadky' | 'Akadémia Lučenec';
   description: string;
 }
 
@@ -22,7 +22,7 @@ export const SEMINAR_GALLERY_PHOTOS: GalleryPhoto[] = [
     image: "/images/riccardo/gallery/riccardo_art_01.jpg",
     title: "Hands-on tréning v zákulisí",
     category: "Školenia",
-    subcategory: "Umenie fúkanej",
+    subcategory: "Styling",
     description: "Osobná asistencia Richarda Čonku pri stylingu objemových kučier a technike fixácie."
   },
   {
@@ -30,7 +30,7 @@ export const SEMINAR_GALLERY_PHOTOS: GalleryPhoto[] = [
     image: "/images/riccardo/gallery/riccardo_art_05.jpg",
     title: "Anatomické sekcionovanie vlasov",
     category: "Školenia",
-    subcategory: "Precízny strih",
+    subcategory: "Strih",
     description: "Praktická ukážka presného delenia sekcií hrebeňom pred strihaním na živej modelke."
   },
   {
@@ -38,7 +38,7 @@ export const SEMINAR_GALLERY_PHOTOS: GalleryPhoto[] = [
     image: "/images/riccardo/gallery/riccardo_art_16.jpg",
     title: "Pódiový masterclass: Geometria strihu",
     category: "Školenia",
-    subcategory: "Precízny strih",
+    subcategory: "Strih",
     description: "Živá prezentácia strihu krátkej formy pred publikom kaderníkov."
   },
   {
@@ -46,7 +46,7 @@ export const SEMINAR_GALLERY_PHOTOS: GalleryPhoto[] = [
     image: "/images/riccardo/gallery/riccardo_art_64.jpg",
     title: "Pódiový styling a tvarovanie objemu",
     category: "Školenia",
-    subcategory: "Umenie fúkanej",
+    subcategory: "Styling",
     description: "Práca na scéne pred publikom kaderníkov – vytvorenie ikonického objemu a zrkadlového lesku."
   },
   {
@@ -54,7 +54,7 @@ export const SEMINAR_GALLERY_PHOTOS: GalleryPhoto[] = [
     image: "/images/riccardo/gallery/riccardo_art_26.jpg",
     title: "Osobná korekcia ťahu kefou",
     category: "Školenia",
-    subcategory: "Umenie fúkanej",
+    subcategory: "Styling",
     description: "Detailné nastavenie biomechaniky rúk pri nadvihovaní vlasov od korienkov."
   },
   {

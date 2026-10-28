@@ -15,7 +15,7 @@ export interface LuxuryEmailData {
 
 export function generateLuxuryEmailHtml(data: LuxuryEmailData): string {
   const ticketCode = data.ticketCode || 'RIC-2026-LUC-4821';
-  const seminarTitle = data.seminarTitle || 'Umenie fúkanej: Architektúra objemu & Trvácnosť';
+  const seminarTitle = data.seminarTitle || 'Architektúra objemu & Trvácnosť: Styling Masterclass';
   const seminarDates = data.seminarDates || 'Nedeľa, 15. marec 2026 (09:30 – 17:30)';
   const venue = data.venue || 'Ateliér Hair Salon Riccardo, J. Kármána 1727/30, 984 01 Lučenec';
   const customerName = data.customerName || 'Vážený zákazník';

@@ -33,7 +33,7 @@ export const AdminSeminarModal: React.FC<AdminSeminarModalProps> = ({
   const [country, setCountry] = useState('Slovensko');
   const [venue, setVenue] = useState('Atelier Hair Salon Riccardo, J. Kármána 30');
   const [dates, setDates] = useState('');
-  const [category, setCategory] = useState<Seminar['category']>('Umenie Fúkanej');
+  const [category, setCategory] = useState<Seminar['category']>('Styling');
   const [duration, setDuration] = useState('2 dni (14 hodín intenzívnej praxe)');
   const [totalSeats, setTotalSeats] = useState(6);
   const [availableSeats, setAvailableSeats] = useState(6);
@@ -42,7 +42,7 @@ export const AdminSeminarModal: React.FC<AdminSeminarModalProps> = ({
   const [learningOutcomes, setLearningOutcomes] = useState<string[]>([
     'Správna biomechanika a ergonómia rúk pri napínaní prameňa',
     'Technika fixácie vlasu studeným vzduchom pre 72-hodinovú trvácnosť',
-    'Fúkané Riccardo Glam Waves výhradne cez okrúhlu termálnu kefu bez kulmy'
+    'Styling Riccardo Glam Waves výhradne cez okrúhlu termálnu kefu bez kulmy'
   ]);
   const [tiers, setTiers] = useState<TicketTier[]>([
     {
@@ -81,7 +81,7 @@ export const AdminSeminarModal: React.FC<AdminSeminarModalProps> = ({
       setCountry('Slovensko');
       setVenue('Atelier Hair Salon Riccardo, J. Kármána 30');
       setDates('15. – 16. Február 2027');
-      setCategory('Umenie Fúkanej');
+      setCategory('Styling');
       setDuration('2 dni (14 hodín)');
       setTotalSeats(6);
       setAvailableSeats(6);
@@ -198,7 +198,7 @@ export const AdminSeminarModal: React.FC<AdminSeminarModalProps> = ({
               required
               value={title}
               onChange={(e) => setTitle(e.target.value)}
-              placeholder="napr. Umenie Fúkanej & Signature Vlny: Masterclass"
+              placeholder="napr. Signature Styling & Objem: Masterclass"
               className="w-full bg-zinc-900 border border-zinc-800 text-white p-2.5 rounded-xl focus:outline-none focus:border-zinc-500 font-medium text-sm"
             />
           </div>
@@ -212,8 +212,8 @@ export const AdminSeminarModal: React.FC<AdminSeminarModalProps> = ({
                 onChange={(e) => setCategory(e.target.value as any)}
                 className="w-full bg-zinc-900 border border-zinc-800 text-white p-2.5 rounded-xl focus:outline-none cursor-pointer"
               >
-                <option value="Umenie Fúkanej">Umenie Fúkanej</option>
-                <option value="Precízny Strih">Precízny Strih</option>
+                <option value="Styling">Styling</option>
+                <option value="Strih">Strih</option>
                 <option value="Balayage & Blond">Balayage & Blond</option>
               </select>
             </div>

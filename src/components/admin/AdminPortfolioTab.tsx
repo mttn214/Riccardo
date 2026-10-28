@@ -43,8 +43,8 @@ export const AdminPortfolioTab: React.FC = () => {
 
   const categories = [
     'Balayage & Farba',
-    'Precízne Strihy',
-    'Umenie Fúkanej & Styling',
+    'Strih',
+    'Styling',
     'Svadobné & Spoločenské',
   ];
 
@@ -140,7 +140,7 @@ export const AdminPortfolioTab: React.FC = () => {
             Galéria & Portfólio premien
           </h1>
           <p className="text-xs text-zinc-400 mt-1">
-            Spravujte fotografie účesov, techniky fúkanej, balayage receptúry a pred/po premeny.
+            Spravujte fotografie účesov, stylingové techniky, balayage receptúry a pred/po premeny.
           </p>
         </div>
 
@@ -421,7 +421,7 @@ export const AdminPortfolioTab: React.FC = () => {
                     type="text"
                     value={formTechnique}
                     onChange={(e) => setFormTechnique(e.target.value)}
-                    placeholder="napr. AirTouch, fúkaná termokefou"
+                    placeholder="napr. AirTouch, styling termokefou"
                     className="w-full bg-zinc-900 border border-zinc-800 text-white p-2.5 rounded-xl focus:outline-none focus:border-zinc-500"
                   />
                 </div>

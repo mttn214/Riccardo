@@ -48,7 +48,7 @@ export const SeminarSpotlightPhoto: React.FC<SeminarSpotlightPhotoProps> = ({
       {/* 1. Primary Action Image (Autorské dielo / Modelka) */}
       <img
         src={primaryImage}
-        alt={`${title} - Autorská technika fúkanej`}
+        alt={`${title} - Autorská technika stylingu`}
         className={`absolute inset-0 w-full h-full object-cover object-center transition-all duration-700 ease-in-out ${
           activeTab === 'action' ? 'opacity-100 scale-100 z-10' : 'opacity-0 scale-105 z-0'
         }`}

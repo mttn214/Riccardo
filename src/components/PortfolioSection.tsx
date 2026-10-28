@@ -11,8 +11,8 @@ export const PortfolioSection: React.FC<PortfolioSectionProps> = ({ onSelectItem
 
   const categories = [
     'Všetky diela',
-    'Umenie Fúkanej & Styling',
-    'Precízne Strihy',
+    'Styling',
+    'Strih',
     'Balayage & Farba'
   ];
 
