@@ -214,6 +214,14 @@ export function App() {
               />
             }
           />
+          <Route
+            path="/tvorba"
+            element={
+              <PortfolioPage
+                onSelectItem={(item) => setPortfolioItem(item)}
+              />
+            }
+          />
           <Route path="/ocenenia" element={<AwardsPage />} />
           <Route path="/referencie" element={<TestimonialsPage />} />
           <Route path="/salon" element={<ContactPage />} />
@@ -273,10 +281,6 @@ export function App() {
       <PortfolioModal
         item={portfolioItem}
         onClose={() => setPortfolioItem(null)}
-        onBookSeminar={(seminar, tierId) => {
-          setPortfolioItem(null);
-          handleOpenBooking(seminar, tierId);
-        }}
       />
     </div>
   );

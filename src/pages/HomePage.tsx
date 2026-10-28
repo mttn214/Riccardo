@@ -1,5 +1,5 @@
 import React, { useRef, useState, useEffect } from 'react';
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import { Hero } from '../components/Hero';
 import { SEMINARS_DATA, PORTFOLIO_DATA, STYLIST_PROFILE, TESTIMONIALS_DATA, TESTIMONIALS_STATS, PortfolioItem } from '../data/content';
 import { formatPrice } from '../utils/currency';
@@ -14,8 +14,10 @@ interface HomePageProps {
 }
 
 export const HomePage: React.FC<HomePageProps> = ({ onOpenBooking, onSelectPortfolioItem }) => {
+  const navigate = useNavigate();
   const featuredSeminar = SEMINARS_DATA[0];
-  const featuredPortfolio = PORTFOLIO_DATA.slice(0, 4);
+  const tickerPortfolio = PORTFOLIO_DATA.slice(0, 10);
+  const marqueePortfolio = [...tickerPortfolio, ...tickerPortfolio];
 
   // Review Slider State & Drag
   const reviewsSliderRef = useRef<HTMLDivElement>(null);
@@ -81,7 +83,7 @@ export const HomePage: React.FC<HomePageProps> = ({ onOpenBooking, onSelectPortf
           const el = document.getElementById('featured-drop');
           if (el) el.scrollIntoView({ behavior: 'smooth' });
         }}
-        onExplorePortfolio={() => {}}
+        onExplorePortfolio={() => navigate('/tvorba')}
       />
 
       {/* SECTION: The Upcoming Exclusive Masterclass Drop */}
@@ -204,48 +206,57 @@ export const HomePage: React.FC<HomePageProps> = ({ onOpenBooking, onSelectPortf
         </div>
       </section>
 
-      {/* SECTION: Lookbook Preview */}
-      <section className="py-24 sm:py-32 bg-black border-t border-zinc-900 text-white">
+      {/* SECTION: Lookbook / Tvorba Moving Gallery */}
+      <section className="py-24 sm:py-32 bg-black border-t border-zinc-900 text-white overflow-hidden">
         <div className="max-w-6xl mx-auto px-4 sm:px-6">
-          <div className="flex flex-col md:flex-row md:items-end justify-between gap-4 mb-12">
+          <div className="flex flex-col md:flex-row md:items-end justify-between gap-4 mb-10">
             <div>
               <span className="text-xs uppercase tracking-[0.2em] text-zinc-500 font-medium block mb-2">
-                Portfólio účesov
+                Tvorba účesov
               </span>
               <h2 className="text-3xl sm:text-5xl font-semibold tracking-[-0.03em] leading-tight">
                 Čisté remeslo v pohybe.
               </h2>
             </div>
             <Link
-              to="/portfolio"
+              to="/tvorba"
               className="inline-flex items-center gap-1.5 text-xs sm:text-sm text-zinc-400 hover:text-white font-medium transition-colors"
             >
-              <span>Otvoriť celé portfólio</span>
+              <span>Otvoriť celú tvorbu</span>
               <ArrowUpRight className="w-4 h-4" />
             </Link>
           </div>
+        </div>
 
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
-            {featuredPortfolio.map((item) => (
+        {/* Continuous Infinite Moving Ticker (from one side to the other) */}
+        <div className="relative w-full overflow-hidden py-4">
+          {/* Subtle Left & Right edge blur masks */}
+          <div className="pointer-events-none absolute inset-y-0 left-0 w-12 sm:w-32 bg-gradient-to-r from-black via-black/80 to-transparent z-10" />
+          <div className="pointer-events-none absolute inset-y-0 right-0 w-12 sm:w-32 bg-gradient-to-l from-black via-black/80 to-transparent z-10" />
+
+          {/* Marquee Track */}
+          <div className="animate-hair-ticker flex items-stretch gap-6 px-4 select-none">
+            {marqueePortfolio.map((item, idx) => (
               <div
-                key={item.id}
+                key={`${item.id}-${idx}`}
                 onClick={() => onSelectPortfolioItem(item)}
-                className="group cursor-pointer flex flex-col"
+                className="w-[260px] sm:w-[310px] shrink-0 group cursor-pointer flex flex-col"
               >
-                <div className="relative aspect-[4/5] w-full rounded-2xl overflow-hidden bg-zinc-900 mb-3">
+                <div className="relative aspect-[4/5] w-full rounded-2xl overflow-hidden bg-zinc-900 border border-zinc-850 group-hover:border-zinc-700 transition-all mb-3 shadow-xl">
                   <img
                     src={item.image}
                     alt={item.title}
                     className="w-full h-full object-cover object-top group-hover:scale-105 transition-transform duration-500"
+                    loading="lazy"
                   />
                   {item.hasBeforeAfter && (
-                    <div className="absolute top-3 left-3">
-                      <span className="px-2.5 py-1 rounded-full text-[10px] font-semibold bg-black/80 backdrop-blur-md text-white">
+                    <div className="absolute top-3 left-3 z-10">
+                      <span className="px-2.5 py-1 rounded-full text-[10px] font-semibold bg-black/80 backdrop-blur-md text-white border border-white/10">
                         Pred / Po
                       </span>
                     </div>
                   )}
-                  <div className="absolute bottom-3 right-3 opacity-0 group-hover:opacity-100 transition-opacity">
+                  <div className="absolute bottom-3 right-3 opacity-0 group-hover:opacity-100 transition-opacity z-10">
                     <span className="w-8 h-8 rounded-full bg-white text-black flex items-center justify-center shadow-lg">
                       <ArrowUpRight className="w-4 h-4" />
                     </span>
@@ -262,6 +273,22 @@ export const HomePage: React.FC<HomePageProps> = ({ onOpenBooking, onSelectPortf
                 </div>
               </div>
             ))}
+          </div>
+        </div>
+
+        <div className="max-w-6xl mx-auto px-4 sm:px-6">
+          <div className="mt-8 flex flex-col sm:flex-row sm:items-center justify-between gap-3 text-xs text-zinc-500 border-t border-zinc-900 pt-4">
+            <span className="flex items-center gap-2">
+              <span className="w-2 h-2 rounded-full bg-amber-400 animate-pulse" />
+              <span>Prejdite myšou pre pozastavenie pohybu a kliknite na detail účesu</span>
+            </span>
+            <Link
+              to="/tvorba"
+              className="inline-flex items-center gap-1 text-zinc-400 hover:text-white transition-colors"
+            >
+              <span>Všetky práce v ateliéri ({PORTFOLIO_DATA.length})</span>
+              <ArrowUpRight className="w-3.5 h-3.5" />
+            </Link>
           </div>
         </div>
       </section>

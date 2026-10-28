@@ -29,7 +29,7 @@ export const Navbar: React.FC<NavbarProps> = ({ onOpenBooking }) => {
   const navLinks = [
     { label: 'Domov', href: '/' },
     { label: 'Semináre', href: '/seminare' },
-    { label: 'Portfólio', href: '/portfolio' },
+    { label: 'Tvorba', href: '/tvorba' },
     { label: 'Ocenenia', href: '/ocenenia' },
     { label: 'Referencie', href: '/referencie' },
     { label: 'Salón', href: '/salon' },

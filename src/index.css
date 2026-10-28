@@ -268,3 +268,27 @@ body.admin-light-mode ::selection {
   border: 1px solid rgba(0, 0, 0, 0.08) !important;
   box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.15) !important;
 }
+
+/* ==========================================================================
+   HAIR CREATION TICKER ANIMATION (HOMEPAGE MINI GALLERY)
+   ========================================================================== */
+@keyframes hairTicker {
+  0% {
+    transform: translate3d(0, 0, 0);
+  }
+  100% {
+    transform: translate3d(-50%, 0, 0);
+  }
+}
+
+.animate-hair-ticker {
+  display: flex;
+  width: max-content;
+  animation: hairTicker 42s linear infinite;
+  will-change: transform;
+}
+
+.animate-hair-ticker:hover,
+.animate-hair-ticker:active {
+  animation-play-state: paused;
+}

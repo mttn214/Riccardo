@@ -86,7 +86,7 @@ export const Footer: React.FC = () => {
             </span>
             <ul className="space-y-2">
               <li><Link to="/seminare" className="hover:text-white transition-colors">Termíny seminárov</Link></li>
-              <li><Link to="/portfolio" className="hover:text-white transition-colors">Portfólio</Link></li>
+              <li><Link to="/tvorba" className="hover:text-white transition-colors">Tvorba</Link></li>
               <li><Link to="/ocenenia" className="hover:text-white transition-colors">Ocenenia</Link></li>
               <li><Link to="/referencie" className="hover:text-white transition-colors">Hodnotenia</Link></li>
               <li><Link to="/salon" className="hover:text-white transition-colors">Salón Lučenec</Link></li>

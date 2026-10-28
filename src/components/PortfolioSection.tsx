@@ -28,17 +28,17 @@ export const PortfolioSection: React.FC<PortfolioSectionProps> = ({ onSelectItem
         <div className="max-w-2xl mb-12">
           <div className="flex flex-wrap items-center gap-2 mb-2">
             <span className="text-xs uppercase tracking-[0.2em] text-zinc-500 font-medium">
-              Autentická Tvorba & Diela
+              Autentická Tvorba
             </span>
             <span className="text-[10px] uppercase tracking-wider px-2.5 py-0.5 rounded-full bg-zinc-900 border border-zinc-800 text-zinc-300 font-medium">
               100% Autentické fotografie • Bez AI
             </span>
           </div>
           <h2 className="text-3xl sm:text-5xl font-semibold tracking-[-0.03em] leading-tight mb-4">
-            Galéria prác a kolekcií.
+            Tvorba
           </h2>
           <p className="text-sm sm:text-base text-zinc-400 font-normal leading-relaxed">
-            Výhradne originálne fotografie diel Richarda Čonku vrátane ocenených kolekcií z Czech & Slovak Hairdressing Awards v Prahe. Kliknutím zobrazíte detail, použité techniky a ocenenia.
+            Galéria účesov, premien a ocenených autorských kolekcií Richarda Čonku z Czech & Slovak Hairdressing Awards. Kliknutím na ktorýkoľvek účes zobrazíte jeho detail, stylingové postupy a použité techniky.
           </p>
         </div>
 
