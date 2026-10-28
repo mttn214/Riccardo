@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { Routes, Route, Navigate, useLocation } from 'react-router-dom';
 import { Seminar, PortfolioItem, SEMINARS_DATA, STYLIST_PROFILE } from './data/content';
+import { adminStore } from './services/adminStore';
 import { Navbar } from './components/Navbar';
 import { Footer } from './components/Footer';
 import { ScrollToTop } from './components/ScrollToTop';
@@ -64,7 +65,7 @@ export function App() {
           const customerName = savedForm.fullName || 'Vážený zákazník';
           const customerEmail = savedForm.email || '';
           const customerPhone = savedForm.phone || '';
-          const ticketCode = bookingData?.randomTicketId || `RIC-${seminar.city.slice(0, 3).toUpperCase()}-${Math.floor(1000 + Math.random() * 9000)}`;
+          const ticketCode = bookingData?.randomTicketId || adminStore.generateTicketCode(seminar.city);
 
           await sendFormNotification({
             formType: 'Rezervácia seminára',
@@ -119,7 +120,7 @@ export function App() {
           const customerName = savedForm.fullName || res.customerName || 'Vážený zákazník';
           const customerEmail = savedForm.email || res.customerEmail || '';
           const customerPhone = savedForm.phone || '';
-          const ticketCode = bookingData?.randomTicketId || `RIC-${seminar.city.slice(0, 3).toUpperCase()}-${Math.floor(1000 + Math.random() * 9000)}`;
+          const ticketCode = bookingData?.randomTicketId || adminStore.generateTicketCode(seminar.city);
 
           await sendFormNotification({
             formType: 'Rezervácia seminára',

@@ -1164,6 +1164,15 @@ class AdminStore {
     this.notify();
   }
 
+  public generateTicketCode(city?: string): string {
+    const settings = this.getSettings();
+    const rawPrefix = (settings.invoicePrefix || 'RIC-2026-').trim();
+    const cityCode = (city || 'LUC').slice(0, 3).toUpperCase();
+    const rand = Math.floor(1000 + Math.random() * 9000);
+    const prefix = rawPrefix.endsWith('-') ? rawPrefix : `${rawPrefix}-`;
+    return `${prefix}${cityCode}-${rand}`;
+  }
+
   public getStripeConfig(): { mode: 'live'; publishableKey: string; secretKey: string } {
     const s = this.getSettings();
     const defaultLivePk = 'pk_live_51UQoDZHAmh46e1VBb3RxsHk6XPTQg6ttug0vwDCux9p7Bxgva79oiJm2gvsUNzJfCPEMaoc9bb0MC0HEbhyjzixa008QwAoWJr';

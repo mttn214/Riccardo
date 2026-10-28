@@ -211,7 +211,7 @@ export const ReservationModal: React.FC<ReservationModalProps> = ({
     }
     setPaymentStatusText('Odosielam záväznú rezerváciu a vystavujem vstupenku...');
     
-    const randomId = `RIC-${selectedSeminar.city.slice(0, 3).toUpperCase()}-${Math.floor(1000 + Math.random() * 9000)}`;
+    const randomId = adminStore.generateTicketCode(selectedSeminar.city);
     setConfirmationCode(randomId);
 
     await sendFormNotification({

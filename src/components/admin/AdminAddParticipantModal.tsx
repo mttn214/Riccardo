@@ -69,7 +69,7 @@ export const AdminAddParticipantModal: React.FC<AdminAddParticipantModalProps> =
     if (!fullName.trim() || !email.trim() || !seminarId) return;
 
     const remaining = Math.max(0, currentTier.priceEUR - Number(amountPaidEUR));
-    const randomTicket = `RIC-${(currentSeminar.city || 'LUC').slice(0, 3).toUpperCase()}-${Math.floor(1000 + Math.random() * 9000)}`;
+    const randomTicket = store.generateTicketCode(currentSeminar.city);
 
     const paymentStatus: Participant['paymentStatus'] =
       Number(amountPaidEUR) >= currentTier.priceEUR

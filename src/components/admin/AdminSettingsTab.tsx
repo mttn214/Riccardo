@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useAdminStore } from '../../hooks/useAdminStore';
 import { COMPANY_DETAILS } from '../../data/content';
 import {
@@ -99,6 +99,13 @@ export const AdminSettingsTab: React.FC = () => {
     'Dodávateľ nie je platiteľom DPH podľa § 4 zákona o DPH. Úhrada za účasť na odbornom kaderníckom seminári Hair Salon Riccardo & Academy.'
   );
   const [billingSuccess, setBillingSuccess] = useState(false);
+
+  // Synchronize local states when settings change in store
+  useEffect(() => {
+    if (settings.invoicePrefix && settings.invoicePrefix !== invoicePrefix) {
+      setInvoicePrefix(settings.invoicePrefix);
+    }
+  }, [settings.invoicePrefix]);
 
   // 7. Security & Session state
   const [timeoutMinutes, setTimeoutMinutes] = useState(settings.sessionTimeoutMinutes);
@@ -207,17 +214,18 @@ export const AdminSettingsTab: React.FC = () => {
 
   const handleSaveBilling = (e: React.FormEvent) => {
     e.preventDefault();
+    const current = store.getSettings();
     store.saveSettings(
       {
-        ...settings,
-        invoicePrefix,
+        ...current,
+        invoicePrefix: invoicePrefix.trim(),
         currency,
         invoiceDueDays: Number(invoiceDueDays),
         showIbanOnReceipts,
         invoiceNoteText
       },
       'Aktualizácia fakturačných nastavení',
-      `Predčíslie: ${invoicePrefix}, Splatnosť: ${invoiceDueDays} dní`
+      `Predčíslie: ${invoicePrefix.trim()}, Splatnosť: ${invoiceDueDays} dní`
     );
     setBillingSuccess(true);
     setTimeout(() => setBillingSuccess(false), 3000);
@@ -957,10 +965,30 @@ export const AdminSettingsTab: React.FC = () => {
                   type="text"
                   value={invoicePrefix}
                   onChange={(e) => setInvoicePrefix(e.target.value)}
+                  onBlur={() => {
+                    const current = store.getSettings();
+                    if (invoicePrefix.trim() && current.invoicePrefix !== invoicePrefix.trim()) {
+                      store.saveSettings(
+                        {
+                          ...current,
+                          invoicePrefix: invoicePrefix.trim()
+                        },
+                        'Automatické uloženie predčíslia',
+                        `Nové predčíslie: ${invoicePrefix.trim()}`
+                      );
+                      setBillingSuccess(true);
+                      setTimeout(() => setBillingSuccess(false), 2500);
+                    }
+                  }}
                   placeholder="RIC-2026-"
-                  className="w-full bg-zinc-950/80 text-white p-3 rounded-xl border-0 focus:ring-1 focus:ring-white/20 text-xs outline-none font-mono"
+                  className="w-full bg-zinc-950/80 text-white p-3 rounded-xl border border-zinc-800 focus:border-zinc-500 text-xs outline-none font-mono transition-colors"
                 />
-                <span className="text-[10px] text-zinc-500 block">Napr. RIC-2026-001, RIC-2026-002.</span>
+                <div className="flex items-center gap-1.5 text-[11px] font-mono mt-1">
+                  <span className="text-zinc-500">Náhľad kódu dokladu:</span>
+                  <span className="font-semibold bg-emerald-950/60 text-emerald-300 px-2 py-0.5 rounded border border-emerald-500/30">
+                    {invoicePrefix.trim() ? (invoicePrefix.trim().endsWith('-') ? `${invoicePrefix.trim()}LUC-4821` : `${invoicePrefix.trim()}-LUC-4821`) : 'RIC-2026-LUC-4821'}
+                  </span>
+                </div>
               </div>
 
               <div className="space-y-1">
