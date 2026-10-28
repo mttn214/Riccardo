@@ -147,7 +147,7 @@ export const SEMINARS_DATA: Seminar[] = [
     duration: "2 dni (14 hodín intenzívnej praxe)",
     totalSeats: 6,
     availableSeats: 2,
-    image: "/images/riccardo/gallery/riccardo_art_23.jpg",
+    image: "/images/riccardo/gallery/riccardo_art_58.jpg",
     description: "Vlajkový autorský masterclass Richarda Čonku. Komorná skupina maximálne 6 kaderníkov pre garanciu osobnej korekcie každého ťahu kefou. Získate kontrolu nad dynamikou tepla, nadvihnutím od korienkov a zrkadlovo hladkým pohybom bez krepovatenia.",
     learningOutcomes: [
       "Správna biomechanika a ergonómia rúk pri napínaní prameňa",
@@ -257,7 +257,7 @@ export const SEMINARS_DATA: Seminar[] = [
     duration: "2 dni (16 hodín)",
     totalSeats: 6,
     availableSeats: 1,
-    image: "/images/riccardo/gallery/riccardo_art_40.jpg",
+    image: "/images/riccardo/gallery/riccardo_art_66.jpg",
     description: "Najžiadanejšie salónne techniky zosvetľovania: bezchybný AirTouch, plynulé prechody bez 'schodov' a tónovacie receptúry na čistú chladnú i kašmírovú blond s nulovým poškodením vlasu.",
     learningOutcomes: [
       "AirTouch separácia pre 6-mesačný bezúdržbový odrast",
@@ -863,6 +863,6 @@ export const PAST_SOLD_OUT_SEMINARS = [
     soldOutTime: "Vypredané za 6 hodín",
     attendeesFrom: ["Trnava", "Nitra", "Poprad", "Bratislava"],
     rating: "Hodnotenie 5.0 (6/6 odporúčaní)",
-    image: "/images/riccardo/gallery/riccardo_art_58.jpg"
+    image: "/images/riccardo/gallery/riccardo_art_25.jpg"
   }
 ];

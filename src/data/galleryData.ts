@@ -11,11 +11,11 @@ export interface GalleryPhoto {
 export const SEMINAR_GALLERY_PHOTOS: GalleryPhoto[] = [
   {
     id: "sem-gal-1",
-    image: "/images/riccardo/gallery/riccardo_art_58.jpg",
-    title: "Akadémia Hair Salon Riccardo Lučenec",
+    image: "/images/riccardo/gallery/riccardo_art_06.jpg",
+    title: "Ateliérový styling a osobná konzultácia",
     category: "Školenia",
     subcategory: "Akadémia Lučenec",
-    description: "Školiaca miestnosť v materskom ateliéri v Lučenci. Účastníci seminára, Richard Čonka a profesionálne cvičné hlavy."
+    description: "Richard Čonka pri precíznej úprave vlasov a individuálnom prístupe k forme účesu v salóne v Lučenci."
   },
   {
     id: "sem-gal-2",
@@ -43,11 +43,11 @@ export const SEMINAR_GALLERY_PHOTOS: GalleryPhoto[] = [
   },
   {
     id: "sem-gal-5",
-    image: "/images/riccardo/gallery/riccardo_art_23.jpg",
-    title: "Dynamika tepla a fúkaná na scéne",
+    image: "/images/riccardo/gallery/riccardo_art_64.jpg",
+    title: "Pódiový styling a tvarovanie objemu",
     category: "Školenia",
     subcategory: "Umenie fúkanej",
-    description: "Práca s termálnou kefou a fénom pre vytvorenie ikonického objemu a zrkadlového lesku."
+    description: "Práca na scéne pred publikom kaderníkov – vytvorenie ikonického objemu a zrkadlového lesku."
   },
   {
     id: "sem-gal-6",

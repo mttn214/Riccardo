@@ -106,13 +106,13 @@ export const HomePage: React.FC<HomePageProps> = ({ onOpenBooking, onSelectPortf
 
           {/* Spotlight Card */}
           {featuredSeminar && (
-            <div className="rounded-3xl bg-zinc-950 overflow-hidden shadow-2xl">
+            <div className="rounded-3xl bg-zinc-950 border border-zinc-800/80 overflow-hidden shadow-2xl">
               <div className="grid grid-cols-1 lg:grid-cols-12">
-                <div className="lg:col-span-5 relative min-h-[320px] bg-zinc-900 overflow-hidden">
+                <div className="lg:col-span-5 relative min-h-[340px] sm:min-h-[400px] bg-zinc-900 overflow-hidden">
                   <img
                     src={featuredSeminar.image}
                     alt={featuredSeminar.title}
-                    className="w-full h-full object-cover object-top filter brightness-[0.85] contrast-[1.05]"
+                    className="w-full h-full object-cover object-center transition-transform duration-700 hover:scale-105"
                   />
                   <div className="absolute top-4 left-4">
                     <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-black/80 backdrop-blur-md text-[11px] font-medium text-white shadow-lg">

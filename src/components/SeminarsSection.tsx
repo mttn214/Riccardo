@@ -60,15 +60,15 @@ export const SeminarsSection: React.FC<SeminarsSectionProps> = ({
 
         {/* FEATURED IMMINENT MASTERCLASS (Editorial Spotlight Card) */}
         {featuredSeminar && (
-          <div className="mb-16 rounded-3xl bg-zinc-950 overflow-hidden shadow-2xl relative">
+          <div className="mb-16 rounded-3xl bg-zinc-950 border border-zinc-800/80 overflow-hidden shadow-2xl relative">
             <div className="grid grid-cols-1 lg:grid-cols-12">
               
               {/* Photo Side (5 cols) */}
-              <div className="lg:col-span-5 relative min-h-[300px] lg:min-h-full bg-zinc-900 overflow-hidden">
+              <div className="lg:col-span-5 relative min-h-[320px] lg:min-h-full bg-zinc-900 overflow-hidden">
                 <img
                   src={featuredSeminar.image}
                   alt={featuredSeminar.title}
-                  className="w-full h-full object-cover object-top filter brightness-[0.85] contrast-[1.05]"
+                  className="w-full h-full object-cover object-center transition-transform duration-700 hover:scale-105"
                 />
                 <div className="absolute inset-0 bg-gradient-to-t from-zinc-950 via-transparent to-transparent lg:hidden" />
                 
