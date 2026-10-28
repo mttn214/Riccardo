@@ -78,6 +78,14 @@ export const AdminLogin: React.FC<AdminLoginProps> = ({ onLoginSuccess }) => {
       <div className="w-full max-w-md relative z-10 space-y-6">
         {/* Brand header */}
         <div className="text-center space-y-2">
+          <div className="flex justify-center mb-3">
+            <img
+              src="/images/riccardo/official_logo_square.png"
+              alt="Hair Salon Riccardo"
+              className="w-16 h-16 rounded-full object-contain bg-white p-1 border border-zinc-700/80 shadow-2xl"
+            />
+          </div>
+
           <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-zinc-900 text-[11px] font-mono tracking-wider uppercase text-zinc-400 mb-2">
             <ShieldCheck className="w-3.5 h-3.5 text-emerald-400" />
             <span>Zabezpečený prístup</span>

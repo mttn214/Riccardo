@@ -530,7 +530,7 @@ export const HomePage: React.FC<HomePageProps> = ({ onOpenBooking, onSelectPortf
                 src="/images/riccardo/salon_house.jpg"
                 alt="Hair Salon Riccardo - Ateliér a dom na J. Kármána 30 v Lučenci"
                 onError={(e) => {
-                  (e.target as HTMLImageElement).src = '/images/riccardo/salon_logo_wall.jpg';
+                  (e.target as HTMLImageElement).src = '/images/riccardo/official_logo_square.png';
                 }}
                 className="absolute inset-0 w-full h-full object-cover transition-transform duration-700 group-hover:scale-105"
               />

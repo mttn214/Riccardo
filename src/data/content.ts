@@ -89,7 +89,7 @@ export const STYLIST_PROFILE = {
   heroImage: "/images/riccardo/richard_conka_hda_1.jpg",
   stageImage: "/images/riccardo/richard_conka_stage_award.jpg",
   winnersGroupImage: "/images/riccardo/hda_winners_group_hires.jpg",
-  logoImage: "/images/riccardo/salon_logo_wall.jpg",
+  logoImage: "/images/riccardo/official_logo_square.png",
   portraitImage: "/images/riccardo/richard_conka_hda_1.jpg",
   stats: [
     { label: "Rokov skúseností", value: "14+" },
@@ -394,7 +394,7 @@ export const AWARDS_DATA: Award[] = [
     location: "Slovensko",
     status: "Čestné uznanie",
     citation: "Hair Salon Riccardo v Lučenci je aktívnym partnerským salónom, ktorý bezplatne strihá a odovzdáva vlasy pre výrobu parochní pre onkologické pacientky.",
-    image: "/images/riccardo/salon_logo_wall.jpg",
+    image: "/images/riccardo/official_logo_square.png",
     badgeIcon: "Heart"
   },
   {

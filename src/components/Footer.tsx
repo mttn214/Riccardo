@@ -39,8 +39,15 @@ export const Footer: React.FC = () => {
           
           {/* Brand Info (4 cols) */}
           <div className="md:col-span-4 space-y-4">
-            <Link to="/" className="font-semibold tracking-[0.2em] text-white uppercase text-sm block">
-              RICCARDO
+            <Link to="/" className="inline-flex items-center gap-3 group">
+              <img
+                src="/images/riccardo/official_logo_square.png"
+                alt="Hair Salon Riccardo"
+                className="w-9 h-9 rounded-full object-contain bg-white p-0.5 border border-zinc-800 group-hover:border-zinc-600 transition-colors"
+              />
+              <span className="font-semibold tracking-[0.2em] text-white uppercase text-sm block">
+                RICCARDO
+              </span>
             </Link>
             <p className="text-zinc-400 text-xs leading-relaxed max-w-sm">
               Autorské vzdelávanie kaderníkov a salónna tvorba.

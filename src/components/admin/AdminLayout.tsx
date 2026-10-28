@@ -109,17 +109,29 @@ export const AdminLayout: React.FC = () => {
       <aside className="hidden lg:flex flex-col justify-between w-64 bg-zinc-950/90 p-5 shrink-0 h-screen sticky top-0">
         <div className="space-y-6">
           {/* Logo & Brand */}
-          <div className="space-y-1">
+          <div className="space-y-3">
             <div className="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full bg-white/[0.06] text-[10px] font-mono uppercase text-emerald-400">
               <ShieldCheck className="w-3 h-3" />
               <span>Admin Portál</span>
             </div>
-            <h2 className="text-sm font-semibold tracking-tight text-white uppercase block pt-1">
-              HAIR SALON <span className="font-extrabold">RICCARDO</span>
-            </h2>
-            <p className="text-[10px] text-zinc-500 font-mono">
-              {COMPANY_DETAILS.legalName}
-            </p>
+            <div className="flex items-center gap-3 pt-0.5">
+              <img
+                src="/images/riccardo/official_logo_square.png"
+                alt="Hair Salon Riccardo"
+                className="w-10 h-10 rounded-full object-contain bg-white p-0.5 border border-zinc-700/80 shadow-md shrink-0"
+              />
+              <div className="min-w-0">
+                <h2 className="text-xs font-bold tracking-wider text-white uppercase block leading-tight truncate">
+                  RICCARDO
+                </h2>
+                <p className="text-[10px] text-zinc-400 truncate">
+                  Hair Salon & Academy
+                </p>
+                <p className="text-[9px] text-zinc-500 font-mono truncate">
+                  {COMPANY_DETAILS.legalName}
+                </p>
+              </div>
+            </div>
           </div>
 
           {/* Navigation Items */}

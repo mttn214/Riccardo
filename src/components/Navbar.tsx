@@ -75,9 +75,9 @@ export const Navbar: React.FC<NavbarProps> = ({ onOpenBooking }) => {
           {/* Brand Logo */}
           <Link to="/" className="flex items-center gap-2.5 group">
             <img
-              src="/images/riccardo/salon_logo_wall.jpg"
+              src="/images/riccardo/official_logo_square.png"
               alt="Hair Salon Riccardo"
-              className="w-7 h-7 rounded-full object-cover border border-zinc-700/80 filter brightness-[1.1] contrast-[1.1] group-hover:border-zinc-500 transition-colors"
+              className="w-8 h-8 rounded-full object-contain bg-white p-0.5 border border-zinc-700/80 group-hover:border-zinc-400 transition-colors shadow-sm"
             />
             <span className="font-semibold tracking-[0.2em] text-white text-sm uppercase">
               RICCARDO
