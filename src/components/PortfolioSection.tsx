@@ -72,7 +72,7 @@ export const PortfolioSection: React.FC<PortfolioSectionProps> = ({ onSelectItem
                 <img
                   src={item.image}
                   alt={item.title}
-                  className="w-full h-full object-cover object-top group-hover:scale-105 transition-transform duration-500 filter brightness-[0.92]"
+                  className="w-full h-full object-cover object-top group-hover:scale-105 transition-transform duration-500"
                 />
                 
                 {item.hasBeforeAfter && (

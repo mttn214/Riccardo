@@ -120,15 +120,14 @@ export const PortfolioModal: React.FC<PortfolioModalProps> = ({
               </div>
             </div>
           ) : (
-            <div className="relative w-full h-[52vh] sm:h-[62vh] bg-black flex items-center justify-center overflow-hidden">
+            <div className="relative w-full h-[54vh] sm:h-[64vh] bg-black flex items-center justify-center overflow-hidden p-3 sm:p-6">
               {/* Volumetric ambient glow */}
               <div
-                className="absolute inset-0 bg-cover bg-top filter blur-3xl opacity-20 scale-125 pointer-events-none"
+                className="absolute inset-0 bg-cover bg-center filter blur-3xl opacity-15 scale-125 pointer-events-none"
                 style={{ backgroundImage: `url(${item.image})` }}
               />
-              <div className="absolute inset-0 bg-gradient-to-t from-zinc-950 via-transparent to-black/60 pointer-events-none z-10" />
 
-              {/* Full photo */}
+              {/* Full photo - uncropped, complete hairstyle and face visible */}
               <img
                 src={item.image}
                 alt={item.title}
