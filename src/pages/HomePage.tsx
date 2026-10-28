@@ -313,14 +313,14 @@ export const HomePage: React.FC<HomePageProps> = ({ onOpenBooking, onSelectPortf
                     subtitle: 'Richard Čonka s víťaznou soškou kaderníckych Oskarov'
                   },
                   {
-                    img: '/images/riccardo/salon_gallery/salon_photo_41.jpg',
+                    img: '/images/riccardo/gallery/riccardo_art_12.jpg',
                     title: 'Červený koberec & Galavečer',
-                    subtitle: 'Richard Čonka a prehliadkový tím na červenom koberci'
+                    subtitle: 'Richard Čonka a prehliadkový tím s modelkami'
                   },
                   {
-                    img: '/images/riccardo/salon_gallery/salon_photo_48.jpg',
+                    img: '/images/riccardo/gallery/riccardo_art_34.jpg',
                     title: 'Finále módnej galashow',
-                    subtitle: 'Couture večerné róby a autorský styling na javisku'
+                    subtitle: 'Couture róby a autorský styling na javisku'
                   }
                 ].map((item, idx) => (
                   <div key={idx} className="group relative aspect-[16/10] rounded-2xl overflow-hidden bg-zinc-900 border border-zinc-800">

@@ -104,7 +104,7 @@ export const AwardsSection: React.FC = () => {
         </div>
 
         {/* Minimalist Accolades List (Birne.sk style) */}
-        <div className="divide-y divide-zinc-850 border-y border-zinc-850">
+        <div className="divide-y divide-zinc-850 border-y border-zinc-850 mb-20">
           {AWARDS_DATA.map((award) => (
             <div
               key={award.id}
@@ -135,6 +135,54 @@ export const AwardsSection: React.FC = () => {
               </div>
             </div>
           ))}
+        </div>
+
+        {/* Gala & Competition Authentic Gallery */}
+        <div className="mb-20">
+          <div className="flex flex-wrap items-center gap-2 mb-2">
+            <span className="text-xs uppercase tracking-[0.2em] text-zinc-500 font-medium">
+              Vizuálny archív úspechov
+            </span>
+            <span className="text-[10px] uppercase tracking-wider px-2.5 py-0.5 rounded-full bg-zinc-900 border border-zinc-800 text-zinc-300 font-medium">
+              Galavečery & Červený koberec
+            </span>
+          </div>
+          <h3 className="text-2xl sm:text-4xl font-semibold tracking-[-0.03em] leading-tight mb-4">
+            Pódium, galashow a atmosféra víťazstiev.
+          </h3>
+          <p className="text-xs sm:text-sm text-zinc-400 font-normal leading-relaxed mb-8 max-w-2xl">
+            Originálne fotografie zo slávnostných odovzdávaní ocenení, módnych galaprehliadok a červeného koberca s autorským stylingom tímu Hair Salon Riccardo.
+          </p>
+
+          <div className="grid grid-cols-2 sm:grid-cols-4 gap-4">
+            {[
+              { img: '/images/riccardo/gallery/riccardo_art_12.jpg', title: 'Červený koberec galavečera', subtitle: 'Tím salónu a modelky' },
+              { img: '/images/riccardo/gallery/riccardo_art_34.jpg', title: 'Finále galashow', subtitle: 'Veľkolepé pódium' },
+              { img: '/images/riccardo/gallery/riccardo_art_69.jpg', title: 'MATRIX Hair Cup', subtitle: 'Súťažná prezentácia' },
+              { img: '/images/riccardo/gallery/riccardo_art_77.jpg', title: 'Schwarzkopf Professional', subtitle: 'Kampaň s Richardom Čonkom' },
+              { img: '/images/riccardo/gallery/riccardo_art_31.jpg', title: 'Prehliadková scéna', subtitle: 'Richard Čonka v obleku' },
+              { img: '/images/riccardo/gallery/riccardo_art_14.jpg', title: 'Ceremoniál ocenení', subtitle: 'Slávnostný tím' },
+              { img: '/images/riccardo/gallery/riccardo_art_10.jpg', title: 'Haute Coiffure detail', subtitle: 'Umelecká skulptúra' },
+              { img: '/images/riccardo/gallery/riccardo_art_08.jpg', title: 'Couture backstage', subtitle: 'Finálny styling róby' },
+            ].map((item, idx) => (
+              <div key={idx} className="group relative aspect-[3/4] rounded-2xl overflow-hidden bg-zinc-950 border border-zinc-850 hover:border-zinc-700 transition-all">
+                <img
+                  src={item.img}
+                  alt={item.title}
+                  className="w-full h-full object-cover filter brightness-[0.88] contrast-[1.05] group-hover:scale-105 transition-transform duration-500"
+                />
+                <div className="absolute inset-0 bg-gradient-to-t from-black/90 via-black/20 to-transparent pointer-events-none" />
+                <div className="absolute bottom-3 left-3 right-3">
+                  <span className="text-xs font-semibold text-white block truncate">
+                    {item.title}
+                  </span>
+                  <span className="text-[10px] text-zinc-400 block truncate font-mono">
+                    {item.subtitle}
+                  </span>
+                </div>
+              </div>
+            ))}
+          </div>
         </div>
 
         {/* Quote Block (Understated, clean) */}

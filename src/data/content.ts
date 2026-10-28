@@ -86,11 +86,11 @@ export const STYLIST_PROFILE = {
   bioHeadline: "Vášeň pre dokonalú fúkanú, geometriu strihu a žiarivé farby.",
   bioDescription: "Richard Čonka (Riccardo) je uznávaný slovenský hairstylist, zakladateľ prestížneho Hair Salon Riccardo v Lučenci a nositeľ ocenenia Cena verejnosti SR na prestížnych Czech & Slovak Hairdressing Awards (kaderníckych Oskaroch v Prahe). Svojou ikonickou vzdelávacou sériou 'Umenie fúkanej' a majstrovskými seminármi inšpiruje kaderníkov po celom Slovensku a Česku.",
   quote: "Vlasy nie sú len práca, sú architektúra v pohybe. Správna technika fúkanej a precízny strih dajú žene sebavedomie, ktoré zmení celú jej auru.",
-  heroImage: "/images/riccardo/salon_gallery/salon_photo_09.jpg",
+  heroImage: "/images/riccardo/gallery/riccardo_art_56.jpg",
   stageImage: "/images/riccardo/richard_conka_stage_award.jpg",
   winnersGroupImage: "/images/riccardo/hda_winners_group_hires.jpg",
   logoImage: "/images/riccardo/official_logo_square.png",
-  portraitImage: "/images/riccardo/salon_gallery/salon_photo_10.jpg",
+  portraitImage: "/images/riccardo/gallery/riccardo_art_37.jpg",
   stats: [
     { label: "Rokov skúseností", value: "14+" },
     { label: "Vyškolených kaderníkov", value: "1,200+" },
@@ -147,7 +147,7 @@ export const SEMINARS_DATA: Seminar[] = [
     duration: "2 dni (14 hodín intenzívnej praxe)",
     totalSeats: 6,
     availableSeats: 2,
-    image: "/images/riccardo/salon_gallery/salon_photo_40.jpg",
+    image: "/images/riccardo/gallery/riccardo_art_23.jpg",
     description: "Vlajkový autorský masterclass Richarda Čonku. Komorná skupina maximálne 6 kaderníkov pre garanciu osobnej korekcie každého ťahu kefou. Získate kontrolu nad dynamikou tepla, nadvihnutím od korienkov a zrkadlovo hladkým pohybom bez krepovatenia.",
     learningOutcomes: [
       "Správna biomechanika a ergonómia rúk pri napínaní prameňa",
@@ -203,7 +203,7 @@ export const SEMINARS_DATA: Seminar[] = [
     duration: "2 dni (16 hodín)",
     totalSeats: 6,
     availableSeats: 3,
-    image: "/images/riccardo/salon_gallery/salon_photo_16.jpg",
+    image: "/images/riccardo/gallery/riccardo_art_19.jpg",
     description: "Autorský strihací masterclass zameraný na techniky, ktoré Richardovi priniesli víťazstvo na Czech & Slovak Hairdressing Awards. Mikrobob, odľahčenie hmoty na zátylku a čisté línie, ktoré klientke držia tvar 10 týždňov.",
     learningOutcomes: [
       "Anatomické sekcionovanie hlavy pre prirodzený pád vlasov",
@@ -257,7 +257,7 @@ export const SEMINARS_DATA: Seminar[] = [
     duration: "2 dni (16 hodín)",
     totalSeats: 6,
     availableSeats: 1,
-    image: "/images/riccardo/salon_gallery/salon_photo_02.jpg",
+    image: "/images/riccardo/gallery/riccardo_art_40.jpg",
     description: "Najžiadanejšie salónne techniky zosvetľovania: bezchybný AirTouch, plynulé prechody bez 'schodov' a tónovacie receptúry na čistú chladnú i kašmírovú blond s nulovým poškodením vlasu.",
     learningOutcomes: [
       "AirTouch separácia pre 6-mesačný bezúdržbový odrast",
@@ -349,85 +349,115 @@ export const SEMINARS_DATA: Seminar[] = [
 
 export const PORTFOLIO_DATA: PortfolioItem[] = [
   {
-    id: "port-folklore",
-    title: "Žitná Symfónia",
-    category: "Precízne Strihy",
-    year: "2023",
-    collection: "Víťazná kolekcia Czech & Slovak Hairdressing Awards (Praha)",
-    image: "/images/riccardo/salon_gallery/salon_photo_23.jpg",
-    description: "Ikonické súťažné dielo Richarda Čonku z víťaznej kolekcie Czech & Slovak Hairdressing Awards 2023. Skulpturálny pletený účes harmonicky prepájajúci organické folklórne prvky s modernou geometriou strihu.",
-    technique: "3D štruktúrované pletenie s variabilnou tenziou, fixácia bez krepovatenia a integrácia prírodných materiálov.",
-    toolsUsed: "Modelovacia pasta s matným finišom, suchý púdrový sprej, mikro-vlásenky.",
-    awardsWon: "Víťaz: Cena verejnosti SR (Czech & Slovak Hairdressing Awards 2023)"
-  },
-  {
     id: "port-glamour-waves",
     title: "Hollywood Glamour Waves",
     category: "Umenie Fúkanej & Styling",
     year: "2024",
     collection: "Salónna tvorba & Red Carpet",
-    image: "/images/riccardo/salon_gallery/salon_photo_08.jpg",
-    description: "Ikonické hollywoodske vlny fúkané výhradne cez okrúhlu termálnu kefu bez použitia kulmy. Dokonalé prepojenie lesku, objemu a hodvábneho pohybu vlasov.",
+    image: "/images/riccardo/gallery/riccardo_art_71.jpg",
+    description: "Ikonické hollywoodske vlny fúkané výhradne cez okrúhlu termálnu kefu bez použitia kulmy. Dokonalé prepojenie zrkadlového lesku, vzdušného objemu a hodvábneho pohybu vlasov.",
     technique: "Smerové napínanie prameňov pod 90-stupňovým uhlom, tepelná pamäť vlasu a fixácia chladným prúdom vzduchu.",
     toolsUsed: "Termálna keramická kefa Riccardo, iontový fén, leskový sprej s mikročasticami.",
     awardsWon: "Podpisová technika masterclassu Umenie fúkanej"
   },
   {
-    id: "port-sculptural",
-    title: "Sculptural Haute Coiffure",
-    category: "Umenie Fúkanej & Styling",
-    year: "2023",
-    collection: "Editorial & Avant-Garde",
-    image: "/images/riccardo/salon_gallery/salon_photo_03.jpg",
-    description: "Vysoko estetický skulpturálny výčes s precíznou architektúrou objemu. Tvorba spájajúca prvky módneho editoriálu a vysokej kaderníckej školy.",
-    technique: "Vnútorná mikroskopická stavba účesu, geometrické ukladanie vĺn a čisté kontúry lemujúce tvár.",
-    toolsUsed: "Karbónový hrebienok na tupírovanie, elastický lak so silnou fixáciou.",
-    awardsWon: "Finalista súťažných editoriálov"
-  },
-  {
-    id: "port-platinum-pixie",
+    id: "port-pixie-precision",
     title: "Platinum Pixie Precision",
     category: "Precízne Strihy",
     year: "2024",
     collection: "Geometrické krátke strihy",
-    image: "/images/riccardo/salon_gallery/salon_photo_05.jpg",
-    description: "Čistý platinový pixie strih s precízne odľahčeným zátylkom a textúrovanou vrchnou partiou. Strih, ktorý drží svoj dokonalý tvar týždne po návšteve salónu.",
-    technique: "Kombinácia nožníc a britvy na mokrých i suchých vlasoch, personalizácia kontúr podľa kostnej štruktúry.",
-    toolsUsed: "Japonské ergonomické nožnice, zmatňujúca hlina s flexibilnou fixáciou."
+    image: "/images/riccardo/gallery/riccardo_art_39.jpg",
+    description: "Čistý platinový pixie strih s precízne odľahčeným zátylkom a textúrovanou vrchnou partiou. Strih, ktorý drží svoj dokonalý tvar celé týždne po návšteve salónu.",
+    technique: "Kombinácia nožníc a britvy na suchých vlasoch, personalizácia kontúr podľa kostnej štruktúry tváre.",
+    toolsUsed: "Japonské ergonomické nožnice, zmatňujúca stylingová hlina."
   },
   {
-    id: "port-sunset-bob",
-    title: "Vibrant Sunset Bob",
+    id: "port-blonde-airtouch",
+    title: "Golden Blonde Glamour",
     category: "Balayage & Farba",
     year: "2024",
-    collection: "Creative Color & Geometric Cut",
-    image: "/images/riccardo/salon_gallery/salon_photo_01.jpg",
-    description: "Odvážna a sofistikovaná fúzia žiarivých tónov v kombinácii s precíznym geometrickým mikrobobom a čistým undercutom.",
-    technique: "Precízne sekcionovanie, vrstvenie pigmentov a diamantovo ostrá línia strihu.",
-    toolsUsed: "Ploché strihacie hrebene, priame pigmenty a termo-ochranné sérum."
+    collection: "AirTouch & Multidimenzionálna Blond",
+    image: "/images/riccardo/gallery/riccardo_art_40.jpg",
+    description: "Luxusné zlatisté AirTouch tóny s ultra-plynulým prechodom od korienkov. Maximálne zachovanie zdravia a lesku vlasového vlákna.",
+    technique: "Vzduchová separácia jemných vlasov, zónové tónovanie a ochrana disulfidových väzieb.",
+    toolsUsed: "Špeciálny AirTouch fén, tónovacia kefa, ochranný systém Bond Builder."
   },
   {
-    id: "port-crimson-avantgarde",
-    title: "Crimson Avant-Garde Volumetry",
+    id: "port-crimson-bob",
+    title: "Vibrant Crimson Geometric Bob",
+    category: "Precízne Strihy",
+    year: "2024",
+    collection: "Creative Color & Geometric Cut",
+    image: "/images/riccardo/gallery/riccardo_art_15.jpg",
+    description: "Odvážna geometrická línia v sýtom rubínovom odtieni. Dokonalá rovnováha medzi výrazným módnym stanoviskom a precíznym salónnym remeslom.",
+    technique: "Diamantovo ostrý strih na tupo, vyváženie váhy na zátylku a sýte vrstvenie pigmentu.",
+    toolsUsed: "Plochý karbónový hrebeň, japonské rovné nožnice, vyhladzujúce sérum."
+  },
+  {
+    id: "port-afro-coiffure",
+    title: "Voluminous Afro Coiffure",
     category: "Umenie Fúkanej & Styling",
     year: "2023",
-    collection: "Súťažný editoriál & Haute Coiffure",
-    image: "/images/riccardo/salon_gallery/salon_photo_07.jpg",
-    description: "Monumentálny ohnivý červený objem s precíznym tvarovaním. Ukážka nekompromisnej práce s bohatou textúrou, sýtym farebným pigmentom a čistou architektonickou siluetou.",
-    technique: "Mikro-krepovanie pre vnútornú oporu objemu, smerové vyfúkanie kefou a záverečná fixácia suchým púdrom.",
-    toolsUsed: "Termálna keramická kefa, stylingová krepovačka, lak so silnou pamäťou.",
-    awardsWon: "Publikované v odborných kaderníckych médiách"
+    collection: "Editorial & Avant-Garde",
+    image: "/images/riccardo/gallery/riccardo_art_35.jpg",
+    description: "Čiernobiele editoriálne dielo plné monumentálneho objemu a surovej textúry. Nekompromisná kontrola nad štruktúrou účesu.",
+    technique: "Vrstvenie textúry, mikro-krepovanie a smerové ukladanie siluety.",
+    toolsUsed: "Iontový difuzér, suchý textúrovací sprej."
   },
   {
-    id: "port-wild-curls",
-    title: "Wild Voluminous Curls",
+    id: "port-sunburst-curls",
+    title: "Sunburst Curls & Styling",
     category: "Umenie Fúkanej & Styling",
     year: "2024",
     collection: "Textúra & Prirodzený objem",
-    image: "/images/riccardo/salon_gallery/salon_photo_22.jpg",
-    description: "Monumentálny objem plný života a prirodzenej pružnosti. Ukážka práce s bohatou textúrou bez zaťaženia a straty pohybu.",
-    technique: "Difuzérová technika, nadvihnutie vlasových cibuliek a tvarovanie prameň po prameni.",
-    toolsUsed: "Iontový difuzér, hydratačný krém na kučery, suchý sprej pre objem od korienkov."
+    image: "/images/riccardo/gallery/riccardo_art_67.jpg",
+    description: "Pružné, definované kučery plné vitality na žiarivom pozadí. Ukážka salónneho stylingu pre prirodzene vlnité a nepoddajné vlasy.",
+    technique: "Hydratačná definícia prameňov, difuzérové sušenie bez krepovatenia.",
+    toolsUsed: "Termoochranný stylingový krém, difuzér, kefa na tvarovanie kučier."
+  },
+  {
+    id: "port-copper-texture",
+    title: "Warm Copper Texture",
+    category: "Balayage & Farba",
+    year: "2024",
+    collection: "Koloristika & Teplé tóny",
+    image: "/images/riccardo/gallery/riccardo_art_45.jpg",
+    description: "Hrejivý medený balayage s bohatou salónnou textúrou. Farba, ktorá mení odlesk v závislosti od dopadu denného svetla.",
+    technique: "Viacúrovňové tónovanie teplých pigmentov a voľné plážové vlny.",
+    toolsUsed: "Tónovacie emulzie, kónická kulma, sprej pre saténový finiš."
+  },
+  {
+    id: "port-biker-texture",
+    title: "Biker Glamour Texture",
+    category: "Umenie Fúkanej & Styling",
+    year: "2024",
+    collection: "Haute Coiffure & Módne kampane",
+    image: "/images/riccardo/gallery/riccardo_art_04.jpg",
+    description: "Dramatický čiernobiely kontrast rockovej elegancie a bohatej ženskej hrivy vyfúkanej do absolútnej dokonalosti.",
+    technique: "Termálna fúkaná s maximálnym nadvihnutím od temena hlavy.",
+    toolsUsed: "Veľká okrúhla termokefa, objemová pena, lak s pamäťovým efektom."
+  },
+  {
+    id: "port-sculptural-haute",
+    title: "Sculptural Haute Coiffure",
+    category: "Umenie Fúkanej & Styling",
+    year: "2023",
+    collection: "Súťažný editoriál",
+    image: "/images/riccardo/gallery/riccardo_art_76.jpg",
+    description: "Skulpturálny výčes vysokej kaderníckej školy. Precízne vedenie vĺn lemujúcich tvár v harmonickom spojení s luxusným módnym doplnkom.",
+    technique: "Vnútorná mikroskopická stavba účesu a čisté línie kontúr.",
+    toolsUsed: "Karbónový hrebienok na tupírovanie, elastický lak so silnou fixáciou."
+  },
+  {
+    id: "port-platinum-crop",
+    title: "Platinový Geometrický Crop",
+    category: "Precízne Strihy",
+    year: "2024",
+    collection: "Moderné krátke línie",
+    image: "/images/riccardo/gallery/riccardo_art_38.jpg",
+    description: "Precízne textúrovaný krátky strih s platinovým odleskom snímaný z nadhľadu. Dôraz na čistotu každého jedného zástrihu.",
+    technique: "Bodové prestrihávanie nožnicami, vyváženie hustoty na temene.",
+    toolsUsed: "Japonské nožnice, modelovacia ílová pasta."
   },
   {
     id: "port-salon-transformations",
@@ -435,11 +465,23 @@ export const PORTFOLIO_DATA: PortfolioItem[] = [
     category: "Precízne Strihy",
     year: "2024",
     collection: "Premeny z Lučenca",
-    image: "/images/riccardo/salon_gallery/salon_photo_24.jpg",
+    image: "/images/riccardo/gallery/riccardo_art_62.jpg",
     hasBeforeAfter: true,
-    description: "Štvorica autentických transformácií z ateliéru Hair Salon Riccardo v Lučenci: blond mikrobob, luxusné dlhé vlny, medený lesk a precízny krátky strih.",
-    technique: "Individuálna diagnóza typu tváre a kvality vlasu, zosvetlenie s ochranou väzieb a finálna autorská fúkaná.",
+    description: "Štvorica autentických transformácií z ateliéru Hair Salon Riccardo v Lučenci: blond bob, bohaté vlny, medený lesk a krátky crop.",
+    technique: "Individuálna diagnóza typu tváre, zosvetlenie s ochranou väzieb a finálna autorská fúkaná.",
     toolsUsed: "Kompletné salónne portfólio prémiových nástrojov Riccardo."
+  },
+  {
+    id: "port-folklore-master",
+    title: "Žitná Symfónia (CSHA Víťaz)",
+    category: "Precízne Strihy",
+    year: "2023",
+    collection: "Víťazná kolekcia Czech & Slovak Hairdressing Awards (Praha)",
+    image: "/images/riccardo/gallery/riccardo_art_56.jpg",
+    description: "Ikonické súťažné dielo Richarda Čonku z víťaznej kolekcie Czech & Slovak Hairdressing Awards. Skulpturálny pletený účes harmonicky prepájajúci organické folklórne prvky s modernou geometriou.",
+    technique: "3D štruktúrované pletenie s variabilnou tenziou a integrácia prírodných materiálov.",
+    toolsUsed: "Modelovacia pasta, suchý púdrový sprej, mikro-vlásenky.",
+    awardsWon: "Víťaz: Cena verejnosti SR (Czech & Slovak Hairdressing Awards)"
   }
 ];
 
@@ -458,8 +500,8 @@ export const AWARDS_DATA: Award[] = [
     galleryImages: [
       "/images/riccardo/richard_conka_stage_award.jpg",
       "/images/riccardo/hda_winners_group_hires.jpg",
-      "/images/riccardo/richard_conka_hda_1.jpg",
-      "/images/riccardo/richard_conka_hda_2.jpg",
+      "/images/riccardo/gallery/riccardo_art_56.jpg",
+      "/images/riccardo/gallery/riccardo_art_47.jpg",
       "/images/riccardo/richard_conka_hda_3.jpg",
       "/images/riccardo/richard_conka_hda_4.jpg"
     ]
@@ -473,7 +515,7 @@ export const AWARDS_DATA: Award[] = [
     location: "Praha, Česká republika",
     status: "Nominácia",
     citation: "Odborná medzinárodná porota ocenila Richardovu kolekciu dámskych strihov a stylingu medzi top finalistov celého Česka a Slovenska.",
-    image: "/images/riccardo/salon_gallery/salon_photo_21.jpg",
+    image: "/images/riccardo/gallery/riccardo_art_60.jpg",
     badgeIcon: "Crown"
   },
   {
@@ -485,7 +527,7 @@ export const AWARDS_DATA: Award[] = [
     location: "Slovensko",
     status: "Čestné uznanie",
     citation: "Hair Salon Riccardo v Lučenci je aktívnym partnerským salónom, ktorý bezplatne strihá a odovzdáva vlasy pre výrobu parochní pre onkologické pacientky.",
-    image: "/images/riccardo/salon_gallery/salon_photo_27.jpg",
+    image: "/images/riccardo/gallery/riccardo_art_08.jpg",
     badgeIcon: "Heart"
   },
   {
@@ -497,7 +539,7 @@ export const AWARDS_DATA: Award[] = [
     location: "Lučenec / Banskobystrický kraj",
     status: "Víťaz",
     citation: "Ocenenie za dlhodobo najvyššie hodnotenie služieb, profesionalitu tímu a príjemnú rodinnú atmosféru v Lučenci.",
-    image: "/images/riccardo/salon_gallery/salon_photo_32.jpg",
+    image: "/images/riccardo/gallery/riccardo_art_03.jpg",
     badgeIcon: "Sparkles"
   },
   {
@@ -509,7 +551,7 @@ export const AWARDS_DATA: Award[] = [
     location: "Praha, Česká republika",
     status: "Nominácia",
     citation: "Prebojovanie sa medzi elitu kaderníckeho remesla v Česku a na Slovensku s precíznou pánskou kolekciou.",
-    image: "/images/riccardo/salon_gallery/salon_photo_13.jpg",
+    image: "/images/riccardo/gallery/riccardo_art_69.jpg",
     badgeIcon: "Medal"
   }
 ];
@@ -735,7 +777,7 @@ export const PAST_SEMINAR_RECAPS = [
     attendees: 6,
     countriesRepresented: "SR & ČR",
     rating: "5.0 / 5.0",
-    image: "/images/riccardo/salon_gallery/salon_photo_11.jpg",
+    image: "/images/riccardo/gallery/riccardo_art_01.jpg",
     highlight: "Vypredané za 4 hodiny od zverejnenia. Komorná atmosféra priamo v materskom salóne v Lučenci s individuálnym prístupom."
   }
 ];
@@ -801,7 +843,7 @@ export const PAST_SOLD_OUT_SEMINARS = [
     soldOutTime: "Vypredané za 4 hodiny",
     attendeesFrom: ["Bratislava", "Košice", "Banská Bystrica", "Brno"],
     rating: "Hodnotenie 5.0 (6/6 odporúčaní)",
-    image: "/images/riccardo/salon_gallery/salon_photo_35.jpg"
+    image: "/images/riccardo/gallery/riccardo_art_30.jpg"
   },
   {
     id: "past-2",
@@ -811,7 +853,7 @@ export const PAST_SOLD_OUT_SEMINARS = [
     soldOutTime: "Vypredané za 9 hodín",
     attendeesFrom: ["Praha", "Žilina", "Zvolen", "Lučenec"],
     rating: "Hodnotenie 5.0 (6/6 odporúčaní)",
-    image: "/images/riccardo/salon_gallery/salon_photo_34.jpg"
+    image: "/images/riccardo/gallery/riccardo_art_17.jpg"
   },
   {
     id: "past-3",
@@ -821,6 +863,6 @@ export const PAST_SOLD_OUT_SEMINARS = [
     soldOutTime: "Vypredané za 6 hodín",
     attendeesFrom: ["Trnava", "Nitra", "Poprad", "Bratislava"],
     rating: "Hodnotenie 5.0 (6/6 odporúčaní)",
-    image: "/images/riccardo/salon_gallery/salon_photo_25.jpg"
+    image: "/images/riccardo/gallery/riccardo_art_58.jpg"
   }
 ];

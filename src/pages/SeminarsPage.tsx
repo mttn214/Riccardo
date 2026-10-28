@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { SeminarsSection } from '../components/SeminarsSection';
 import { PastSeminarsSection } from '../components/PastSeminarsSection';
+import { AcademyGallerySection } from '../components/AcademyGallerySection';
 import { AcademyFAQ } from '../components/AcademyFAQ';
 import { WaitlistModal } from '../components/WaitlistModal';
 import { Seminar } from '../data/content';
@@ -22,13 +23,16 @@ export const SeminarsPage: React.FC<SeminarsPageProps> = ({ onOpenDetail, onBook
         onBookSeminar={onBookSeminar}
       />
 
-      {/* 2. Past Sold-Out Masterclasses Archive (Scarcity Proof) */}
+      {/* 2. Visual Education Atmosphere Gallery */}
+      <AcademyGallerySection />
+
+      {/* 3. Past Sold-Out Masterclasses Archive (Scarcity Proof) */}
       <PastSeminarsSection onOpenWaitlist={() => setIsWaitlistOpen(true)} />
 
-      {/* 3. Academy Stylist FAQ Accordion */}
+      {/* 4. Academy Stylist FAQ Accordion */}
       <AcademyFAQ />
 
-      {/* 4. VIP Waitlist Modal */}
+      {/* 5. VIP Waitlist Modal */}
       <WaitlistModal
         isOpen={isWaitlistOpen}
         onClose={() => setIsWaitlistOpen(false)}
