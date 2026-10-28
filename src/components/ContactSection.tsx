@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { Link } from 'react-router-dom';
 import { STYLIST_PROFILE, COMPANY_DETAILS } from '../data/content';
-import { ChevronDown, ArrowUpRight, Check, Building2, FileText } from 'lucide-react';
+import { ChevronDown, ArrowUpRight, Check, Building2, FileText, MapPin } from 'lucide-react';
 import { InstagramIcon, FacebookIcon } from './SocialIcons';
 import { sendFormNotification } from '../services/formService';
 
@@ -314,6 +314,74 @@ export const ContactSection: React.FC = () => {
             </div>
           </div>
 
+        </div>
+
+        {/* Visual Showcase: House Photo & Google Maps */}
+        <div className="mb-24">
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+            {/* 1. House Photo Card */}
+            <div className="relative rounded-3xl overflow-hidden bg-zinc-950 min-h-[300px] sm:min-h-[360px] group shadow-2xl flex flex-col justify-between">
+              <img
+                src="/images/riccardo/salon_house.jpg"
+                alt="Hair Salon Riccardo - Ateliér a dom na J. Kármána 30 v Lučenci"
+                onError={(e) => {
+                  (e.target as HTMLImageElement).src = '/images/riccardo/official_logo_square.png';
+                }}
+                className="absolute inset-0 w-full h-full object-cover transition-transform duration-700 group-hover:scale-105"
+              />
+              <div className="absolute inset-0 bg-gradient-to-t from-black/90 via-black/30 to-black/30 pointer-events-none" />
+
+              {/* Top Badges */}
+              <div className="relative z-10 p-5 flex items-center justify-between">
+                <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-black/60 backdrop-blur-md text-[11px] font-mono text-zinc-300">
+                  <Building2 className="w-3.5 h-3.5 text-white" />
+                  <span>Sídlo salónu & Akadémie</span>
+                </span>
+                <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-emerald-500/20 backdrop-blur-md text-[11px] font-mono text-emerald-300">
+                  <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse" />
+                  <span>Parkovanie pred domom</span>
+                </span>
+              </div>
+
+              {/* Bottom Info */}
+              <div className="relative z-10 p-6 space-y-1">
+                <div className="text-white font-semibold text-lg tracking-tight">
+                  Hair Salon Riccardo Atelier
+                </div>
+                <p className="text-xs text-zinc-300">
+                  Rodinný dom pod nadjazdom • J. Kármána 1727/30, Lučenec
+                </p>
+              </div>
+            </div>
+
+            {/* 2. Interactive Google Maps Card */}
+            <div className="relative rounded-3xl overflow-hidden bg-zinc-950 min-h-[300px] sm:min-h-[360px] shadow-2xl flex flex-col">
+              <iframe
+                title="Hair Salon Riccardo Lučenec - Google Maps"
+                src="https://maps.google.com/maps?q=Hair+Salon+Riccardo,+J.+K%C3%A1rm%C3%A1na+1727%2F30,+Lu%C4%8Denec&t=&z=16&ie=UTF8&iwloc=&output=embed"
+                className="w-full h-full min-h-[300px] sm:min-h-[360px] border-0 filter invert-[92%] hue-rotate-180 contrast-[105%]"
+                loading="lazy"
+                allowFullScreen
+              />
+
+              {/* Map Floating Glassmorphism Controls Overlay */}
+              <div className="absolute bottom-4 left-4 right-4 p-3 rounded-2xl bg-black/85 backdrop-blur-md flex items-center justify-between gap-3 text-xs">
+                <div className="flex items-center gap-2 text-zinc-200 min-w-0">
+                  <MapPin className="w-4 h-4 text-emerald-400 shrink-0" />
+                  <span className="font-medium truncate text-xs">J. Kármána 1727/30, 984 01 Lučenec</span>
+                </div>
+                <a
+                  href={STYLIST_PROFILE.googleMapsUrl}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="px-3 py-1.5 rounded-lg bg-white/10 hover:bg-white/20 text-white font-medium shrink-0 transition-colors inline-flex items-center gap-1"
+                >
+                  <span>Navigovať</span>
+                  <ArrowUpRight className="w-3.5 h-3.5" />
+                </a>
+              </div>
+            </div>
+          </div>
         </div>
 
         {/* Minimal FAQ Accordion */}
