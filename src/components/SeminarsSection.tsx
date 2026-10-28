@@ -122,32 +122,32 @@ export const SeminarsSection: React.FC<SeminarsSectionProps> = ({
                 </div>
 
                 {/* Price & Action row */}
-                <div className="pt-2 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
+                <div className="pt-4 border-t border-zinc-850/60 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
                   <div>
-                    <span className="text-[10px] uppercase text-zinc-500 block font-medium">
-                      All-Inclusive účasť (Možnosť zálohy 100 €)
+                    <span className="text-[11px] uppercase tracking-wider text-zinc-500 block font-medium">
+                      Cena kurzu
                     </span>
-                    <div className="flex items-baseline gap-2">
-                      <span className="text-2xl sm:text-3xl font-semibold text-white">
+                    <div className="flex items-baseline gap-2 mt-0.5">
+                      <span className="text-2xl sm:text-3xl font-semibold text-white tracking-tight whitespace-nowrap">
                         {formatPrice(featuredSeminar.tiers[0]?.priceEUR || 380, currency)}
                       </span>
-                      <span className="text-xs text-amber-400 font-medium">
-                        alebo záloha 100 €
+                      <span className="text-xs text-zinc-400 font-normal whitespace-nowrap">
+                        (záloha 100 €)
                       </span>
                     </div>
                   </div>
 
-                  <div className="flex items-center gap-3 w-full sm:w-auto">
+                  <div className="flex items-center gap-3 w-full sm:w-auto justify-end">
                     <button
                       onClick={() => onOpenDetail(featuredSeminar)}
-                      className="px-4 py-2.5 rounded-full text-xs font-medium text-zinc-400 hover:text-white transition-colors"
+                      className="px-4 py-2.5 rounded-full text-xs font-medium text-zinc-400 hover:text-white transition-colors cursor-pointer whitespace-nowrap"
                     >
                       Harmonogram
                     </button>
 
                     <button
                       onClick={() => onBookSeminar(featuredSeminar)}
-                      className="flex-grow sm:flex-grow-0 inline-flex items-center justify-center gap-1.5 px-6 py-2.5 rounded-full text-xs sm:text-sm font-semibold bg-white text-black hover:bg-zinc-200 transition-all active:scale-95 shadow-lg shadow-white/10"
+                      className="inline-flex items-center justify-center gap-1.5 px-6 py-2.5 rounded-full text-xs sm:text-sm font-semibold bg-white text-black hover:bg-zinc-200 transition-all active:scale-95 shadow-lg shadow-white/10 cursor-pointer whitespace-nowrap"
                     >
                       <span>Rezervovať miesto</span>
                       <ArrowUpRight className="w-4 h-4" />
