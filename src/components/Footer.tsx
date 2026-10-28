@@ -39,15 +39,20 @@ export const Footer: React.FC = () => {
           
           {/* Brand Info (4 cols) */}
           <div className="md:col-span-4 space-y-4">
-            <Link to="/" className="inline-flex items-center gap-3 group">
+            <Link to="/" className="inline-flex items-center gap-3.5 group">
               <img
                 src="/images/riccardo/official_logo_dark_square.png"
                 alt="Hair Salon Riccardo"
-                className="w-9 h-9 rounded-full object-contain bg-zinc-950 border border-zinc-800 group-hover:border-zinc-600 transition-colors shadow-md"
+                className="w-12 h-12 rounded-full object-contain bg-zinc-950 border border-zinc-800 group-hover:border-zinc-500 transition-all p-0.5 shadow-lg shrink-0"
               />
-              <span className="font-semibold tracking-[0.2em] text-white uppercase text-sm block">
-                RICCARDO
-              </span>
+              <div className="flex flex-col">
+                <span className="font-semibold tracking-[0.22em] text-white uppercase text-base block leading-none">
+                  RICCARDO
+                </span>
+                <span className="text-[10px] text-zinc-400 tracking-wider uppercase mt-1">
+                  Atelier &amp; Academy Lučenec
+                </span>
+              </div>
             </Link>
             <p className="text-zinc-400 text-xs leading-relaxed max-w-sm">
               Autorské vzdelávanie kaderníkov a salónna tvorba.

@@ -73,18 +73,20 @@ export const Navbar: React.FC<NavbarProps> = ({ onOpenBooking }) => {
         <div className="flex items-center justify-between">
           
           {/* Brand Logo */}
-          <Link to="/" className="flex items-center gap-2.5 group">
+          <Link to="/" className="flex items-center gap-3 group">
             <img
               src="/images/riccardo/official_logo_dark_square.png"
               alt="Hair Salon Riccardo"
-              className="w-8 h-8 rounded-full object-contain bg-zinc-950 border border-zinc-800 group-hover:border-zinc-400 transition-colors shadow-lg"
+              className="w-11 h-11 sm:w-12 sm:h-12 rounded-full object-contain bg-zinc-950 border border-zinc-800/90 group-hover:border-zinc-500 transition-all p-0.5 shadow-xl shrink-0"
             />
-            <span className="font-semibold tracking-[0.2em] text-white text-sm uppercase">
-              RICCARDO
-            </span>
-            <span className="text-[11px] text-zinc-500 font-normal tracking-wide hidden sm:inline">
-              / Lučenec
-            </span>
+            <div className="flex flex-col">
+              <span className="font-semibold tracking-[0.22em] text-white text-sm sm:text-base uppercase leading-none">
+                RICCARDO
+              </span>
+              <span className="text-[9px] sm:text-[10px] text-zinc-400 font-normal tracking-wider uppercase mt-1">
+                Hair Salon &amp; Academy <span className="hidden sm:inline">• Lučenec</span>
+              </span>
+            </div>
           </Link>
 
           {/* Desktop Multi-page Navigation */}

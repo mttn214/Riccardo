@@ -83,10 +83,10 @@ export const ContactSection: React.FC = () => {
               <img
                 src="/images/riccardo/official_logo_dark_square.png"
                 alt="Hair Salon Riccardo"
-                className="w-14 h-14 rounded-full object-contain bg-zinc-950 border border-zinc-800 shadow-xl"
+                className="w-16 h-16 sm:w-20 sm:h-20 rounded-full object-contain bg-zinc-950 border border-zinc-800 shadow-2xl p-1 shrink-0"
               />
               <div>
-                <h3 className="text-base font-semibold text-white tracking-tight">Hair Salon Riccardo</h3>
+                <h3 className="text-lg sm:text-xl font-semibold text-white tracking-tight">Hair Salon Riccardo</h3>
                 <span className="text-xs text-zinc-400">Ateliér Richarda Čonku v Lučenci</span>
               </div>
             </div>

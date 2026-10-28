@@ -82,7 +82,7 @@ export const AdminLogin: React.FC<AdminLoginProps> = ({ onLoginSuccess }) => {
             <img
               src="/images/riccardo/official_logo_dark_square.png"
               alt="Hair Salon Riccardo"
-              className="w-16 h-16 rounded-full object-contain bg-zinc-950 p-1 border border-zinc-800 shadow-2xl"
+              className="w-20 h-20 rounded-full object-contain bg-zinc-950 p-1.5 border border-zinc-800 shadow-2xl"
             />
           </div>
 
