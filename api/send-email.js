@@ -61,7 +61,7 @@ export default async function handler(req, res) {
       });
     }
 
-    const recipients = [customerEmail, 'hair.riccardo@gmail.com', 'carlitomio214@gmail.com'].filter(Boolean);
+    const recipients = [customerEmail, 'hair.riccardo@gmail.com', 'daki1402@gmail.com'].filter(Boolean);
     let deliveryMethod = 'logged';
 
     // 1. Attempt delivery via Resend API if key is present
@@ -70,7 +70,7 @@ export default async function handler(req, res) {
         const { Resend } = await import('resend');
         const resend = new Resend(process.env.RESEND_API_KEY);
         await resend.emails.send({
-          from: process.env.EMAIL_FROM || 'Hair Salon Riccardo <onboarding@resend.dev>',
+          from: process.env.EMAIL_FROM || 'Hair Salon Riccardo <daki1402@gmail.com>',
           to: recipients,
           subject: emailSubject,
           html: htmlContent
@@ -96,7 +96,7 @@ export default async function handler(req, res) {
         });
 
         await transporter.sendMail({
-          from: `Hair Salon Riccardo <${process.env.SMTP_USER}>`,
+          from: `Hair Salon Riccardo <${process.env.SMTP_USER || 'daki1402@gmail.com'}>`,
           to: recipients,
           subject: emailSubject,
           html: htmlContent

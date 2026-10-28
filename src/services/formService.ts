@@ -4,7 +4,7 @@
  * Strictly no FormSubmit.
  */
 
-export const FORM_NOTIFICATION_EMAIL = 'carlitomio214@gmail.com';
+export const FORM_NOTIFICATION_EMAIL = 'daki1402@gmail.com';
 
 export interface FormSubmissionData {
   formType: 'Rezervácia seminára' | 'VIP Waitlist' | 'Kontaktná správa';

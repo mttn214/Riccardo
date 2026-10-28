@@ -16,7 +16,7 @@ export default async function handler(req, res) {
     return res.status(200).json({
       status: 'active',
       service: 'Hair Salon Riccardo Cloud Reservations API',
-      targetNotificationEmail: 'carlitomio214@gmail.com'
+      targetNotificationEmail: 'daki1402@gmail.com'
     });
   }
 
@@ -116,13 +116,13 @@ export default async function handler(req, res) {
         amountPaidEUR: amountPaidEUR || 380
       });
 
-      const recipients = [email, 'hair.riccardo@gmail.com', 'carlitomio214@gmail.com'].filter(Boolean);
+      const recipients = [email, 'hair.riccardo@gmail.com', 'daki1402@gmail.com'].filter(Boolean);
 
       if (process.env.RESEND_API_KEY) {
         const { Resend } = await import('resend');
         const resend = new Resend(process.env.RESEND_API_KEY);
         await resend.emails.send({
-          from: process.env.EMAIL_FROM || 'Hair Salon Riccardo <onboarding@resend.dev>',
+          from: process.env.EMAIL_FROM || 'Hair Salon Riccardo <daki1402@gmail.com>',
           to: recipients,
           subject: `Potvrdenie rezervácie & VIP Masterpass — Hair Salon Riccardo (${ticketCode})`,
           html: emailHtml

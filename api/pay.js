@@ -156,13 +156,13 @@ export default async function handler(req, res) {
         receiptUrl
       });
 
-      const recipients = [customerEmail, 'hair.riccardo@gmail.com', 'carlitomio214@gmail.com'].filter(Boolean);
+      const recipients = [customerEmail, 'hair.riccardo@gmail.com', 'daki1402@gmail.com'].filter(Boolean);
 
       if (process.env.RESEND_API_KEY) {
         const { Resend } = await import('resend');
         const resend = new Resend(process.env.RESEND_API_KEY);
         await resend.emails.send({
-          from: process.env.EMAIL_FROM || 'Hair Salon Riccardo <onboarding@resend.dev>',
+          from: process.env.EMAIL_FROM || 'Hair Salon Riccardo <daki1402@gmail.com>',
           to: recipients,
           subject: `Doklad o úhrade — Hair Salon Riccardo (${amountEUR} €)`,
           html: emailHtml
