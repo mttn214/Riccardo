@@ -91,7 +91,7 @@ export const STYLIST_PROFILE = {
   stageImage: "/images/riccardo/richard_conka_stage_award.jpg",
   winnersGroupImage: "/images/riccardo/hda_winners_group_hires.jpg",
   logoImage: "/images/riccardo/official_logo_dark_square.png",
-  portraitImage: "/images/riccardo/gallery/riccardo_art_37.jpg",
+  portraitImage: "/images/riccardo/gallery/riccardo_art_06.jpg",
   stats: [
     { label: "Rokov skúseností", value: "14+" },
     { label: "Vyškolených kaderníkov", value: "1,200+" },

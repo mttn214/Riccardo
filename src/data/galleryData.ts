@@ -59,11 +59,11 @@ export const SEMINAR_GALLERY_PHOTOS: GalleryPhoto[] = [
   },
   {
     id: "sem-gal-7",
-    image: "/images/riccardo/gallery/riccardo_art_37.jpg",
-    title: "Majster remesla: Richard Čonka",
+    image: "/images/riccardo/gallery/riccardo_art_02.jpg",
+    title: "Salónny styling a fixácia textúry",
     category: "Školenia",
     subcategory: "Akadémia Lučenec",
-    description: "Vášeň pre dokonalú geometriu a remeselnú precíznosť odovzdávaná ďalšej generácii kaderníkov."
+    description: "Praktická ukážka práce s textúrou, fixácie objemových vĺn a precízneho finišu v ateliéri."
   },
   {
     id: "sem-gal-8",
