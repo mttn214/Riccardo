@@ -118,7 +118,7 @@ export const HomePage: React.FC<HomePageProps> = ({ onOpenBooking, onSelectPortf
                   : 'bg-zinc-900/90 text-zinc-400 hover:text-white border border-zinc-800'
               }`}
             >
-              Turnus I: Architektúra objemu (16. – 17. Nov 2026)
+              Turnus I: Umenie fúkanej (16. – 17. Nov 2026)
             </button>
             <button
               onClick={() => setActiveTurnusIndex(1)}

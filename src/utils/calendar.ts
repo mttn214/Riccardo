@@ -33,7 +33,7 @@ export function getSeminarCalendarDates(seminar: Seminar): ParsedDates {
     return {
       dtStart: '20261116T093000',
       dtEnd: '20261117T173000',
-      filename: 'Masterclass-Styling-Riccardo-Lucenec.ics',
+      filename: 'Masterclass-Umenie-Fukanej-Riccardo-Lucenec.ics',
     };
   }
 

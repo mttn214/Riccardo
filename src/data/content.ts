@@ -14,7 +14,7 @@ export interface Seminar {
   country: string;
   venue: string;
   dates: string;
-  category: 'Styling' | 'Strih' | 'Balayage & Blond' | 'Overenie Platby';
+  category: 'Umenie Fúkanej' | 'Styling' | 'Strih' | 'Balayage & Blond' | 'Overenie Platby';
   duration: string;
   totalSeats: number;
   availableSeats: number;
@@ -84,9 +84,9 @@ export const STYLIST_PROFILE = {
   instagramUrl: "https://www.instagram.com/hair_riccardo/",
   facebookUrl: "https://www.facebook.com/hairsalonriccardo",
   googleMapsUrl: "https://maps.google.com/?q=Hair+Salon+Riccardo+Lucenec",
-  bioHeadline: "Vášeň pre dokonalý styling, geometriu strihu a žiarivé farby.",
-  bioDescription: "Richard Čonka (Riccardo) je uznávaný slovenský hairstylist, zakladateľ prestížneho Hair Salon Riccardo v Lučenci a nositeľ ocenenia Cena verejnosti SR na prestížnych Czech & Slovak Hairdressing Awards (kaderníckych Oskaroch v Prahe). Svojimi autorskými masterclassmi a majstrovskými seminármi inšpiruje kaderníkov po celom Slovensku a Česku.",
-  quote: "Vlasy nie sú len práca, sú architektúra v pohybe. Správna technika stylingu a precízny strih dajú žene sebavedomie, ktoré zmení celú jej auru.",
+  bioHeadline: "Vášeň pre dokonalú fúkanú, geometriu strihu a žiarivé farby.",
+  bioDescription: "Richard Čonka (Riccardo) je uznávaný slovenský hairstylist, zakladateľ prestížneho Hair Salon Riccardo v Lučenci a nositeľ ocenenia Cena verejnosti SR na prestížnych Czech & Slovak Hairdressing Awards (kaderníckych Oskaroch v Prahe). Svojou ikonickou vzdelávacou sériou 'Umenie fúkanej' a majstrovskými seminármi inšpiruje kaderníkov po celom Slovensku a Česku.",
+  quote: "Vlasy nie sú len práca, sú architektúra v pohybe. Správna technika fúkanej a precízny strih dajú žene sebavedomie, ktoré zmení celú jej auru.",
   heroImage: "/images/riccardo/gallery/riccardo_art_56.jpg",
   stageImage: "/images/riccardo/richard_conka_stage_award.jpg",
   winnersGroupImage: "/images/riccardo/hda_winners_group_hires.jpg",
@@ -139,12 +139,12 @@ export const COMPANY_DETAILS = {
 export const SEMINARS_DATA: Seminar[] = [
   {
     id: "sem-umenie-fukanej-lucenec",
-    title: "Architektúra objemu & Trvácnosť: Styling Masterclass",
+    title: "Umenie fúkanej: Architektúra objemu & Trvácnosť",
     city: "Lučenec",
     country: "Slovensko",
     venue: "Atelier Hair Salon Riccardo, J. Kármána 30",
     dates: "16. – 17. November 2026",
-    category: "Styling",
+    category: "Umenie Fúkanej",
     duration: "2 dni (14 hodín intenzívnej praxe)",
     totalSeats: 6,
     availableSeats: 2,
@@ -154,18 +154,18 @@ export const SEMINARS_DATA: Seminar[] = [
     learningOutcomes: [
       "Správna biomechanika a ergonómia rúk pri napínaní prameňa",
       "Technika fixácie vlasu studeným vzduchom pre 72-hodinovú trvácnosť",
-      "Styling 'Riccardo Glam Waves' výhradne cez okrúhlu termálnu kefu bez kulmy",
+      "Fúkané 'Riccardo Glam Waves' výhradne cez okrúhlu termálnu kefu bez kulmy",
       "Práca s live modelkou a profesionálne fotenie pred sociálne siete"
     ],
     schedule: [
       {
         day: "1. Deň: Dynamika tepla, analýza vlasu & Live ukážky",
-        morning: "09:30 – 13:00: Úvod, rozbor štruktúry vlasu, produkty a live ukážka 2 premien na živých modelkách.",
+        morning: "09:30 – 13:00: Úvod, rozbor štruktúry vlasu, produkty a live ukážka 2 fúkaných na živých modelkách.",
         afternoon: "14:00 – 18:00: Praktický hands-on tréning na cvičných hlavách pod osobným dohľadom Richarda Čonku."
       },
       {
         day: "2. Deň: Práca na modelkách & Finálny styling",
-        morning: "09:30 – 13:00: Účastníci kompletne upravujú živé modelky (objem a glamour vlny).",
+        morning: "09:30 – 13:00: Účastníci kompletne fúkajú živé modelky (objem a glamour vlny).",
         afternoon: "14:00 – 17:30: Korekcia detailov, fotenie, odovzdanie certifikátov a toast."
       }
     ],
