@@ -68,22 +68,22 @@ export const Navbar: React.FC<NavbarProps> = ({ onOpenBooking }) => {
       )}
 
       <div className={`max-w-6xl mx-auto px-4 sm:px-6 transition-all duration-300 ${
-        isScrolled ? 'py-3.5 sm:py-4' : 'py-4 sm:py-4.5'
+        isScrolled ? 'py-2.5 sm:py-3' : 'py-3 sm:py-3.5'
       }`}>
         <div className="flex items-center justify-between">
           
           {/* Brand Logo */}
-          <Link to="/" className="flex items-center gap-3 group">
+          <Link to="/" className="flex items-center gap-3.5 group">
             <img
               src="/images/riccardo/official_logo_dark_square.png"
               alt="Hair Salon Riccardo"
-              className="w-11 h-11 sm:w-12 sm:h-12 rounded-full object-contain bg-zinc-950 border border-zinc-800/90 group-hover:border-zinc-500 transition-all p-0.5 shadow-xl shrink-0"
+              className="w-14 h-14 sm:w-16 sm:h-16 rounded-full object-contain bg-zinc-950 border border-zinc-800/90 group-hover:border-zinc-500 transition-all p-0.5 shadow-xl shrink-0"
             />
-            <div className="flex flex-col">
-              <span className="font-semibold tracking-[0.22em] text-white text-sm sm:text-base uppercase leading-none">
+            <div className="flex flex-col font-brand">
+              <span className="font-bold tracking-[0.22em] text-white text-sm sm:text-base uppercase leading-none font-brand">
                 RICCARDO
               </span>
-              <span className="text-[9px] sm:text-[10px] text-zinc-400 font-normal tracking-wider uppercase mt-1">
+              <span className="text-[9px] sm:text-[10px] text-zinc-400 font-medium tracking-[0.14em] uppercase mt-1 font-brand">
                 Hair Salon &amp; Academy <span className="hidden sm:inline">• Lučenec</span>
               </span>
             </div>

@@ -31,6 +31,12 @@ export default {
           'system-ui',
           'sans-serif'
         ],
+        brand: [
+          '"Montserrat"',
+          '-apple-system',
+          'BlinkMacSystemFont',
+          'sans-serif'
+        ],
       },
       letterSpacing: {
         tightest: '-0.04em',
