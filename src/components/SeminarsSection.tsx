@@ -129,9 +129,6 @@ export const SeminarsSection: React.FC<SeminarsSectionProps> = ({
                         <span className="text-2xl sm:text-3xl font-semibold text-white tracking-tight whitespace-nowrap">
                           {formatPrice(seminar.tiers[0]?.priceEUR || 380, currency)}
                         </span>
-                        <span className="text-xs text-zinc-400 font-normal whitespace-nowrap">
-                          (záloha 100 €)
-                        </span>
                       </div>
                     </div>
 

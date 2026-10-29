@@ -177,7 +177,7 @@ export const HomePage: React.FC<HomePageProps> = ({ onOpenBooking, onSelectPortf
                       </div>
                       <div className="flex items-center gap-2">
                         <span className="w-1.5 h-1.5 rounded-full bg-white flex-shrink-0" />
-                        <span>Záloha iba 100 € (doplatok 280 € na mieste) alebo plná úhrada online</span>
+                        <span><strong>Fakturácia:</strong> Možnosť vystavenia daňového dokladu na salón (IČO / DIČ)</span>
                       </div>
                     </div>
                   </div>
@@ -190,9 +190,6 @@ export const HomePage: React.FC<HomePageProps> = ({ onOpenBooking, onSelectPortf
                       <div className="flex items-baseline gap-2 mt-0.5">
                         <span className="text-2xl sm:text-3xl font-semibold text-white tracking-tight whitespace-nowrap">
                           {formatPrice(featuredSeminar.tiers[0]?.priceEUR || 380)}
-                        </span>
-                        <span className="text-xs text-zinc-400 font-normal whitespace-nowrap">
-                          (záloha 100 €)
                         </span>
                       </div>
                     </div>

@@ -203,7 +203,7 @@ export const SeminarDetailModal: React.FC<SeminarDetailModalProps> = ({
               <div className="pt-2 flex flex-col sm:flex-row items-center justify-between gap-3 bg-zinc-950/70 p-4 rounded-2xl">
                 <div className="text-xs text-zinc-300 flex items-center gap-2">
                   <span className="w-2 h-2 rounded-full bg-emerald-400 animate-pulse flex-shrink-0" />
-                  <span>Práve si tento termín prezerajú ďalší stylisti • Možnosť zaistenia zálohou 100 €</span>
+                  <span>Práve si tento termín prezerajú ďalší stylisti • Zostávajú posledné voľné kreslá</span>
                 </div>
 
                 <button
@@ -356,9 +356,6 @@ export const SeminarDetailModal: React.FC<SeminarDetailModalProps> = ({
                     <div className="py-2">
                       <span className="text-3xl font-black text-white tracking-tight block">
                         {formatPrice(tier.priceEUR, currency)}
-                      </span>
-                      <span className="text-[10px] text-zinc-400 block font-mono">
-                        Možnosť platby zálohy 100 € (doplatok na mieste)
                       </span>
                     </div>
 
