@@ -32,7 +32,7 @@ export default {
           'sans-serif'
         ],
         brand: [
-          '"Montserrat"',
+          '"Syncopate"',
           '-apple-system',
           'BlinkMacSystemFont',
           'sans-serif'

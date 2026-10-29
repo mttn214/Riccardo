@@ -46,10 +46,10 @@ export const Footer: React.FC = () => {
                 className="w-14 h-14 sm:w-16 sm:h-16 rounded-full object-contain bg-zinc-950 border border-zinc-800 group-hover:border-zinc-500 transition-all p-0.5 shadow-lg shrink-0"
               />
               <div className="flex flex-col font-brand">
-                <span className="font-bold tracking-[0.22em] text-white uppercase text-base block leading-none font-brand">
+                <span className="font-bold tracking-[0.14em] text-white uppercase text-sm sm:text-base block leading-none font-brand">
                   RICCARDO
                 </span>
-                <span className="text-[10px] text-zinc-400 font-medium tracking-[0.14em] uppercase mt-1 font-brand">
+                <span className="text-[9px] sm:text-[10px] text-zinc-400 font-normal tracking-[0.10em] uppercase mt-1.5 font-brand">
                   Atelier &amp; Academy Lučenec
                 </span>
               </div>
