@@ -9,13 +9,14 @@ import { WaitlistModal } from '../components/WaitlistModal';
 import { SeminarSpotlightPhoto } from '../components/SeminarSpotlightPhoto';
 
 interface HomePageProps {
-  onOpenBooking: () => void;
+  onOpenBooking: (seminar?: Seminar) => void;
   onSelectPortfolioItem: (item: PortfolioItem) => void;
 }
 
 export const HomePage: React.FC<HomePageProps> = ({ onOpenBooking, onSelectPortfolioItem }) => {
   const navigate = useNavigate();
-  const featuredSeminar = SEMINARS_DATA[0];
+  const [activeTurnusIndex, setActiveTurnusIndex] = useState(0);
+  const featuredSeminar = SEMINARS_DATA[activeTurnusIndex] || SEMINARS_DATA[0];
   const tickerPortfolio = PORTFOLIO_DATA.slice(0, 10);
   const marqueePortfolio = [...tickerPortfolio, ...tickerPortfolio];
 
@@ -107,6 +108,30 @@ export const HomePage: React.FC<HomePageProps> = ({ onOpenBooking, onSelectPortf
             </Link>
           </div>
 
+          {/* Turnus Switcher Tabs */}
+          <div className="flex flex-wrap items-center gap-2 mb-6">
+            <button
+              onClick={() => setActiveTurnusIndex(0)}
+              className={`px-4 py-2 rounded-full text-xs font-semibold transition-all cursor-pointer ${
+                activeTurnusIndex === 0
+                  ? 'bg-white text-black shadow-lg shadow-white/10'
+                  : 'bg-zinc-900/90 text-zinc-400 hover:text-white border border-zinc-800'
+              }`}
+            >
+              Turnus I: Architektúra objemu (16. – 17. Nov 2026)
+            </button>
+            <button
+              onClick={() => setActiveTurnusIndex(1)}
+              className={`px-4 py-2 rounded-full text-xs font-semibold transition-all cursor-pointer ${
+                activeTurnusIndex === 1
+                  ? 'bg-white text-black shadow-lg shadow-white/10'
+                  : 'bg-zinc-900/90 text-zinc-400 hover:text-white border border-zinc-800'
+              }`}
+            >
+              Turnus II: Biker Glamour & Kučery (17. – 18. Máj 2027)
+            </button>
+          </div>
+
           {/* Spotlight Card */}
           {featuredSeminar && (
             <div className="rounded-3xl bg-zinc-950 border border-zinc-800/80 overflow-hidden shadow-2xl">
@@ -182,7 +207,7 @@ export const HomePage: React.FC<HomePageProps> = ({ onOpenBooking, onSelectPortf
 
                       {featuredSeminar.availableSeats > 0 ? (
                         <button
-                          onClick={onOpenBooking}
+                          onClick={() => onOpenBooking(featuredSeminar)}
                           className="inline-flex items-center justify-center gap-1.5 px-6 py-2.5 rounded-full text-xs sm:text-sm font-semibold bg-white text-black hover:bg-zinc-200 transition-all active:scale-95 shadow-lg shadow-white/10 cursor-pointer whitespace-nowrap"
                         >
                           <span>Rezervovať miesto</span>

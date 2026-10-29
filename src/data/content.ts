@@ -195,6 +195,62 @@ export const SEMINARS_DATA: Seminar[] = [
     ]
   },
   {
+    id: "sem-biker-glamour-kuce-lucenec",
+    title: "Biker Glamour & Definitíva Kučier: Styling Masterclass",
+    city: "Lučenec",
+    country: "Slovensko",
+    venue: "Atelier Hair Salon Riccardo, J. Kármána 30",
+    dates: "17. – 18. Máj 2027",
+    category: "Styling",
+    duration: "2 dni (14 hodín intenzívnej praxe)",
+    totalSeats: 6,
+    availableSeats: 2,
+    image: "/images/riccardo/gallery/riccardo_art_04.jpg",
+    secondaryImage: "/images/riccardo/gallery/riccardo_art_01_portrait.jpg",
+    description: "Autorský masterclass zameraný na techniky objemového vlnenia, rockovo-elegantnej textúry a definície pružných kučier s vysokou fixáciou. Naučíte sa vytvárať ikonický glamour look s trvácnosťou, ktorý Richard Čonka prezentoval na módnych prehliadkach a prestížnych súťažiach.",
+    learningOutcomes: [
+      "Termálna architektúra a fixácia kučier pre 72-hodinovú trvácnosť",
+      "Technika vrstvenia textúry a práca s pamäťovými stylingovými produktmi",
+      "Definícia prirodzene vlnitých aj nepoddajných vlasov bez krepovatenia",
+      "Backstage styling a kompozícia dramatických vĺn pre módne portfólio"
+    ],
+    schedule: [
+      {
+        day: "1. Deň: Dynamika vĺn, textúra & Live ukážky",
+        morning: "09:30 – 13:00: Úvod, analýza elasticity vlasu, termoochrana a live ukážka 2 premien na modelkách.",
+        afternoon: "14:00 – 18:00: Praktický hands-on tréning tvarovania kučier a vĺn na cvičných hlavách."
+      },
+      {
+        day: "2. Deň: Práca na modelkách & Finálny styling",
+        morning: "09:30 – 13:00: Účastníci samostatne tvoria kompletný glamour styling na živých modelkách.",
+        afternoon: "14:00 – 17:30: Korekcia detailov, stylingový finiš, profesionálne fotenie a certifikácia."
+      }
+    ],
+    includedItems: [
+      "Pracovné skriptá a manuál stylingu kučier",
+      "Oficiálny akreditovaný certifikát Riccardo Academy",
+      "Stylingový darčekový balíček profesionálnych prípravkov",
+      "Gurmánsky obed a občerstvenie po oba dni",
+      "Prístup do súkromnej WhatsApp skupiny absolventov pre konzultácie"
+    ],
+    tiers: [
+      {
+        id: "tier-glamour-master",
+        name: "Hands-On Masterpass (Limitované na 6 miest)",
+        priceEUR: 380,
+        description: "Kompletný 2-dňový praktický tréning s osobnou asistenciou Richarda Čonku, prácou na živej modelke a certifikátom.",
+        recommended: true,
+        features: [
+          "Miesto v komornej skupine max 6 účastníkov",
+          "Práca na cvičnej hlave aj živej modelke",
+          "Osobná asistencia a korekcia techniky od Richarda Čonku",
+          "Oficiálny certifikát Riccardo Academy",
+          "Profesionálne fotografie vášho diela pre sociálne siete"
+        ]
+      }
+    ]
+  },
+  {
     id: "sem-strih-lucenec",
     title: "Precízny strih & Geometria: Víťazné línie",
     city: "Lučenec",

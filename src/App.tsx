@@ -192,7 +192,7 @@ export function App() {
             path="/"
             element={
               <HomePage
-                onOpenBooking={() => handleOpenBooking()}
+                onOpenBooking={(sem) => handleOpenBooking(sem)}
                 onSelectPortfolioItem={(item) => setPortfolioItem(item)}
               />
             }

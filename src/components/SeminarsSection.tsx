@@ -19,10 +19,10 @@ export const SeminarsSection: React.FC<SeminarsSectionProps> = ({
   const [priorityEmail, setPriorityEmail] = useState('');
   const [prioritySubscribed, setPrioritySubscribed] = useState(false);
 
-  // The primary imminent masterclass is the first one
-  const featuredSeminar = SEMINARS_DATA[0];
-  // Next exclusive dates
-  const upcomingSeminars = SEMINARS_DATA.slice(1);
+  // The primary imminent masterclasses with spotlight interactive photos
+  const featuredSeminars = [SEMINARS_DATA[0], SEMINARS_DATA[1]];
+  // Next exclusive dates in 2027
+  const upcomingSeminars = SEMINARS_DATA.slice(2);
 
   const handlePrioritySubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -59,101 +59,106 @@ export const SeminarsSection: React.FC<SeminarsSectionProps> = ({
           </p>
         </div>
 
-        {/* FEATURED IMMINENT MASTERCLASS (Editorial Spotlight Card) */}
-        {featuredSeminar && (
-          <div className="mb-16 rounded-3xl bg-zinc-950 border border-zinc-800/80 overflow-hidden shadow-2xl relative">
-            <div className="grid grid-cols-1 lg:grid-cols-12">
-              
-              {/* Photo Side (5 cols) */}
-              <div className="lg:col-span-5 relative">
-                <SeminarSpotlightPhoto
-                  primaryImage={featuredSeminar.image}
-                  secondaryImage={featuredSeminar.secondaryImage}
-                  title={featuredSeminar.title}
-                  availableSeats={featuredSeminar.availableSeats}
-                  totalSeats={featuredSeminar.totalSeats}
-                />
-              </div>
-
-              {/* Details Side (7 cols) */}
-              <div className="lg:col-span-7 p-7 sm:p-10 flex flex-col justify-between space-y-6">
-                <div>
-                  <div className="flex flex-wrap items-center gap-2 text-xs text-zinc-500 font-medium mb-2">
-                    <span className="text-zinc-300">{featuredSeminar.dates}</span>
-                    <span>•</span>
-                    <span>{featuredSeminar.city} (Atelier)</span>
-                    <span>•</span>
-                    <span>{featuredSeminar.duration}</span>
-                  </div>
-
-                  <h3 className="text-2xl sm:text-3xl font-semibold text-white tracking-tight leading-snug mb-3">
-                    {featuredSeminar.title}
-                  </h3>
-
-                  <p className="text-xs sm:text-sm text-zinc-400 leading-relaxed font-normal mb-6">
-                    {featuredSeminar.description}
-                  </p>
-
-                  {/* Highlights list */}
-                  <div className="space-y-2 py-4 text-xs sm:text-sm text-zinc-300">
-                    <div className="flex items-center gap-2">
-                      <span className="w-1.5 h-1.5 rounded-full bg-white flex-shrink-0" />
-                      <span><strong>Prísna kapacita:</strong> Iba 6 kaderníkov pre 100% individuálny prístup</span>
-                    </div>
-                    <div className="flex items-center gap-2">
-                      <span className="w-1.5 h-1.5 rounded-full bg-white flex-shrink-0" />
-                      <span><strong>Prax na modelkách:</strong> Osobné nastavenie biomechaniky rúk a uhlov od Richarda</span>
-                    </div>
-                    <div className="flex items-center gap-2">
-                      <span className="w-1.5 h-1.5 rounded-full bg-white flex-shrink-0" />
-                      <span><strong>V cene:</strong> Originálna termálna kefa Riccardo, manuál a certifikát</span>
-                    </div>
-                    <div className="flex items-center gap-2">
-                      <span className="w-1.5 h-1.5 rounded-full bg-white flex-shrink-0" />
-                      <span><strong>Fakturácia:</strong> Možnosť vystavenia daňového dokladu na salón (IČO / DIČ)</span>
-                    </div>
-                  </div>
+        {/* FEATURED IMMINENT MASTERCLASSES (Editorial Spotlight Cards) */}
+        <div className="space-y-12 mb-16">
+          {featuredSeminars.map((seminar) => (
+            <div
+              key={seminar.id}
+              className="rounded-3xl bg-zinc-950 border border-zinc-800/80 overflow-hidden shadow-2xl relative"
+            >
+              <div className="grid grid-cols-1 lg:grid-cols-12">
+                
+                {/* Photo Side (5 cols) */}
+                <div className="lg:col-span-5 relative">
+                  <SeminarSpotlightPhoto
+                    primaryImage={seminar.image}
+                    secondaryImage={seminar.secondaryImage}
+                    title={seminar.title}
+                    availableSeats={seminar.availableSeats}
+                    totalSeats={seminar.totalSeats}
+                  />
                 </div>
 
-                {/* Price & Action row */}
-                <div className="pt-4 border-t border-zinc-850/60 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
+                {/* Details Side (7 cols) */}
+                <div className="lg:col-span-7 p-7 sm:p-10 flex flex-col justify-between space-y-6">
                   <div>
-                    <span className="text-[11px] uppercase tracking-wider text-zinc-500 block font-medium">
-                      Cena kurzu
-                    </span>
-                    <div className="flex items-baseline gap-2 mt-0.5">
-                      <span className="text-2xl sm:text-3xl font-semibold text-white tracking-tight whitespace-nowrap">
-                        {formatPrice(featuredSeminar.tiers[0]?.priceEUR || 380, currency)}
-                      </span>
-                      <span className="text-xs text-zinc-400 font-normal whitespace-nowrap">
-                        (záloha 100 €)
-                      </span>
+                    <div className="flex flex-wrap items-center gap-2 text-xs text-zinc-500 font-medium mb-2">
+                      <span className="text-zinc-300 font-semibold">{seminar.dates}</span>
+                      <span>•</span>
+                      <span>{seminar.city} (Atelier)</span>
+                      <span>•</span>
+                      <span>{seminar.duration}</span>
+                    </div>
+
+                    <h3 className="text-2xl sm:text-3xl font-semibold text-white tracking-tight leading-snug mb-3">
+                      {seminar.title}
+                    </h3>
+
+                    <p className="text-xs sm:text-sm text-zinc-400 leading-relaxed font-normal mb-6">
+                      {seminar.description}
+                    </p>
+
+                    {/* Highlights list */}
+                    <div className="space-y-2 py-4 text-xs sm:text-sm text-zinc-300">
+                      <div className="flex items-center gap-2">
+                        <span className="w-1.5 h-1.5 rounded-full bg-white flex-shrink-0" />
+                        <span><strong>Prísna kapacita:</strong> Iba 6 kaderníkov pre 100% individuálny prístup</span>
+                      </div>
+                      <div className="flex items-center gap-2">
+                        <span className="w-1.5 h-1.5 rounded-full bg-white flex-shrink-0" />
+                        <span><strong>Prax na modelkách:</strong> Osobné nastavenie biomechaniky rúk a techniky od Richarda</span>
+                      </div>
+                      <div className="flex items-center gap-2">
+                        <span className="w-1.5 h-1.5 rounded-full bg-white flex-shrink-0" />
+                        <span><strong>V cene:</strong> {seminar.includedItems?.[0] || 'Pracovné skriptá'}, certifikát a gurmánsky obed</span>
+                      </div>
+                      <div className="flex items-center gap-2">
+                        <span className="w-1.5 h-1.5 rounded-full bg-white flex-shrink-0" />
+                        <span><strong>Fakturácia:</strong> Možnosť vystavenia daňového dokladu na salón (IČO / DIČ)</span>
+                      </div>
                     </div>
                   </div>
 
-                  <div className="flex items-center gap-3 w-full sm:w-auto justify-end">
-                    <button
-                      onClick={() => onOpenDetail(featuredSeminar)}
-                      className="px-4 py-2.5 rounded-full text-xs font-medium text-zinc-400 hover:text-white transition-colors cursor-pointer whitespace-nowrap"
-                    >
-                      Harmonogram
-                    </button>
+                  {/* Price & Action row */}
+                  <div className="pt-4 border-t border-zinc-850/60 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
+                    <div>
+                      <span className="text-[11px] uppercase tracking-wider text-zinc-500 block font-medium">
+                        Cena kurzu
+                      </span>
+                      <div className="flex items-baseline gap-2 mt-0.5">
+                        <span className="text-2xl sm:text-3xl font-semibold text-white tracking-tight whitespace-nowrap">
+                          {formatPrice(seminar.tiers[0]?.priceEUR || 380, currency)}
+                        </span>
+                        <span className="text-xs text-zinc-400 font-normal whitespace-nowrap">
+                          (záloha 100 €)
+                        </span>
+                      </div>
+                    </div>
 
-                    <button
-                      onClick={() => onBookSeminar(featuredSeminar)}
-                      className="inline-flex items-center justify-center gap-1.5 px-6 py-2.5 rounded-full text-xs sm:text-sm font-semibold bg-white text-black hover:bg-zinc-200 transition-all active:scale-95 shadow-lg shadow-white/10 cursor-pointer whitespace-nowrap"
-                    >
-                      <span>Rezervovať miesto</span>
-                      <ArrowUpRight className="w-4 h-4" />
-                    </button>
+                    <div className="flex items-center gap-3 w-full sm:w-auto justify-end">
+                      <button
+                        onClick={() => onOpenDetail(seminar)}
+                        className="px-4 py-2.5 rounded-full text-xs font-medium text-zinc-400 hover:text-white transition-colors cursor-pointer whitespace-nowrap"
+                      >
+                        Harmonogram
+                      </button>
+
+                      <button
+                        onClick={() => onBookSeminar(seminar)}
+                        className="inline-flex items-center justify-center gap-1.5 px-6 py-2.5 rounded-full text-xs sm:text-sm font-semibold bg-white text-black hover:bg-zinc-200 transition-all active:scale-95 shadow-lg shadow-white/10 cursor-pointer whitespace-nowrap"
+                      >
+                        <span>Rezervovať miesto</span>
+                        <ArrowUpRight className="w-4 h-4" />
+                      </button>
+                    </div>
                   </div>
+
                 </div>
 
               </div>
-
             </div>
-          </div>
-        )}
+          ))}
+        </div>
 
         {/* UPCOMING DATES SCHEDULE (Quiet Minimalist List) */}
         <div className="mb-16">

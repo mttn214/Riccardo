@@ -21,7 +21,15 @@ export interface ParsedDates {
 export function getSeminarCalendarDates(seminar: Seminar): ParsedDates {
   const id = seminar.id || '';
 
-  if (id.includes('fukan') || id.includes('styling') || seminar.dates?.includes('November 2026')) {
+  if (id.includes('biker') || id.includes('glamour') || id.includes('kuce') || seminar.dates?.includes('Máj 2027')) {
+    return {
+      dtStart: '20270517T093000',
+      dtEnd: '20270518T173000',
+      filename: 'Masterclass-Biker-Glamour-Riccardo-Lucenec.ics',
+    };
+  }
+
+  if (id.includes('fukan') || id.includes('objem') || (seminar.dates?.includes('November 2026') && !id.includes('biker'))) {
     return {
       dtStart: '20261116T093000',
       dtEnd: '20261117T173000',
