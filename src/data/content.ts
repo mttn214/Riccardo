@@ -149,7 +149,7 @@ export const SEMINARS_DATA: Seminar[] = [
     totalSeats: 6,
     availableSeats: 2,
     image: "/images/riccardo/richard_conka_hda_3.jpg",
-    secondaryImage: "/images/riccardo/gallery/riccardo_art_58.jpg",
+    secondaryImage: "/images/riccardo/gallery/riccardo_art_02.jpg",
     description: "Vlajkový autorský masterclass Richarda Čonku. Komorná skupina maximálne 6 kaderníkov pre garanciu osobnej korekcie každého ťahu kefou. Získate kontrolu nad dynamikou tepla, nadvihnutím od korienkov a zrkadlovo hladkým pohybom bez krepovatenia.",
     learningOutcomes: [
       "Správna biomechanika a ergonómia rúk pri napínaní prameňa",

@@ -36,6 +36,8 @@ import {
 import { adminStore } from '../services/adminStore';
 import { generateLuxuryTicketPDF } from '../services/ticketService';
 import { saveReservationToCloud } from '../services/supabaseClient';
+import { downloadSeminarIcs, generateGoogleCalendarUrl } from '../utils/calendar';
+import { formatSensitivePaymentError } from '../utils/paymentErrors';
 
 
 interface ReservationModalProps {
@@ -525,7 +527,7 @@ export const ReservationModal: React.FC<ReservationModalProps> = ({
 
       if (!stripeResult.success) {
         setIsProcessingPayment(false);
-        setStripeError(stripeResult.error || 'Platobnú kartu sa nepodarilo autorizovať cez Stripe.');
+        setStripeError(formatSensitivePaymentError(stripeResult.error));
         return;
       }
 
@@ -538,7 +540,7 @@ export const ReservationModal: React.FC<ReservationModalProps> = ({
       });
     } catch (err: any) {
       setIsProcessingPayment(false);
-      setStripeError(err.message || 'Nastala neočakávaná chyba pri spracovaní platby.');
+      setStripeError(formatSensitivePaymentError(err?.message));
     }
   };
 
@@ -640,15 +642,13 @@ export const ReservationModal: React.FC<ReservationModalProps> = ({
 
 
   const handleDownloadCalendar = () => {
-    const icsContent = `BEGIN:VCALENDAR\r\nVERSION:2.0\r\nPRODID:-//Hair Salon Riccardo//Masterclass Reservations//SK\r\nBEGIN:VEVENT\r\nSUMMARY:${selectedSeminar.title} — Hair Salon Riccardo\r\nDESCRIPTION:Masterclass s Richardom Čonkom. Kód rezervácie: ${confirmationCode}. Prevádzkovateľ: ${COMPANY_DETAILS.legalName}.\r\nLOCATION:${selectedSeminar.venue}, ${selectedSeminar.city}\r\nSTATUS:CONFIRMED\r\nEND:VEVENT\r\nEND:VCALENDAR`;
-    const blob = new Blob([icsContent], { type: 'text/calendar;charset=utf-8' });
-    const url = window.URL.createObjectURL(blob);
-    const link = document.createElement('a');
-    link.href = url;
-    link.setAttribute('download', `${selectedSeminar.id}.ics`);
-    document.body.appendChild(link);
-    link.click();
-    document.body.removeChild(link);
+    downloadSeminarIcs({
+      seminar: selectedSeminar,
+      attendeeName: formData.fullName,
+      confirmationCode: confirmationCode || 'RIC-VIP',
+      tierName: currentTier?.name,
+      amountEUR: amountToPayNow,
+    });
   };
 
   const resetAndClose = () => {
@@ -1126,7 +1126,7 @@ export const ReservationModal: React.FC<ReservationModalProps> = ({
               {stripeError && (
                 <div className="p-4 rounded-2xl bg-amber-500/10 border border-amber-500/20 text-amber-200 text-xs flex items-start gap-3 animate-fadeIn">
                   <AlertCircle className="w-4 h-4 mt-0.5 flex-shrink-0 text-amber-400" />
-                  <p className="text-zinc-200 leading-relaxed">{stripeError}</p>
+                  <p className="text-zinc-200 leading-relaxed">{formatSensitivePaymentError(stripeError)}</p>
                 </div>
               )}
 
@@ -1341,11 +1341,18 @@ export const ReservationModal: React.FC<ReservationModalProps> = ({
           {step === 4 && (
             <div className="space-y-6 text-center animate-fadeIn">
               
-              <div className="space-y-2">
-                <div className="w-14 h-14 mx-auto rounded-full bg-emerald-950/80 border border-emerald-500/30 flex items-center justify-center text-emerald-400 shadow-xl">
-                  <CheckCircle2 className="w-8 h-8" />
+              <div className="space-y-3">
+                <div className="flex flex-col items-center justify-center gap-2">
+                  <img
+                    src="/images/riccardo/official_logo_dark_square.png"
+                    alt="Hair Salon Riccardo"
+                    className="w-16 h-16 rounded-2xl object-contain shadow-2xl border border-[#c5a059]/30 p-1 bg-black/80 backdrop-blur-md"
+                  />
+                  <div className="w-10 h-10 rounded-full bg-emerald-950/80 border border-emerald-500/30 flex items-center justify-center text-emerald-400 shadow-xl mt-1">
+                    <CheckCircle2 className="w-6 h-6" />
+                  </div>
                 </div>
-                <span className="text-xs uppercase tracking-widest text-emerald-400 font-semibold block">
+                <span className="text-xs uppercase tracking-widest text-[#c5a059] font-bold block">
                   Rezervácia úspešná • Miesto garantované
                 </span>
                 <h3 className="text-2xl sm:text-3xl font-semibold text-white tracking-tight">
@@ -1385,12 +1392,19 @@ export const ReservationModal: React.FC<ReservationModalProps> = ({
                 id="printable-ticket"
                 className="max-w-md mx-auto p-6 rounded-3xl bg-zinc-950/90 ring-1 ring-[#c5a059]/30 text-left space-y-4 shadow-2xl relative overflow-hidden"
               >
-                <div className="flex justify-between items-baseline pb-3">
-                  <div>
-                    <span className="text-xs font-bold tracking-wider text-[#c5a059] uppercase block">
-                      RICCARDO ACADEMY • VIP VSTUPENKA
-                    </span>
-                    <span className="text-[11px] text-zinc-500">Prevádzkovateľ: {COMPANY_DETAILS.legalName}</span>
+                <div className="flex justify-between items-center pb-3 border-b border-zinc-800/80">
+                  <div className="flex items-center gap-3">
+                    <img
+                      src="/images/riccardo/official_logo_dark_square.png"
+                      alt="Riccardo"
+                      className="w-11 h-11 rounded-xl object-contain border border-[#c5a059]/40 bg-black/60 p-1 shadow-lg"
+                    />
+                    <div>
+                      <span className="text-xs font-bold tracking-wider text-[#c5a059] uppercase block">
+                        RICCARDO ACADEMY • VIP VSTUPENKA
+                      </span>
+                      <span className="text-[11px] text-zinc-500">Prevádzkovateľ: {COMPANY_DETAILS.legalName}</span>
+                    </div>
                   </div>
                   <span className="font-mono text-xs text-[#c5a059] bg-[#c5a059]/15 px-2.5 py-1 rounded-lg font-bold">
                     {confirmationCode}
@@ -1517,7 +1531,13 @@ export const ReservationModal: React.FC<ReservationModalProps> = ({
                     <span>Apple / Outlook (.ics)</span>
                   </button>
                   <a
-                    href={`https://calendar.google.com/calendar/render?action=TEMPLATE&text=${encodeURIComponent(selectedSeminar.title + ' — Hair Salon Riccardo')}&details=${encodeURIComponent('Masterclass s Richardom Čonkom. Kód vstupenky: ' + confirmationCode + '. Prevádzkovateľ: ' + COMPANY_DETAILS.legalName + '. Vstupenka bola riadne zaevidovaná.')}&location=${encodeURIComponent(selectedSeminar.venue + ', Lučenec')}`}
+                    href={generateGoogleCalendarUrl({
+                      seminar: selectedSeminar,
+                      attendeeName: formData.fullName,
+                      confirmationCode: confirmationCode || 'RIC-VIP',
+                      tierName: currentTier?.name,
+                      amountEUR: amountToPayNow,
+                    })}
                     target="_blank"
                     rel="noopener noreferrer"
                     className="px-4 py-2 rounded-full bg-zinc-900 hover:bg-zinc-800 border border-zinc-750 text-xs font-medium text-white transition-all flex items-center gap-1.5 shadow-sm"

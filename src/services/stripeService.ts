@@ -1,5 +1,6 @@
 import { loadStripe, Stripe, PaymentRequest } from '@stripe/stripe-js';
 import { adminStore } from './adminStore';
+import { formatSensitivePaymentError } from '../utils/paymentErrors';
 
 /**
  * Stripe Service for Hair Salon Riccardo / ZETEREM s.r.o.
@@ -124,7 +125,7 @@ export async function processStripeCardPayment(params: CreateStripePaymentParams
           isTestModeRealCard,
           error: isTestModeRealCard
             ? 'Zadali ste reálnu bankovú kartu do testovacieho prostredia Stripe. Testovací režim zámerne odmieta reálne karty, aby vám nestiahol peniaze. Pre otestovanie použite tlačidlo „Vložiť testovaciu kartu (4242...)“, alebo potvrďte rezerváciu na faktúru / mieste.'
-            : (errMsg || 'Platobnú kartu sa nepodarilo overiť cez Stripe.')
+            : formatSensitivePaymentError(errMsg, error?.code)
         };
       }
 
@@ -159,7 +160,7 @@ export async function processStripeCardPayment(params: CreateStripePaymentParams
           if (confirmError) {
             return {
               success: false,
-              error: confirmError.message || '3D Secure overenie karty bolo zamietnuté.'
+              error: formatSensitivePaymentError(confirmError.message, confirmError.code)
             };
           }
           if (confirmedPI && (confirmedPI.status === 'succeeded' || confirmedPI.status === 'processing')) {
@@ -184,7 +185,7 @@ export async function processStripeCardPayment(params: CreateStripePaymentParams
       } else {
         return {
           success: false,
-          error: data.error || 'Autorizácia platby v Stripe zlyhala.'
+          error: formatSensitivePaymentError(data.error, data.code || data.decline_code)
         };
       }
     } catch (apiErr: any) {

@@ -237,14 +237,34 @@ export default async function handler(req, res) {
 
   } catch (error) {
     console.error('Chyba Stripe spracovania:', error);
-    let friendlyError = error.message || 'Nastala chyba pri autorizácii platby v systéme Stripe.';
-    const lower = friendlyError.toLowerCase();
-    if (lower.includes('activated payment methods') || lower.includes('charges_enabled') || lower.includes('cannot charge') || lower.includes('inactive')) {
+    const code = (error?.code || error?.decline_code || '').toLowerCase();
+    const msg = (error?.message || '').toLowerCase();
+
+    let friendlyError = 'Platbu sa nepodarilo autorizovať. Prosíme, skontrolujte zadané údaje karty alebo zvoľte platbu bankovým prevodom na účet.';
+
+    if (code === 'insufficient_funds' || msg.includes('insufficient funds') || msg.includes('nedostatočný zostatok')) {
+      friendlyError = 'Platba neprebehla z dôvodu nedostatočného disponibilného zostatku na účte. Prosíme, skontrolujte zostatok na karte vo svojej bankovej aplikácii alebo vyskúšajte inú platobnú kartu či alternatívnu metódu.';
+    } else if (code === 'card_declined' || code === 'generic_decline' || msg.includes('declined') || msg.includes('do_not_honor')) {
+      friendlyError = 'Platobná karta bola vašou bankou odmietnutá. Prosíme, skontrolujte si vo svojej bankovej aplikácii povolenie internetových platieb a denné limity, alebo použite inú platobnú kartu.';
+    } else if (code === 'expired_card' || msg.includes('expired')) {
+      friendlyError = 'Platnosť zadanej karty už vypršala. Prosíme, skontrolujte dátum platnosti karty alebo zadajte novú kartu.';
+    } else if (code === 'incorrect_cvc' || code === 'invalid_cvc' || msg.includes('cvc') || msg.includes('security code')) {
+      friendlyError = 'Bezpečnostný kód CVC (3 číslice na zadnej strane karty) bol zadaný nesprávne. Skontrolujte ho prosím a zadajte znova.';
+    } else if (code === 'incorrect_number' || code === 'invalid_number' || msg.includes('card number')) {
+      friendlyError = 'Číslo platobnej karty nie je správne. Prosíme, skontrolujte zadané číslice a skúste to znova.';
+    } else if (code === 'authentication_required' || msg.includes('3d secure') || msg.includes('authentication')) {
+      friendlyError = 'Bezpečnostné overenie platby (3D Secure vo vašej bankovej aplikácii) nebolo dokončené. Skúste prosím platbu zopakovať a potvrdiť vo svojej banke.';
+    } else if (code === 'processing_error' || msg.includes('processing error')) {
+      friendlyError = 'Pri spracovaní platby v banke nastala dočasná technická chyba. Prosíme, vyskúšajte to o minútu znova alebo zvoľte platbu bankovým prevodom.';
+    } else if (msg.includes('activated payment methods') || msg.includes('charges_enabled') || msg.includes('cannot charge') || msg.includes('inactive')) {
       friendlyError = 'Váš živý Stripe účet (hair.riccardo@gmail.com) zatiaľ nemá dokončenú aktiváciu firemných údajov v Stripe Dashboarde (https://dashboard.stripe.com). Po overení údajov spoločnosti ZETEREM s.r.o. Stripe automaticky aktivuje príjem platieb.';
     }
+
     return res.status(400).json({
       success: false,
-      error: friendlyError
+      error: friendlyError,
+      code: error?.code || null,
+      decline_code: error?.decline_code || null
     });
   }
 }

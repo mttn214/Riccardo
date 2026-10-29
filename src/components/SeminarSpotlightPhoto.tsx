@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useRef } from 'react';
+import React, { useState } from 'react';
 
 interface SeminarSpotlightPhotoProps {
   primaryImage: string;
@@ -13,54 +13,42 @@ export const SeminarSpotlightPhoto: React.FC<SeminarSpotlightPhotoProps> = ({
   secondaryImage,
   title,
 }) => {
-  const [activeTab, setActiveTab] = useState<'action' | 'atelier'>('action');
   const [isHovered, setIsHovered] = useState(false);
-  const timerRef = useRef<NodeJS.Timeout | null>(null);
+  const [isClicked, setIsClicked] = useState(false);
 
-  // Auto-rotate every 5.5 seconds when not hovered by user
-  useEffect(() => {
-    if (!secondaryImage) return;
-
-    if (isHovered) {
-      // When hovered, show the authentic atelier
-      setActiveTab('atelier');
-      return;
-    } else {
-      // When hover leaves, return to primary action photo
-      setActiveTab('action');
-    }
-
-    timerRef.current = setInterval(() => {
-      setActiveTab((prev) => (prev === 'action' ? 'atelier' : 'action'));
-    }, 5500);
-
-    return () => {
-      if (timerRef.current) clearInterval(timerRef.current);
-    };
-  }, [isHovered, secondaryImage]);
+  // Active secondary image ONLY when hovered with cursor or clicked/tapped (NO auto timer)
+  const showSecondary = Boolean(secondaryImage && (isHovered || isClicked));
 
   return (
     <div
-      className="relative w-full h-full min-h-[360px] sm:min-h-[420px] bg-zinc-950 overflow-hidden group select-none cursor-pointer"
+      className="relative w-full h-full min-h-[360px] sm:min-h-[420px] bg-zinc-950 overflow-hidden select-none cursor-pointer"
       onMouseEnter={() => setIsHovered(true)}
-      onMouseLeave={() => setIsHovered(false)}
+      onMouseLeave={() => {
+        setIsHovered(false);
+        setIsClicked(false);
+      }}
+      onClick={() => {
+        if (secondaryImage) {
+          setIsClicked((prev) => !prev);
+        }
+      }}
     >
       {/* 1. Primary Action Image (Autorské dielo / Modelka) */}
       <img
         src={primaryImage}
         alt={`${title} - Autorská technika stylingu`}
-        className={`absolute inset-0 w-full h-full object-cover object-center transition-all duration-700 ease-in-out ${
-          activeTab === 'action' ? 'opacity-100 scale-100 z-10' : 'opacity-0 scale-105 z-0'
+        className={`absolute inset-0 w-full h-full object-cover object-center transition-all duration-500 ease-in-out ${
+          !showSecondary ? 'opacity-100 scale-100 z-10' : 'opacity-0 scale-105 z-0 pointer-events-none'
         }`}
       />
 
-      {/* 2. Secondary Authentic Atelier Image (Lučenec akadémia) */}
+      {/* 2. Secondary Practical Action Image (Preklikávacia / Prejdenie kurzorom) */}
       {secondaryImage && (
         <img
           src={secondaryImage}
-          alt={`${title} - Ateliér a účastníci v Lučenci`}
-          className={`absolute inset-0 w-full h-full object-cover object-center transition-all duration-700 ease-in-out ${
-            activeTab === 'atelier' ? 'opacity-100 scale-100 z-10' : 'opacity-0 scale-105 z-0'
+          alt={`${title} - Salónny styling a fixácia textúry`}
+          className={`absolute inset-0 w-full h-full object-cover object-center transition-all duration-500 ease-in-out ${
+            showSecondary ? 'opacity-100 scale-100 z-10' : 'opacity-0 scale-105 z-0 pointer-events-none'
           }`}
         />
       )}
