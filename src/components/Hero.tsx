@@ -1,5 +1,6 @@
 import React from 'react';
 import { ArrowUpRight } from 'lucide-react';
+import { GlassHeadlineLine } from './GlassHeadlineLine';
 import { STYLIST_PROFILE } from '../data/content';
 
 interface HeroProps {
@@ -21,8 +22,8 @@ export const Hero: React.FC<HeroProps> = ({ onExploreSeminars, onExplorePortfoli
 
         {/* Large Clean Headline (Apple / Birne style) */}
         <h1 className="text-4xl sm:text-6xl md:text-7xl lg:text-[84px] font-semibold tracking-[-0.035em] leading-[1.05] max-w-4xl mb-6">
-          Umenie stylingu. <br />
-          <span className="text-zinc-500 font-normal">Precíznosť formy.</span>
+          <GlassHeadlineLine>Umenie stylingu.</GlassHeadlineLine>
+          <GlassHeadlineLine className="text-zinc-500 font-normal">Precíznosť formy.</GlassHeadlineLine>
         </h1>
 
         {/* Crisp Subtitle */}

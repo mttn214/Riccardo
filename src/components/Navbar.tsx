@@ -37,10 +37,10 @@ export const Navbar: React.FC<NavbarProps> = ({ onOpenBooking }) => {
 
   const brandText = (
     <>
-      <span className="font-bold tracking-[0.14em] text-white text-xs sm:text-sm uppercase leading-none font-brand">
+      <span className="font-bold tracking-[0.14em] text-white text-[0.9rem] sm:text-[1.05rem] uppercase leading-none font-brand">
         RICCARDO
       </span>
-      <span className="text-[8px] sm:text-[9px] text-zinc-400 font-normal tracking-[0.10em] uppercase mt-1.5 font-brand">
+      <span className="text-[9.6px] sm:text-[10.8px] text-zinc-400 font-normal tracking-[0.10em] uppercase mt-1.5 font-brand">
         Hair Salon &amp; Academy <span className="hidden sm:inline">• Lučenec</span>
       </span>
     </>
@@ -53,7 +53,7 @@ export const Navbar: React.FC<NavbarProps> = ({ onOpenBooking }) => {
       {/* Dynamic Top Announcement Banner */}
       {settings.bannerEnabled && settings.bannerText && (
         <div
-          className={`w-full py-2 px-4 text-center text-xs font-medium flex items-center justify-center gap-2 border-b transition-colors ${
+          className={`w-full py-2 px-4 text-center text-[0.9rem] font-medium flex items-center justify-center gap-2 border-b transition-colors ${
             settings.bannerStyle === 'emerald'
               ? 'bg-emerald-950/90 text-emerald-200 border-emerald-800/40'
               : settings.bannerStyle === 'dark'
@@ -75,7 +75,7 @@ export const Navbar: React.FC<NavbarProps> = ({ onOpenBooking }) => {
       )}
 
       <div className={`max-w-6xl mx-auto px-4 sm:px-6 transition-all duration-300 ${
-        isScrolled ? 'py-2.5 sm:py-3' : 'py-3 sm:py-3.5'
+        isScrolled ? 'py-3 sm:py-[0.9rem]' : 'py-[0.9rem] sm:py-[1.05rem]'
       }`}>
         <div className="flex items-center justify-between gap-3 lg:gap-6">
           
@@ -84,7 +84,7 @@ export const Navbar: React.FC<NavbarProps> = ({ onOpenBooking }) => {
             <img
               src="/images/riccardo/official_logo_dark_square.png"
               alt="Hair Salon Riccardo"
-              className="w-14 h-14 sm:w-16 sm:h-16 rounded-full object-contain bg-zinc-950 border border-zinc-800/90 p-0.5 shadow-xl shrink-0"
+              className="size-[4.2rem] sm:size-[4.8rem] rounded-full object-contain bg-zinc-950 border border-zinc-800/90 p-0.5 shadow-xl shrink-0"
             />
             <div
               className="glass-brand-text relative font-brand"
@@ -103,13 +103,13 @@ export const Navbar: React.FC<NavbarProps> = ({ onOpenBooking }) => {
           </Link>
 
           {/* Desktop Multi-page Navigation */}
-          <nav className="hidden shrink-0 items-center whitespace-nowrap md:flex lg:gap-4">
+          <nav className="hidden shrink-0 items-center whitespace-nowrap min-[960px]:flex lg:gap-4">
             {navLinks.map((link) => (
               <NavLink
                 key={link.label}
                 to={link.href}
                 className={({ isActive }) =>
-                  `glass-nav-link relative isolate rounded-full px-2 py-1 text-[13px] transition-colors font-normal tracking-tight ${
+                  `glass-nav-link relative isolate rounded-full px-2 py-1 text-[15.6px] transition-colors font-normal tracking-tight ${
                     isActive
                       ? 'text-white font-medium'
                       : 'text-zinc-400 hover:text-white'
@@ -122,10 +122,10 @@ export const Navbar: React.FC<NavbarProps> = ({ onOpenBooking }) => {
           </nav>
 
           {/* Minimal CTA Button */}
-          <div className="hidden shrink-0 items-center md:flex">
+          <div className="hidden shrink-0 items-center min-[960px]:flex">
             <button
               onClick={onOpenBooking}
-              className="inline-flex items-center gap-1.5 px-4 py-1.5 rounded-full text-xs font-semibold bg-white text-black hover:bg-zinc-200 transition-all active:scale-95 shadow-sm"
+              className="inline-flex items-center gap-1.5 px-4 py-1.5 rounded-full text-[0.9rem] font-semibold bg-white text-black hover:bg-zinc-200 transition-all active:scale-95 shadow-sm"
             >
               <span>Rezervovať</span>
               <ArrowUpRight className="w-3.5 h-3.5" />
@@ -133,10 +133,10 @@ export const Navbar: React.FC<NavbarProps> = ({ onOpenBooking }) => {
           </div>
 
           {/* Mobile Menu Button */}
-          <div className="flex shrink-0 items-center gap-2 md:hidden">
+          <div className="flex shrink-0 items-center gap-2 min-[960px]:hidden">
             <button
               onClick={onOpenBooking}
-              className="px-3 py-1 rounded-full text-xs font-semibold bg-white text-black"
+              className="px-3 py-1 rounded-full text-[0.9rem] font-semibold bg-white text-black"
             >
               Rezervovať
             </button>
@@ -145,7 +145,7 @@ export const Navbar: React.FC<NavbarProps> = ({ onOpenBooking }) => {
               className="p-1.5 text-zinc-400 hover:text-white focus:outline-none"
               aria-label="Menu"
             >
-              {mobileMenuOpen ? <X className="w-5 h-5" /> : <Menu className="w-5 h-5" />}
+              {mobileMenuOpen ? <X className="size-6" /> : <Menu className="size-6" />}
             </button>
           </div>
 
@@ -154,7 +154,7 @@ export const Navbar: React.FC<NavbarProps> = ({ onOpenBooking }) => {
 
       {/* Mobile Drawer */}
       {mobileMenuOpen && (
-        <div className="md:hidden bg-black/40 px-6 py-6 animate-fadeIn">
+        <div className="min-[960px]:hidden bg-black/40 px-6 py-6 animate-fadeIn">
           <div className="flex flex-col space-y-4">
             {navLinks.map((link) => (
               <NavLink
@@ -162,7 +162,7 @@ export const Navbar: React.FC<NavbarProps> = ({ onOpenBooking }) => {
                 to={link.href}
                 onClick={() => setMobileMenuOpen(false)}
                 className={({ isActive }) =>
-                  `glass-nav-link self-start rounded-full px-2 py-1.5 text-sm transition-colors ${
+                  `glass-nav-link self-start rounded-full px-2 py-1.5 text-[1.05rem] transition-colors ${
                     isActive ? 'text-white font-semibold' : 'text-zinc-400 hover:text-white'
                   }`
                 }

@@ -39,36 +39,58 @@
   box-shadow: 0 10px 30px rgb(0 0 0 / 24%);
 }
 
-::highlight(riccardo-glow) {
-  text-shadow: 0 1px 2px rgb(0 0 0 / 85%), 0 0 3px rgb(255 255 255 / 95%), 0 0 9px rgb(255 255 255 / 65%);
+::highlight(riccardo-glow-0) {
+  color: color-mix(in srgb, var(--text-glow-base), white 50%);
+  text-shadow: 0 0 6px rgb(255 255 255 / 27%);
 }
 
-::highlight(riccardo-glow-edge) {
-  text-shadow: 0 0 5px rgb(255 255 255 / 38%);
+::highlight(riccardo-glow-1) {
+  color: color-mix(in srgb, var(--text-glow-base), white 41%);
+  text-shadow: 0 0 6px rgb(255 255 255 / 21%);
 }
 
-[data-local-text-glow] {
-  --footer-glow-base: theme('colors.zinc.500');
+::highlight(riccardo-glow-2) {
+  color: color-mix(in srgb, var(--text-glow-base), white 30%);
+  text-shadow: 0 0 6px rgb(255 255 255 / 15%);
 }
 
-[data-local-text-glow] > span {
-  --footer-glow-base: theme('colors.zinc.300');
+::highlight(riccardo-glow-3) {
+  color: color-mix(in srgb, var(--text-glow-base), white 19%);
+  text-shadow: 0 0 6px rgb(255 255 255 / 9%);
+}
+
+::highlight(riccardo-glow-4) {
+  color: color-mix(in srgb, var(--text-glow-base), white 9%);
+  text-shadow: 0 0 6px rgb(255 255 255 / 4%);
+}
+
+::highlight(riccardo-glow-5) {
+  color: color-mix(in srgb, var(--text-glow-base), white 3%);
+  text-shadow: 0 0 6px rgb(255 255 255 / 1%);
+}
+
+::highlight(riccardo-bronze-glow) {
+  text-shadow: 0 0 5px rgb(195 140 92 / 60%);
+}
+
+::highlight(riccardo-bronze-glow-edge) {
+  text-shadow: 0 0 4px rgb(195 140 92 / 24%);
 }
 
 ::highlight(riccardo-footer-glow-0) {
-  color: color-mix(in srgb, var(--footer-glow-base) 80%, white);
+  color: color-mix(in srgb, var(--text-glow-base) 80%, white);
 }
 
 ::highlight(riccardo-footer-glow-1) {
-  color: color-mix(in srgb, var(--footer-glow-base) 86%, white);
+  color: color-mix(in srgb, var(--text-glow-base) 86%, white);
 }
 
 ::highlight(riccardo-footer-glow-2) {
-  color: color-mix(in srgb, var(--footer-glow-base) 92%, white);
+  color: color-mix(in srgb, var(--text-glow-base) 92%, white);
 }
 
 ::highlight(riccardo-footer-glow-3) {
-  color: color-mix(in srgb, var(--footer-glow-base) 97%, white);
+  color: color-mix(in srgb, var(--text-glow-base) 97%, white);
 }
 
 .glass-brand-highlight {
@@ -87,7 +109,7 @@
   }
 }
 
-.public-site :where(button, [role="button"], .glass-action, .glass-nav-link:hover:not(nav .glass-nav-link)),
+.public-site :where(button:not(.faq-toggle), [role="button"], .glass-action, .glass-nav-link:hover:not(nav .glass-nav-link)),
 .public-site nav .glass-nav-link:hover::before {
   --glass-highlight: rgb(255 255 255 / 23%);
   --glass-edge: rgb(255 255 255 / 20%);

@@ -116,7 +116,7 @@ export const ContactSection: React.FC = () => {
                 </a>
               </div>
 
-              <div>
+              <div data-local-text-glow>
                 <span className="text-xs uppercase tracking-wider text-zinc-500 block mb-1 font-medium">
                   Otváracie hodiny
                 </span>
@@ -390,7 +390,7 @@ export const ContactSection: React.FC = () => {
             Časté otázky
           </h3>
 
-          <div className="divide-y divide-zinc-850 border-y border-zinc-850">
+          <div>
             {faqs.map((faq, idx) => {
               const isOpen = activeFaq === idx;
               return (
@@ -398,7 +398,7 @@ export const ContactSection: React.FC = () => {
                   <button
                     type="button"
                     onClick={() => setActiveFaq(isOpen ? null : idx)}
-                    className="w-full text-left flex items-center justify-between gap-4 group"
+                    className="faq-toggle w-full text-left flex items-center justify-between gap-4 group"
                   >
                     <span className="text-base text-zinc-200 font-medium tracking-tight group-hover:text-white transition-colors">
                       {faq.q}

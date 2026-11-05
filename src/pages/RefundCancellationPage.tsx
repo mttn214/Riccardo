@@ -5,7 +5,7 @@ import { ArrowLeft, ShieldCheck, RefreshCw, FileText, Building2, AlertCircle } f
 
 export const RefundCancellationPage: React.FC = () => {
   return (
-    <div className="pt-24 pb-20 bg-black text-white min-h-screen">
+    <div className="pt-28 sm:pt-32 pb-20 bg-black text-white min-h-screen">
       <div className="max-w-4xl mx-auto px-4 sm:px-6">
         
         {/* Navigation Breadcrumb */}

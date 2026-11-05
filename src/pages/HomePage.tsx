@@ -1,3 +1,4 @@
+import { GlassHeadlineLine } from '../components/GlassHeadlineLine';
 import React, { useRef, useState, useEffect } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { Hero } from '../components/Hero';
@@ -96,7 +97,7 @@ export const HomePage: React.FC<HomePageProps> = ({ onOpenBooking, onSelectPortf
                 Najbližší autorský masterclass
               </span>
               <h2 className="text-3xl sm:text-5xl font-semibold tracking-[-0.03em] leading-tight">
-                Vzácnosť. Nie masovosť.
+                <GlassHeadlineLine>Vzácnosť. Nie masovosť.</GlassHeadlineLine>
               </h2>
             </div>
             <Link
@@ -155,7 +156,7 @@ export const HomePage: React.FC<HomePageProps> = ({ onOpenBooking, onSelectPortf
                     </div>
 
                     <h3 className="text-2xl sm:text-3xl font-semibold text-white tracking-tight leading-snug mb-3">
-                      {featuredSeminar.title}
+                      <GlassHeadlineLine>{featuredSeminar.title}</GlassHeadlineLine>
                     </h3>
 
                     <p className="text-sm text-zinc-400 leading-relaxed font-normal mb-6">
