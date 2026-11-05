@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { Link, NavLink } from 'react-router-dom';
+import { Link, NavLink, useLocation } from 'react-router-dom';
 import { Menu, X, ArrowUpRight } from 'lucide-react';
 import { adminStore } from '../services/adminStore';
 
@@ -8,6 +8,8 @@ interface NavbarProps {
 }
 
 export const Navbar: React.FC<NavbarProps> = ({ onOpenBooking }) => {
+  const { pathname } = useLocation();
+  const bookingColor = pathname === '/' ? 'bg-yellow-400 hover:bg-yellow-300' : 'bg-white hover:bg-zinc-200';
   const [isScrolled, setIsScrolled] = useState(false);
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [settings, setSettings] = useState(() => adminStore.getSettings());
@@ -112,7 +114,7 @@ export const Navbar: React.FC<NavbarProps> = ({ onOpenBooking }) => {
           <div className="hidden sm:flex items-center">
             <button
               onClick={onOpenBooking}
-              className="inline-flex items-center gap-1.5 px-4 py-1.5 rounded-full text-xs font-semibold bg-white text-black hover:bg-zinc-200 transition-all active:scale-95 shadow-sm"
+              className={`inline-flex items-center gap-1.5 px-4 py-1.5 rounded-full text-xs font-semibold text-black transition-all active:scale-95 shadow-sm ${bookingColor}`}
             >
               <span>Rezervovať</span>
               <ArrowUpRight className="w-3.5 h-3.5" />
@@ -123,7 +125,7 @@ export const Navbar: React.FC<NavbarProps> = ({ onOpenBooking }) => {
           <div className="flex items-center gap-2 sm:hidden">
             <button
               onClick={onOpenBooking}
-              className="px-3 py-1 rounded-full text-xs font-semibold bg-white text-black"
+              className={`px-3 py-1 rounded-full text-xs font-semibold text-black ${bookingColor}`}
             >
               Rezervovať
             </button>
