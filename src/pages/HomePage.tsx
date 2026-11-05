@@ -77,7 +77,7 @@ export const HomePage: React.FC<HomePageProps> = ({ onOpenBooking, onSelectPortf
   };
 
   return (
-    <div>
+    <div className="bg-[#101010]">
       {/* Editorial Hero */}
       <Hero
         onExploreSeminars={() => {
@@ -88,7 +88,7 @@ export const HomePage: React.FC<HomePageProps> = ({ onOpenBooking, onSelectPortf
       />
 
       {/* SECTION: The Upcoming Exclusive Masterclass Drop */}
-      <section id="featured-drop" className="py-24 sm:py-32 bg-black border-t border-zinc-900 text-white">
+      <section id="featured-drop" className="py-24 sm:py-32 border-t border-zinc-900 text-white">
         <div className="max-w-6xl mx-auto px-4 sm:px-6">
           <div className="flex flex-col md:flex-row md:items-end justify-between gap-4 mb-12">
             <div>
@@ -197,7 +197,7 @@ export const HomePage: React.FC<HomePageProps> = ({ onOpenBooking, onSelectPortf
                     <div className="flex items-center gap-3 w-full sm:w-auto justify-end">
                       <Link
                         to="/seminare"
-                        className="px-4 py-2.5 rounded-full text-xs font-medium text-zinc-400 hover:text-white transition-colors cursor-pointer whitespace-nowrap"
+                        className="glass-action px-4 py-2.5 rounded-full text-xs font-medium text-zinc-400 hover:text-white transition-colors cursor-pointer whitespace-nowrap"
                       >
                         Viac informácií
                       </Link>
@@ -229,7 +229,7 @@ export const HomePage: React.FC<HomePageProps> = ({ onOpenBooking, onSelectPortf
       </section>
 
       {/* SECTION: Lookbook / Tvorba Moving Gallery */}
-      <section className="py-24 sm:py-32 bg-black border-t border-zinc-900 text-white overflow-hidden">
+      <section className="py-24 sm:py-32 border-t border-zinc-900 text-white overflow-hidden">
         <div className="max-w-6xl mx-auto px-4 sm:px-6">
           <div className="flex flex-col md:flex-row md:items-end justify-between gap-4 mb-10">
             <div>
@@ -316,7 +316,7 @@ export const HomePage: React.FC<HomePageProps> = ({ onOpenBooking, onSelectPortf
       </section>
 
       {/* SECTION: Awards Highlight */}
-      <section className="py-24 sm:py-32 bg-black text-white">
+      <section className="py-24 sm:py-32 text-white">
         <div className="max-w-6xl mx-auto px-4 sm:px-6">
           <div className="rounded-3xl bg-zinc-950 overflow-hidden shadow-2xl">
             <div className="p-8 sm:p-12">
@@ -393,7 +393,7 @@ export const HomePage: React.FC<HomePageProps> = ({ onOpenBooking, onSelectPortf
       </section>
 
       {/* SECTION: Verified Client Reviews Spotlight */}
-      <section className="py-24 sm:py-32 bg-black border-t border-zinc-900 text-white overflow-hidden">
+      <section className="py-24 sm:py-32 border-t border-zinc-900 text-white overflow-hidden">
         <div className="max-w-6xl mx-auto px-4 sm:px-6">
           <div className="flex flex-col md:flex-row md:items-end justify-between gap-6 mb-10">
             <div>
@@ -530,7 +530,7 @@ export const HomePage: React.FC<HomePageProps> = ({ onOpenBooking, onSelectPortf
       </section>
 
       {/* SECTION: Atelier Lučenec Callout with House Photo & Google Maps */}
-      <section className="py-20 sm:py-28 bg-black text-white">
+      <section className="py-20 sm:py-28 text-white">
         <div className="max-w-6xl mx-auto px-4 sm:px-6 space-y-8">
           {/* Header Row */}
           <div className="flex flex-col md:flex-row items-start md:items-end justify-between gap-6">
@@ -551,7 +551,7 @@ export const HomePage: React.FC<HomePageProps> = ({ onOpenBooking, onSelectPortf
                 href={STYLIST_PROFILE.googleMapsUrl}
                 target="_blank"
                 rel="noopener noreferrer"
-                className="inline-flex items-center gap-2 px-5 py-3 rounded-full text-xs sm:text-sm font-semibold bg-white hover:bg-zinc-200 text-black transition-all active:scale-95 shadow-lg whitespace-nowrap cursor-pointer"
+                className="glass-action inline-flex items-center gap-2 px-5 py-3 rounded-full text-xs sm:text-sm font-semibold bg-white hover:bg-zinc-200 text-black transition-all active:scale-95 shadow-lg whitespace-nowrap cursor-pointer"
               >
                 <MapPin className="w-4 h-4" />
                 <span>Navigovať cez Google Maps</span>
@@ -560,7 +560,7 @@ export const HomePage: React.FC<HomePageProps> = ({ onOpenBooking, onSelectPortf
 
               <Link
                 to="/salon"
-                className="inline-flex items-center gap-2 px-5 py-3 rounded-full text-xs sm:text-sm font-medium bg-zinc-900 hover:bg-zinc-800 text-zinc-200 hover:text-white transition-all whitespace-nowrap"
+                className="glass-action inline-flex items-center gap-2 px-5 py-3 rounded-full text-xs sm:text-sm font-medium bg-zinc-900 hover:bg-zinc-800 text-zinc-200 hover:text-white transition-all whitespace-nowrap"
               >
                 <span>Viac o salóne</span>
                 <ArrowUpRight className="w-3.5 h-3.5 text-zinc-400" />
@@ -625,7 +625,7 @@ export const HomePage: React.FC<HomePageProps> = ({ onOpenBooking, onSelectPortf
                   href={STYLIST_PROFILE.googleMapsUrl}
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="px-3.5 py-1.5 rounded-xl bg-white hover:bg-zinc-200 text-black font-semibold text-[11px] transition-colors shrink-0 flex items-center gap-1 cursor-pointer"
+                  className="glass-action px-3.5 py-1.5 rounded-xl bg-white hover:bg-zinc-200 text-black font-semibold text-[11px] transition-colors shrink-0 flex items-center gap-1 cursor-pointer"
                 >
                   <span>Trasa</span>
                   <ArrowUpRight className="w-3 h-3" />

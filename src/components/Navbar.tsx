@@ -37,11 +37,7 @@ export const Navbar: React.FC<NavbarProps> = ({ onOpenBooking }) => {
 
   return (
     <header
-      className={`fixed top-0 left-0 right-0 z-40 border-b transition-colors duration-300 transform-gpu will-change-[background-color,border-color] ${
-        isScrolled
-          ? 'bg-black/90 backdrop-blur-xl border-zinc-850'
-          : 'bg-black/40 backdrop-blur-md border-transparent'
-      }`}
+      className="glass-navbar fixed inset-x-0 top-0 z-40"
     >
       {/* Dynamic Top Announcement Banner */}
       {settings.bannerEnabled && settings.bannerText && (
@@ -70,14 +66,14 @@ export const Navbar: React.FC<NavbarProps> = ({ onOpenBooking }) => {
       <div className={`max-w-6xl mx-auto px-4 sm:px-6 transition-all duration-300 ${
         isScrolled ? 'py-2.5 sm:py-3' : 'py-3 sm:py-3.5'
       }`}>
-        <div className="flex items-center justify-between">
+        <div className="flex items-center justify-between gap-3 lg:gap-6">
           
           {/* Brand Logo */}
-          <Link to="/" className="flex items-center gap-3.5 group">
+          <Link to="/" className="flex min-w-0 items-center gap-3.5 [-webkit-tap-highlight-color:transparent]">
             <img
               src="/images/riccardo/official_logo_dark_square.png"
               alt="Hair Salon Riccardo"
-              className="w-14 h-14 sm:w-16 sm:h-16 rounded-full object-contain bg-zinc-950 border border-zinc-800/90 group-hover:border-zinc-500 transition-all p-0.5 shadow-xl shrink-0"
+              className="w-14 h-14 sm:w-16 sm:h-16 rounded-full object-contain bg-zinc-950 border border-zinc-800/90 p-0.5 shadow-xl shrink-0"
             />
             <div className="flex flex-col font-brand">
               <span className="font-bold tracking-[0.14em] text-white text-xs sm:text-sm uppercase leading-none font-brand">
@@ -90,15 +86,15 @@ export const Navbar: React.FC<NavbarProps> = ({ onOpenBooking }) => {
           </Link>
 
           {/* Desktop Multi-page Navigation */}
-          <nav className="hidden md:flex items-center space-x-8">
+          <nav className="hidden shrink-0 items-center whitespace-nowrap md:flex lg:gap-4">
             {navLinks.map((link) => (
               <NavLink
                 key={link.label}
                 to={link.href}
                 className={({ isActive }) =>
-                  `text-[13px] transition-colors font-normal tracking-tight relative py-1 ${
+                  `glass-nav-link rounded-full px-2 py-1 text-[13px] transition-colors font-normal tracking-tight ${
                     isActive
-                      ? 'text-white font-medium after:absolute after:bottom-0 after:left-0 after:right-0 after:h-[1.5px] after:bg-white'
+                      ? 'text-white font-medium'
                       : 'text-zinc-400 hover:text-white'
                   }`
                 }
@@ -109,7 +105,7 @@ export const Navbar: React.FC<NavbarProps> = ({ onOpenBooking }) => {
           </nav>
 
           {/* Minimal CTA Button */}
-          <div className="hidden sm:flex items-center">
+          <div className="hidden shrink-0 items-center md:flex">
             <button
               onClick={onOpenBooking}
               className="inline-flex items-center gap-1.5 px-4 py-1.5 rounded-full text-xs font-semibold bg-white text-black hover:bg-zinc-200 transition-all active:scale-95 shadow-sm"
@@ -120,7 +116,7 @@ export const Navbar: React.FC<NavbarProps> = ({ onOpenBooking }) => {
           </div>
 
           {/* Mobile Menu Button */}
-          <div className="flex items-center gap-2 sm:hidden">
+          <div className="flex shrink-0 items-center gap-2 md:hidden">
             <button
               onClick={onOpenBooking}
               className="px-3 py-1 rounded-full text-xs font-semibold bg-white text-black"
@@ -141,7 +137,7 @@ export const Navbar: React.FC<NavbarProps> = ({ onOpenBooking }) => {
 
       {/* Mobile Drawer */}
       {mobileMenuOpen && (
-        <div className="sm:hidden bg-black/98 border-b border-zinc-800 px-6 py-6 animate-fadeIn backdrop-blur-2xl">
+        <div className="md:hidden bg-black/40 px-6 py-6 animate-fadeIn">
           <div className="flex flex-col space-y-4">
             {navLinks.map((link) => (
               <NavLink
@@ -149,7 +145,7 @@ export const Navbar: React.FC<NavbarProps> = ({ onOpenBooking }) => {
                 to={link.href}
                 onClick={() => setMobileMenuOpen(false)}
                 className={({ isActive }) =>
-                  `text-sm py-1.5 transition-colors ${
+                  `glass-nav-link self-start rounded-full px-2 py-1.5 text-sm transition-colors ${
                     isActive ? 'text-white font-semibold' : 'text-zinc-400 hover:text-white'
                   }`
                 }

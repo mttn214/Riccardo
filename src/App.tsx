@@ -177,7 +177,7 @@ export function App() {
   }
 
   return (
-    <div className="min-h-screen bg-black text-zinc-100 flex flex-col font-sans selection:bg-white selection:text-black">
+    <div className="public-site min-h-screen bg-black text-zinc-100 flex flex-col font-sans selection:bg-white selection:text-black">
       <ScrollToTop />
 
       {/* Global Navigation */}
@@ -239,7 +239,7 @@ export function App() {
       <div className="fixed bottom-6 right-6 z-30 flex items-center gap-2">
         <a
           href={`tel:${STYLIST_PROFILE.phone.replace(/\s+/g, '')}`}
-          className="hidden sm:inline-flex items-center gap-2 px-4 py-2.5 rounded-full bg-zinc-900/90 border border-zinc-800 text-zinc-300 hover:text-white text-xs font-medium backdrop-blur-md shadow-xl transition-all"
+          className="glass-action hidden sm:inline-flex items-center gap-2 px-4 py-2.5 rounded-full bg-zinc-900/90 border border-zinc-800 text-zinc-300 hover:text-white text-xs font-medium backdrop-blur-md shadow-xl transition-all"
           title="Zavolať do salónu"
         >
           <Phone className="w-3.5 h-3.5" />

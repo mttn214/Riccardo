@@ -18,6 +18,54 @@
   }
 }
 
+.glass-navbar {
+  border-radius: 0 0 24px 24px;
+  background-color: rgb(0 0 0 / 65%);
+  background-image: linear-gradient(180deg, rgb(255 255 255 / 7%), transparent 80%);
+  -webkit-backdrop-filter: blur(24px) saturate(150%);
+  backdrop-filter: blur(24px) saturate(150%);
+  box-shadow: 0 10px 30px rgb(0 0 0 / 24%);
+}
+
+.public-site :where(button, [role="button"], .glass-action, .glass-nav-link:hover) {
+  --glass-highlight: rgb(255 255 255 / 23%);
+  --glass-edge: rgb(255 255 255 / 20%);
+  --glass-rim: rgb(255 255 255 / 10%);
+  --glass-reflection: rgb(255 255 255 / 6%);
+  background-image:
+    radial-gradient(ellipse at 24% 0%, var(--glass-highlight), transparent 68%),
+    linear-gradient(180deg, transparent 36%, var(--glass-reflection));
+  -webkit-backdrop-filter: blur(16px) saturate(160%);
+  backdrop-filter: blur(16px) saturate(160%);
+  box-shadow:
+    inset 0 1px 1px var(--glass-edge),
+    inset 0 -1px 2px var(--glass-reflection),
+    inset 0 0 0 1px var(--glass-rim),
+    var(--tw-ring-offset-shadow, 0 0 #0000),
+    var(--tw-ring-shadow, 0 0 #0000),
+    var(--tw-shadow, 0 0 #0000);
+}
+
+.public-site :where(button, [role="button"], .glass-action):where(.bg-white) {
+  background-color: #fff;
+  background-image: none;
+  box-shadow: 0 2px 6px rgb(0 0 0 / 18%);
+}
+
+.public-site :where(button, [role="button"], .glass-action, .glass-nav-link):where(:hover:not(:disabled):not([aria-disabled="true"])) {
+  --glass-edge: rgb(255 255 255 / 38%);
+}
+
+.public-site :where(button, [role="button"], .glass-action):where(.bg-white:hover:not(:disabled):not([aria-disabled="true"])) {
+  background-color: #fffaf4;
+  box-shadow: inset 0 0 0 1px #ac8055, 0 5px 16px rgb(0 0 0 / 36%);
+}
+
+.public-site :where(button, [role="button"], .glass-action):focus-visible {
+  outline: 2px solid rgb(255 255 255 / 75%);
+  outline-offset: 3px;
+}
+
 /* Apple-style minimalist scrollbar */
 ::-webkit-scrollbar {
   width: 6px;

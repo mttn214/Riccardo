@@ -1508,7 +1508,7 @@ export const ReservationModal: React.FC<ReservationModalProps> = ({
                     href={stripeReceiptUrl}
                     target="_blank"
                     rel="noopener noreferrer"
-                    className="w-full py-3 px-4 rounded-xl bg-zinc-900 hover:bg-zinc-850 border border-emerald-500/40 text-emerald-300 hover:text-white font-medium text-xs transition-all flex items-center justify-center gap-2 shadow-lg"
+                    className="glass-action w-full py-3 px-4 rounded-xl bg-zinc-900 hover:bg-zinc-850 border border-emerald-500/40 text-emerald-300 hover:text-white font-medium text-xs transition-all flex items-center justify-center gap-2 shadow-lg"
                   >
                     <Receipt className="w-4 h-4 text-emerald-400" />
                     <span>Zobraziť oficiálny doklad o platbe (Stripe Doklad)</span>

@@ -9,7 +9,7 @@ interface HeroProps {
 
 export const Hero: React.FC<HeroProps> = ({ onExploreSeminars, onExplorePortfolio }) => {
   return (
-    <section className="pt-32 pb-20 sm:pt-40 sm:pb-28 overflow-hidden bg-black text-white">
+    <section className="pt-32 pb-20 sm:pt-40 sm:pb-28 overflow-hidden text-white">
       <div className="max-w-6xl mx-auto px-4 sm:px-6">
         
         {/* Eyebrow Label */}
@@ -34,7 +34,7 @@ export const Hero: React.FC<HeroProps> = ({ onExploreSeminars, onExplorePortfoli
         <div className="flex flex-wrap items-center gap-3.5 mb-16">
           <button
             onClick={onExploreSeminars}
-            className="inline-flex items-center gap-2 px-6 py-3 rounded-full text-xs sm:text-sm font-semibold bg-white text-black hover:bg-zinc-200 transition-all active:scale-95 shadow-sm"
+            className="inline-flex items-center gap-2 px-6 py-3 rounded-full text-xs sm:text-sm font-semibold bg-white text-black hover:text-black transition-all active:scale-95 shadow-sm"
           >
             <span>Vybrať termín seminára</span>
             <ArrowUpRight className="w-4 h-4" />
@@ -75,7 +75,7 @@ export const Hero: React.FC<HeroProps> = ({ onExploreSeminars, onExplorePortfoli
         </div>
 
         {/* Clean Stats Strip (Birne style) */}
-        <div className="grid grid-cols-2 md:grid-cols-4 gap-8 pt-8 border-t border-zinc-850">
+        <div className="grid grid-cols-2 md:grid-cols-4 gap-8 pt-8 border-t border-zinc-800/80">
           <div>
             <span className="block text-3xl sm:text-4xl font-semibold tracking-tight text-white mb-1">
               14+

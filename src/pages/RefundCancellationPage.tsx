@@ -160,7 +160,7 @@ export const RefundCancellationPage: React.FC = () => {
         <div className="pt-12 mt-12 border-t border-zinc-800 flex justify-between items-center">
           <Link
             to="/"
-            className="px-6 py-2.5 rounded-full bg-white text-black font-semibold text-xs hover:bg-zinc-200 transition-all shadow-md"
+            className="glass-action px-6 py-2.5 rounded-full bg-white text-black font-semibold text-xs hover:bg-zinc-200 transition-all shadow-md"
           >
             Späť na úvod
           </Link>
