@@ -35,6 +35,17 @@ export const Navbar: React.FC<NavbarProps> = ({ onOpenBooking }) => {
     { label: 'Salón', href: '/salon' },
   ];
 
+  const brandText = (
+    <>
+      <span className="font-bold tracking-[0.14em] text-white text-xs sm:text-sm uppercase leading-none font-brand">
+        RICCARDO
+      </span>
+      <span className="text-[8px] sm:text-[9px] text-zinc-400 font-normal tracking-[0.10em] uppercase mt-1.5 font-brand">
+        Hair Salon &amp; Academy <span className="hidden sm:inline">• Lučenec</span>
+      </span>
+    </>
+  );
+
   return (
     <header
       className="glass-navbar fixed inset-x-0 top-0 z-40"
@@ -75,13 +86,19 @@ export const Navbar: React.FC<NavbarProps> = ({ onOpenBooking }) => {
               alt="Hair Salon Riccardo"
               className="w-14 h-14 sm:w-16 sm:h-16 rounded-full object-contain bg-zinc-950 border border-zinc-800/90 p-0.5 shadow-xl shrink-0"
             />
-            <div className="flex flex-col font-brand">
-              <span className="font-bold tracking-[0.14em] text-white text-xs sm:text-sm uppercase leading-none font-brand">
-                RICCARDO
-              </span>
-              <span className="text-[8px] sm:text-[9px] text-zinc-400 font-normal tracking-[0.10em] uppercase mt-1.5 font-brand">
-                Hair Salon &amp; Academy <span className="hidden sm:inline">• Lučenec</span>
-              </span>
+            <div
+              className="glass-brand-text relative font-brand"
+              onPointerMove={(event) => {
+                const label = event.currentTarget;
+                const bounds = label.getBoundingClientRect();
+                label.style.setProperty('--brand-x', `${event.clientX - bounds.left}px`);
+                label.style.setProperty('--brand-y', `${event.clientY - bounds.top}px`);
+              }}
+            >
+              <div className="flex flex-col">{brandText}</div>
+              <div aria-hidden="true" className="glass-brand-highlight pointer-events-none absolute inset-0 flex flex-col">
+                {brandText}
+              </div>
             </div>
           </Link>
 
@@ -92,7 +109,7 @@ export const Navbar: React.FC<NavbarProps> = ({ onOpenBooking }) => {
                 key={link.label}
                 to={link.href}
                 className={({ isActive }) =>
-                  `glass-nav-link rounded-full px-2 py-1 text-[13px] transition-colors font-normal tracking-tight ${
+                  `glass-nav-link relative isolate rounded-full px-2 py-1 text-[13px] transition-colors font-normal tracking-tight ${
                     isActive
                       ? 'text-white font-medium'
                       : 'text-zinc-400 hover:text-white'

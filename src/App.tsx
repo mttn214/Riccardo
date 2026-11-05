@@ -21,9 +21,17 @@ import { AdminPage } from './pages/AdminPage';
 import { Phone, Calendar } from 'lucide-react';
 import { verifyStripeSession, getStripe } from './services/stripeService';
 import { sendFormNotification } from './services/formService';
+import { clearTextGlow, updateTextGlow } from './utils/textGlow';
 
 export function App() {
   const location = useLocation();
+  useEffect(() => {
+    window.addEventListener('scroll', clearTextGlow, true);
+    return () => {
+      window.removeEventListener('scroll', clearTextGlow, true);
+      clearTextGlow();
+    };
+  }, [location.pathname]);
   const isAdmin = location.pathname.startsWith('/admin');
   // Modals
   const [detailSeminar, setDetailSeminar] = useState<Seminar | null>(null);
@@ -177,7 +185,11 @@ export function App() {
   }
 
   return (
-    <div className="public-site min-h-screen bg-black text-zinc-100 flex flex-col font-sans selection:bg-white selection:text-black">
+    <div
+      className="public-site min-h-screen bg-black text-zinc-100 flex flex-col font-sans selection:bg-white selection:text-black"
+      onPointerMove={updateTextGlow}
+      onPointerLeave={clearTextGlow}
+    >
       <ScrollToTop />
 
       {/* Global Navigation */}

@@ -18,6 +18,18 @@
   }
 }
 
+.public-site {
+  cursor: default;
+}
+
+:where(.public-site) :where(a[href], button, [role="button"]) {
+  cursor: pointer;
+}
+
+:where(.public-site) :where(input:not([type]), input:is([type="text"], [type="email"], [type="password"], [type="search"], [type="tel"], [type="url"], [type="number"]), textarea, [contenteditable]:not([contenteditable="false"])) {
+  cursor: text;
+}
+
 .glass-navbar {
   border-radius: 0 0 24px 24px;
   background-color: rgb(0 0 0 / 65%);
@@ -27,7 +39,56 @@
   box-shadow: 0 10px 30px rgb(0 0 0 / 24%);
 }
 
-.public-site :where(button, [role="button"], .glass-action, .glass-nav-link:hover) {
+::highlight(riccardo-glow) {
+  text-shadow: 0 1px 2px rgb(0 0 0 / 85%), 0 0 3px rgb(255 255 255 / 95%), 0 0 9px rgb(255 255 255 / 65%);
+}
+
+::highlight(riccardo-glow-edge) {
+  text-shadow: 0 0 5px rgb(255 255 255 / 38%);
+}
+
+[data-local-text-glow] {
+  --footer-glow-base: theme('colors.zinc.500');
+}
+
+[data-local-text-glow] > span {
+  --footer-glow-base: theme('colors.zinc.300');
+}
+
+::highlight(riccardo-footer-glow-0) {
+  color: color-mix(in srgb, var(--footer-glow-base) 80%, white);
+}
+
+::highlight(riccardo-footer-glow-1) {
+  color: color-mix(in srgb, var(--footer-glow-base) 86%, white);
+}
+
+::highlight(riccardo-footer-glow-2) {
+  color: color-mix(in srgb, var(--footer-glow-base) 92%, white);
+}
+
+::highlight(riccardo-footer-glow-3) {
+  color: color-mix(in srgb, var(--footer-glow-base) 97%, white);
+}
+
+.glass-brand-highlight {
+  visibility: hidden;
+}
+
+@media (hover: hover) and (pointer: fine) {
+  .glass-brand-text:hover .glass-brand-highlight {
+    visibility: visible;
+    mask-image: radial-gradient(circle 38px at var(--brand-x, -100px) var(--brand-y, -100px), #000 20%, transparent 100%);
+  }
+
+  .glass-brand-highlight > span {
+    color: #fff;
+    text-shadow: 0 1px 2px #000, 0 0 3px rgb(255 255 255 / 95%), 0 0 9px rgb(255 255 255 / 65%);
+  }
+}
+
+.public-site :where(button, [role="button"], .glass-action, .glass-nav-link:hover:not(nav .glass-nav-link)),
+.public-site nav .glass-nav-link:hover::before {
   --glass-highlight: rgb(255 255 255 / 23%);
   --glass-edge: rgb(255 255 255 / 20%);
   --glass-rim: rgb(255 255 255 / 10%);
@@ -46,6 +107,22 @@
     var(--tw-shadow, 0 0 #0000);
 }
 
+.public-site nav .glass-nav-link:hover::before {
+  content: "";
+  position: absolute;
+  inset: -6px -5.87px;
+  z-index: -1;
+  border-radius: inherit;
+  pointer-events: none;
+  --glass-edge: rgb(255 255 255 / 38%);
+}
+
+@screen lg {
+  .public-site nav .glass-nav-link:hover::before {
+    inset-inline: -16.79px;
+  }
+}
+
 .public-site :where(button, [role="button"], .glass-action):where(.bg-white) {
   background-color: #fff;
   background-image: none;
@@ -57,8 +134,7 @@
 }
 
 .public-site :where(button, [role="button"], .glass-action):where(.bg-white:hover:not(:disabled):not([aria-disabled="true"])) {
-  background-color: #fffaf4;
-  box-shadow: inset 0 0 0 1px #ac8055, 0 5px 16px rgb(0 0 0 / 36%);
+  box-shadow: inset 0 0 0 1px #ac8055, 0 2px 6px rgb(0 0 0 / 18%);
 }
 
 .public-site :where(button, [role="button"], .glass-action):focus-visible {

@@ -80,38 +80,38 @@ export const Footer: React.FC = () => {
           </div>
 
           {/* Quick Links (3 cols) */}
-          <div className="md:col-span-3 space-y-2">
+          <div data-local-text-glow className="md:col-span-3 space-y-2">
             <span className="text-zinc-300 font-medium block mb-3">
               Vzdelávanie & Salón
             </span>
             <ul className="space-y-2">
-              <li><Link to="/seminare" className="hover:text-white transition-colors">Termíny seminárov</Link></li>
-              <li><Link to="/tvorba" className="hover:text-white transition-colors">Tvorba</Link></li>
-              <li><Link to="/ocenenia" className="hover:text-white transition-colors">Ocenenia</Link></li>
-              <li><Link to="/referencie" className="hover:text-white transition-colors">Hodnotenia</Link></li>
-              <li><Link to="/salon" className="hover:text-white transition-colors">Salón Lučenec</Link></li>
-              <li><Link to="/kontakt" className="hover:text-white transition-colors">Kontakt</Link></li>
+              <li><Link to="/seminare">Termíny seminárov</Link></li>
+              <li><Link to="/tvorba">Tvorba</Link></li>
+              <li><Link to="/ocenenia">Ocenenia</Link></li>
+              <li><Link to="/referencie">Hodnotenia</Link></li>
+              <li><Link to="/salon">Salón Lučenec</Link></li>
+              <li><Link to="/kontakt">Kontakt</Link></li>
             </ul>
           </div>
 
           {/* Legal Links (2 cols) */}
-          <div className="md:col-span-2 space-y-2">
+          <div data-local-text-glow className="md:col-span-2 space-y-2">
             <span className="text-zinc-300 font-medium block mb-3">
               Informácie
             </span>
             <ul className="space-y-2">
               <li>
-                <Link to="/obchodne-podmienky" className="hover:text-white transition-colors">
+                <Link to="/obchodne-podmienky">
                   Obchodné podmienky
                 </Link>
               </li>
               <li>
-                <Link to="/ochrana-udajov" className="hover:text-white transition-colors">
+                <Link to="/ochrana-udajov">
                   Ochrana osobných údajov
                 </Link>
               </li>
               <li>
-                <Link to="/reklamacny-poriadok" className="hover:text-white transition-colors">
+                <Link to="/reklamacny-poriadok">
                   Reklamácie a storno
                 </Link>
               </li>
