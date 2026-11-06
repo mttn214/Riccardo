@@ -410,10 +410,10 @@ export const AdminQRScannerModal: React.FC<AdminQRScannerModalProps> = ({ isOpen
                 </div>
 
                 <div className="text-left sm:text-right">
-                  <span className="text-[10px] uppercase font-mono tracking-wider text-zinc-500 block">
+                  <span className="text-[10px] uppercase tracking-wider text-zinc-500 block">
                     Kód vstupenky
                   </span>
-                  <span className="text-sm font-mono font-bold text-amber-400 bg-amber-500/10 px-2 py-0.5 rounded border border-amber-500/20 inline-block mt-0.5">
+                  <span className="text-sm font-bold text-amber-400 bg-amber-500/10 px-2 py-0.5 rounded border border-amber-500/20 inline-block mt-0.5">
                     {activeParticipant.ticketCode}
                   </span>
                 </div>

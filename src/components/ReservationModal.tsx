@@ -9,8 +9,6 @@ import {
   QrCode,
   Check,
   ArrowUpRight,
-  ShieldCheck,
-  Lock,
   CreditCard,
   Building2,
   CheckCircle2,
@@ -97,7 +95,7 @@ export const ReservationModal: React.FC<ReservationModalProps> = ({
   const [addOnAudit, setAddOnAudit] = useState(false);
 
   // Payment Options
-  const [paymentOption, setPaymentOption] = useState<'full' | 'deposit'>('full');
+  const [paymentOption, setPaymentOption] = useState<'full' | 'deposit'>('deposit');
   const [paymentMethod, setPaymentMethod] = useState<'card' | 'apple_pay' | 'transfer'>('card');
 
   // Card details
@@ -183,8 +181,8 @@ export const ReservationModal: React.FC<ReservationModalProps> = ({
       features: []
     };
 
-  const brushPrice = 38;
-  const auditPrice = 65;
+  const brushPrice = 35;
+  const auditPrice = 150;
 
   let totalPackagePriceEUR = currentTier.priceEUR;
   if (addOnBrush) totalPackagePriceEUR += brushPrice;
@@ -241,7 +239,7 @@ export const ReservationModal: React.FC<ReservationModalProps> = ({
       'IČO': formData.ico || 'Neuvedené',
       'DIČ / IČ DPH': formData.dic || 'Neuvedené',
       'Fakturačná adresa': formData.billingAddress || 'Neuvedené',
-      'Doplnky': `${addOnBrush ? 'Termokefa (+38€) ' : ''}${addOnAudit ? 'Audit (+65€)' : ''}` || 'Žiadne',
+      'Doplnky': [addOnBrush ? `Stylingová kefa Riccardo Edition (+${brushPrice} €)` : '', addOnAudit ? `VIP 1-na-1 konzultácia a biznis audit (+${auditPrice} €)` : ''].filter(Boolean).join(', ') || 'Žiadne',
       'Poznámka': formData.notes || 'Žiadna',
       'Prevádzkovateľ eshopu': COMPANY_DETAILS.legalName
     });
@@ -654,7 +652,9 @@ export const ReservationModal: React.FC<ReservationModalProps> = ({
   const resetAndClose = () => {
     setStep(1);
     setPaymentMethod('card');
-    setPaymentOption('full');
+    setPaymentOption('deposit');
+    setAddOnBrush(false);
+    setAddOnAudit(false);
     setStripeError('');
     setTermsAccepted(false);
     setFormErrors({});
@@ -735,9 +735,80 @@ export const ReservationModal: React.FC<ReservationModalProps> = ({
                 </div>
                 <div className="text-right shrink-0">
                   <span className="text-2xl sm:text-3xl font-bold font-sans text-white tracking-tight">
-                    {formatPrice(currentTier.priceEUR, currency)}
+                    {formatPrice(totalPackagePriceEUR, currency)}
                   </span>
+                  {(addOnBrush || addOnAudit) && (
+                    <span className="block text-[11px] text-zinc-500 mt-0.5">
+                      kurz {currentTier.priceEUR} € + doplnky {totalPackagePriceEUR - currentTier.priceEUR} €
+                    </span>
+                  )}
                 </div>
+              </div>
+
+              {/* Order Bump + VIP Upsell */}
+              <div className="space-y-3">
+                <label className="text-xs uppercase tracking-wider text-zinc-400 font-medium block">
+                  Vylepšite si zážitok
+                </label>
+
+                <button
+                  type="button"
+                  role="checkbox"
+                  aria-checked={addOnBrush}
+                  onClick={() => setAddOnBrush((v) => !v)}
+                  className={`w-full p-4 rounded-2xl flex items-start gap-3 text-left transition-all cursor-pointer border ${
+                    addOnBrush
+                      ? 'bg-emerald-500/10 border-emerald-500/60'
+                      : 'bg-zinc-900/60 border-zinc-700 hover:border-zinc-500'
+                  }`}
+                >
+                  <span className={`mt-0.5 w-5 h-5 rounded-md shrink-0 flex items-center justify-center border ${
+                    addOnBrush ? 'bg-emerald-500 border-emerald-500 text-black' : 'border-zinc-600 text-transparent'
+                  }`}>
+                    <Check className="w-3.5 h-3.5" />
+                  </span>
+                  <span className="flex-1 min-w-0">
+                    <span className="block text-sm font-semibold text-white">
+                      [ + ] Profesionálna stylingová kefa Riccardo Edition
+                    </span>
+                    <span className="block text-[11px] text-zinc-400 mt-0.5">
+                      Odovzdaná priamo na školení. Pracujete s ňou už počas masterclassu.
+                    </span>
+                  </span>
+                  <span className="shrink-0 text-sm font-bold text-white">+{brushPrice} €</span>
+                </button>
+
+                <button
+                  type="button"
+                  role="switch"
+                  aria-checked={addOnAudit}
+                  onClick={() => setAddOnAudit((v) => !v)}
+                  className={`w-full p-4 rounded-2xl flex items-start gap-3 text-left transition-all cursor-pointer ${
+                    addOnAudit
+                      ? 'bg-white text-black ring-1 ring-white shadow-lg'
+                      : 'bg-zinc-900/60 border border-zinc-800 hover:border-zinc-600'
+                  }`}
+                >
+                  <span className="flex-1 min-w-0">
+                    <span className={`inline-block px-2 py-0.5 mb-1.5 rounded-full text-[10px] font-semibold uppercase tracking-wider ${
+                      addOnAudit ? 'bg-black text-white' : 'bg-amber-500/15 text-amber-400'
+                    }`}>
+                      VIP 1-on-1
+                    </span>
+                    <span className={`block text-sm font-semibold ${addOnAudit ? 'text-black' : 'text-white'}`}>
+                      Pridať 60 min. privátnu 1-na-1 konzultáciu a biznis audit salónu s Richardom Čonkom
+                    </span>
+                    <span className={`block text-[11px] mt-0.5 ${addOnAudit ? 'text-zinc-600' : 'text-zinc-400'}`}>
+                      Cenotvorba, vyťaženosť kresiel a plán rastu vášho salónu.
+                    </span>
+                  </span>
+                  <span className="shrink-0 flex flex-col items-end gap-2">
+                    <span className={`text-sm font-bold ${addOnAudit ? 'text-black' : 'text-white'}`}>+{auditPrice} €</span>
+                    <span className={`w-9 h-5 rounded-full relative transition-colors ${addOnAudit ? 'bg-black' : 'bg-zinc-700'}`}>
+                      <span className={`absolute top-0.5 w-4 h-4 rounded-full bg-white transition-all ${addOnAudit ? 'left-[18px]' : 'left-0.5'}`} />
+                    </span>
+                  </span>
+                </button>
               </div>
 
               {/* Payment Mode Selection — Clean Luxury Segmented Selector */}
@@ -786,12 +857,13 @@ export const ReservationModal: React.FC<ReservationModalProps> = ({
                 </div>
               )}
 
+
             </div>
           )}
 
           {/* STEP 2: Stylist & Billing Information */}
           {step === 2 && (
-            <div className="space-y-5 animate-fadeIn">
+            <div className="reservation-details space-y-5 animate-fadeIn">
               
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                 <div className="sm:col-span-2">
@@ -1280,7 +1352,7 @@ export const ReservationModal: React.FC<ReservationModalProps> = ({
                       <div className="flex justify-between items-center">
                         <span className="text-zinc-400">IBAN:</span>
                         <div className="flex items-center gap-1.5">
-                          <span className="font-mono text-white text-xs">{COMPANY_DETAILS.bankAccount.iban}</span>
+                          <span className="text-white text-xs">{COMPANY_DETAILS.bankAccount.iban}</span>
                           <button
                             type="button"
                             onClick={handleCopyIban}
@@ -1293,7 +1365,7 @@ export const ReservationModal: React.FC<ReservationModalProps> = ({
                       </div>
                       <div className="flex justify-between items-center">
                         <span className="text-zinc-400">SWIFT / BIC:</span>
-                        <span className="font-mono text-zinc-300">{COMPANY_DETAILS.bankAccount.swift}</span>
+                        <span className="text-zinc-300">{COMPANY_DETAILS.bankAccount.swift}</span>
                       </div>
                     </div>
 
@@ -1369,7 +1441,7 @@ export const ReservationModal: React.FC<ReservationModalProps> = ({
                   Váš oficiálny kód vstupenky
                 </span>
                 <div className="flex items-center justify-center gap-3">
-                  <span className="text-2xl sm:text-3xl font-mono font-black text-white tracking-widest select-all">
+                  <span className="text-2xl sm:text-3xl font-black text-white tracking-widest select-all">
                     {confirmationCode}
                   </span>
                   <button
@@ -1406,7 +1478,7 @@ export const ReservationModal: React.FC<ReservationModalProps> = ({
                       <span className="text-[11px] text-zinc-500">Prevádzkovateľ: {COMPANY_DETAILS.legalName}</span>
                     </div>
                   </div>
-                  <span className="font-mono text-xs text-[#c5a059] bg-[#c5a059]/15 px-2.5 py-1 rounded-lg font-bold">
+                  <span className="text-xs text-[#c5a059] bg-[#c5a059]/15 px-2.5 py-1 rounded-lg font-bold">
                     {confirmationCode}
                   </span>
                 </div>
@@ -1443,7 +1515,7 @@ export const ReservationModal: React.FC<ReservationModalProps> = ({
                         {paymentMethod === 'apple_pay' && 'Apple Pay (Uhradené)'}
                         {paymentMethod === 'transfer' && 'Faktúra / Účet (Rezervované)'}
                       </span>
-                      <span className="text-[10px] text-zinc-400 block font-mono">Uhradená suma: {amountToPayNow} €</span>
+                      <span className="text-[10px] text-zinc-400 block">Uhradená suma: {amountToPayNow} €</span>
                     </div>
                   </div>
 
@@ -1456,14 +1528,14 @@ export const ReservationModal: React.FC<ReservationModalProps> = ({
                         className="w-28 h-28 object-contain"
                       />
                     </div>
-                    <span className="text-[10px] font-mono tracking-wider text-zinc-400 text-center">
+                    <span className="text-[10px] tracking-wider text-zinc-400 text-center">
                       Predložte tento QR kód alebo kód {confirmationCode} pri vstupe
                     </span>
                   </div>
                 </div>
 
                 {/* Official Supplier & Tax Notice for Salons / Accounting */}
-                <div className="pt-3 bg-zinc-900/40 p-3 rounded-xl text-[10px] text-zinc-500 font-mono space-y-1">
+                <div className="pt-3 bg-zinc-900/40 p-3 rounded-xl text-[10px] text-zinc-500 space-y-1">
                   <div className="flex justify-between items-baseline">
                     <span className="text-zinc-300 font-sans font-semibold">{COMPANY_DETAILS.legalName}</span>
                     <span>IČO: {COMPANY_DETAILS.ico} | DIČ: {COMPANY_DETAILS.dic}</span>
@@ -1579,7 +1651,7 @@ export const ReservationModal: React.FC<ReservationModalProps> = ({
                   : 'bg-white text-black hover:bg-zinc-200'
               }`}
             >
-              <span>{step === 1 ? 'Pokračovať na údaje' : 'Prejsť k platbe'}</span>
+              <span>{step === 1 ? (paymentOption === 'deposit' ? 'Rezervovať miesto (Záloha 100 €)' : `Rezervovať miesto (${totalPackagePriceEUR} €)`) : 'Prejsť k platbe'}</span>
               <ArrowRight className="w-3.5 h-3.5" />
             </button>
           </div>

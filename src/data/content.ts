@@ -150,7 +150,7 @@ export const SEMINARS_DATA: Seminar[] = [
     availableSeats: 2,
     image: "/images/riccardo/richard_conka_hda_3.jpg",
     secondaryImage: "/images/riccardo/gallery/riccardo_art_02.jpg",
-    description: "Vlajkový autorský masterclass Richarda Čonku. Komorná skupina maximálne 6 kaderníkov pre garanciu osobnej korekcie každého ťahu kefou. Získate kontrolu nad dynamikou tepla, nadvihnutím od korienkov a zrkadlovo hladkým pohybom bez krepovatenia.",
+    description: "Pre kaderníkov, ktorí chcú zlepšiť fúkanú okrúhlou kefou. Na cvičnej hlave aj na modelke si vyskúšate, ako zdvihnúť vlasy pri korienkoch, uhladiť dĺžky a zafixovať tvar studeným vzduchom. Do salónu si odnesiete postup na objemnú fúkanú aj na vlny vytvorené kefou bez kulmy.",
     learningOutcomes: [
       "Správna biomechanika a ergonómia rúk pri napínaní prameňa",
       "Technika fixácie vlasu studeným vzduchom pre 72-hodinovú trvácnosť",
@@ -180,7 +180,7 @@ export const SEMINARS_DATA: Seminar[] = [
       {
         id: "tier-fuk-master",
         name: "Hands-On Masterpass (Limitované na 6 miest)",
-        priceEUR: 380,
+        priceEUR: 390,
         description: "Kompletný 2-dňový praktický tréning s osobnou asistenciou Richarda Čonku, prácou na živej modelke a certifikátom.",
         recommended: true,
         features: [
@@ -207,7 +207,7 @@ export const SEMINARS_DATA: Seminar[] = [
     availableSeats: 2,
     image: "/images/riccardo/gallery/riccardo_art_04.jpg",
     secondaryImage: "/images/riccardo/gallery/riccardo_art_01_portrait.jpg",
-    description: "Autorský masterclass zameraný na techniky objemového vlnenia, rockovo-elegantnej textúry a definície pružných kučier s vysokou fixáciou. Naučíte sa vytvárať ikonický glamour look s trvácnosťou, ktorý Richard Čonka prezentoval na módnych prehliadkach a prestížnych súťažiach.",
+    description: "Pre kaderníkov, ktorí chcú istejšie tvarovať vlny a kučery. Na cvičnej hlave si precvičíte tvorbu objemu, vrstvenie textúry a fixáciu. Na modelke si potom vyskúšate celý glamour styling. Do salónu si odnesiete postupy na zvýraznenie prirodzených vĺn aj na výraznejší večerný účes.",
     learningOutcomes: [
       "Termálna architektúra a fixácia kučier pre 72-hodinovú trvácnosť",
       "Technika vrstvenia textúry a práca s pamäťovými stylingovými produktmi",

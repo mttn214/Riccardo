@@ -55,7 +55,7 @@ export const Footer: React.FC = () => {
               </div>
             </Link>
             <p className="text-zinc-400 text-xs leading-relaxed max-w-sm">
-              Autorské vzdelávanie kaderníkov a salónna tvorba.
+              V Lučenci sa staráme o vaše vlasy a vedieme praktické semináre pre kaderníkov.
             </p>
             <div className="flex items-center gap-3">
               <a

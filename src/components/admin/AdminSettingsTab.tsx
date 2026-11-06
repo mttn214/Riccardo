@@ -1,3 +1,4 @@
+import { AUTHORIZED_ADMIN_ACCOUNTS } from '../../services/adminStore';
 import React, { useState, useEffect } from 'react';
 import { useAdminStore } from '../../hooks/useAdminStore';
 import { COMPANY_DETAILS } from '../../data/content';
@@ -35,6 +36,7 @@ import {
 
 type SettingsCategory =
   | 'all'
+  | 'accounts'
   | 'stripe'
   | 'salon'
   | 'banner'
@@ -48,40 +50,52 @@ export const AdminSettingsTab: React.FC = () => {
   const { settings, auditLogs, store } = useAdminStore();
   const [activeCategory, setActiveCategory] = useState<SettingsCategory>('all');
 
+  const [saveError, setSaveError] = useState('');
+
+  const submitSettings = (save: (event: React.FormEvent) => void) => (event: React.FormEvent) => {
+    setSaveError('');
+    try {
+      save(event);
+    } catch {
+      setSaveError('Zmeny sa nepodarilo uložiť. Skontrolujte, či prehliadač povoľuje lokálne úložisko, a skúste to znova.');
+    }
+  };
+
   // 1. Stripe Gateway state
-  const stripeConfig = store.getStripeConfig();
-  const [stripePk, setStripePk] = useState(stripeConfig.publishableKey);
-  const [stripeSk, setStripeSk] = useState(stripeConfig.secretKey);
+  const canManageStripe = store.canManageStripe();
+  const stripeConfig = canManageStripe ? store.getStripeConfig() : null;
+  const [stripePk, setStripePk] = useState(stripeConfig?.publishableKey ?? "");
+  const [stripeSk, setStripeSk] = useState(stripeConfig?.secretKey ?? "");
   const [showStripeSecret, setShowStripeSecret] = useState(false);
   const [stripeSuccess, setStripeSuccess] = useState(false);
 
   // 2. Salon & Academy Contact state
-  const [salonPhone, setSalonPhone] = useState(settings.salonPhone || '+421 915 869 758');
-  const [salonSecondaryPhone, setSalonSecondaryPhone] = useState(settings.salonSecondaryPhone || '+421 908 261 740');
-  const [salonEmail, setSalonEmail] = useState(settings.salonEmail || 'hair.riccardo@gmail.com');
-  const [salonAddress, setSalonAddress] = useState(settings.salonAddress || 'J. Kármána 1727/30, 984 01 Lučenec, Slovenská republika');
-  const [salonOpeningHours, setSalonOpeningHours] = useState(settings.salonOpeningHours || 'Pondelok – Piatok: 09:00 – 18:00, Sobota: Na objednávku, Nedeľa: Zatvorené');
-  const [salonInstagram, setSalonInstagram] = useState(settings.salonInstagram || '@hair_salon_riccardo');
+  const [salonPhone, setSalonPhone] = useState(settings.salonPhone ?? '+421 915 869 758');
+  const [salonSecondaryPhone, setSalonSecondaryPhone] = useState(settings.salonSecondaryPhone ?? '+421 908 261 740');
+  const [salonEmail, setSalonEmail] = useState(settings.salonEmail ?? 'hair.riccardo@gmail.com');
+  const [salonAddress, setSalonAddress] = useState(settings.salonAddress ?? 'J. Kármána 1727/30, 984 01 Lučenec, Slovenská republika');
+  const [salonOpeningHours, setSalonOpeningHours] = useState(settings.salonOpeningHours ?? 'Pondelok – Piatok: 09:00 – 18:00, Sobota: Na objednávku, Nedeľa: Zatvorené');
+  const [salonInstagram, setSalonInstagram] = useState(settings.salonInstagram ?? '@hair_salon_riccardo');
   const [salonSuccess, setSalonSuccess] = useState(false);
 
   // 3. Top Announcement Banner state
-  const [bannerEnabled, setBannerEnabled] = useState(settings.bannerEnabled || false);
-  const [bannerText, setBannerText] = useState(settings.bannerText || 'Nové termíny masterclass seminárov Richarda Čonku 2026 sú v predaji.');
-  const [bannerButtonText, setBannerButtonText] = useState(settings.bannerButtonText || 'Zobraziť termíny');
-  const [bannerButtonLink, setBannerButtonLink] = useState(settings.bannerButtonLink || '/seminare');
-  const [bannerStyle, setBannerStyle] = useState<'gold' | 'emerald' | 'dark'>(settings.bannerStyle || 'gold');
+  const [bannerEnabled, setBannerEnabled] = useState(settings.bannerEnabled ?? false);
+  const [bannerText, setBannerText] = useState(settings.bannerText ?? 'Nové termíny masterclass seminárov Richarda Čonku 2026 sú v predaji.');
+  const [bannerButtonText, setBannerButtonText] = useState(settings.bannerButtonText ?? 'Zobraziť termíny');
+  const [bannerButtonLink, setBannerButtonLink] = useState(settings.bannerButtonLink ?? '/seminare');
+  const [bannerStyle, setBannerStyle] = useState<'gold' | 'emerald' | 'dark'>(settings.bannerStyle ?? 'gold');
   const [bannerSuccess, setBannerSuccess] = useState(false);
 
   // 4. Bookings & Capacity Rules state
   const [showRemainingSeats, setShowRemainingSeats] = useState(settings.showRemainingSeats !== false);
   const [enableWaitlist, setEnableWaitlist] = useState(settings.enableWaitlist !== false);
-  const [checkoutHoldMinutes, setCheckoutHoldMinutes] = useState(settings.checkoutHoldMinutes || 15);
-  const [maxTicketsPerOrder, setMaxTicketsPerOrder] = useState(settings.maxTicketsPerOrder || 2);
-  const [lowCapacityThreshold, setLowCapacityThreshold] = useState(settings.lowCapacityThreshold || 2);
+  const [checkoutHoldMinutes, setCheckoutHoldMinutes] = useState(settings.checkoutHoldMinutes ?? 15);
+  const [maxTicketsPerOrder, setMaxTicketsPerOrder] = useState(settings.maxTicketsPerOrder ?? 2);
+  const [lowCapacityThreshold, setLowCapacityThreshold] = useState(settings.lowCapacityThreshold ?? 2);
   const [bookingsSuccess, setBookingsSuccess] = useState(false);
 
   // 5. Notifications state
-  const [adminNotifyEmail, setAdminNotifyEmail] = useState(settings.adminNotifyEmail || 'hair.riccardo@gmail.com');
+  const [adminNotifyEmail, setAdminNotifyEmail] = useState(settings.adminNotifyEmail ?? 'hair.riccardo@gmail.com');
   const [notifyOnNewOrder, setNotifyOnNewOrder] = useState(settings.notifyOnNewOrder !== false);
   const [notifyOnNewInquiry, setNotifyOnNewInquiry] = useState(settings.notifyOnNewInquiry !== false);
   const [notifyOnLowCapacity, setNotifyOnLowCapacity] = useState(settings.notifyOnLowCapacity !== false);
@@ -90,12 +104,12 @@ export const AdminSettingsTab: React.FC = () => {
   const [notificationsSuccess, setNotificationsSuccess] = useState(false);
 
   // 6. Invoicing & Billing state
-  const [invoicePrefix, setInvoicePrefix] = useState(settings.invoicePrefix || 'RIC-2026-');
-  const [currency, setCurrency] = useState(settings.currency || 'EUR');
-  const [invoiceDueDays, setInvoiceDueDays] = useState(settings.invoiceDueDays || 7);
+  const [invoicePrefix, setInvoicePrefix] = useState(settings.invoicePrefix ?? 'RIC-2026-');
+  const [currency, setCurrency] = useState(settings.currency ?? 'EUR');
+  const [invoiceDueDays, setInvoiceDueDays] = useState(settings.invoiceDueDays ?? 7);
   const [showIbanOnReceipts, setShowIbanOnReceipts] = useState(settings.showIbanOnReceipts !== false);
   const [invoiceNoteText, setInvoiceNoteText] = useState(
-    settings.invoiceNoteText ||
+    settings.invoiceNoteText ??
     'Dodávateľ nie je platiteľom DPH podľa § 4 zákona o DPH. Úhrada za účasť na odbornom kaderníckom seminári Hair Salon Riccardo & Academy.'
   );
   const [billingSuccess, setBillingSuccess] = useState(false);
@@ -129,6 +143,7 @@ export const AdminSettingsTab: React.FC = () => {
   // Save Handlers
   const handleSaveStripeGateway = (e: React.FormEvent) => {
     e.preventDefault();
+    if (!canManageStripe) return;
     store.saveStripeConfig({
       mode: 'live',
       publishableKey: stripePk,
@@ -142,7 +157,6 @@ export const AdminSettingsTab: React.FC = () => {
     e.preventDefault();
     store.saveSettings(
       {
-        ...settings,
         salonPhone,
         salonSecondaryPhone,
         salonEmail,
@@ -161,7 +175,6 @@ export const AdminSettingsTab: React.FC = () => {
     e.preventDefault();
     store.saveSettings(
       {
-        ...settings,
         bannerEnabled,
         bannerText,
         bannerButtonText,
@@ -179,7 +192,6 @@ export const AdminSettingsTab: React.FC = () => {
     e.preventDefault();
     store.saveSettings(
       {
-        ...settings,
         showRemainingSeats,
         enableWaitlist,
         checkoutHoldMinutes: Number(checkoutHoldMinutes),
@@ -197,7 +209,6 @@ export const AdminSettingsTab: React.FC = () => {
     e.preventDefault();
     store.saveSettings(
       {
-        ...settings,
         adminNotifyEmail,
         notifyOnNewOrder,
         notifyOnNewInquiry,
@@ -214,10 +225,8 @@ export const AdminSettingsTab: React.FC = () => {
 
   const handleSaveBilling = (e: React.FormEvent) => {
     e.preventDefault();
-    const current = store.getSettings();
     store.saveSettings(
       {
-        ...current,
         invoicePrefix: invoicePrefix.trim(),
         currency,
         invoiceDueDays: Number(invoiceDueDays),
@@ -235,7 +244,6 @@ export const AdminSettingsTab: React.FC = () => {
     e.preventDefault();
     store.saveSettings(
       {
-        ...settings,
         sessionTimeoutMinutes: Number(timeoutMinutes),
         maxFailedAttempts: Number(maxAttempts),
         lockoutDurationMinutes: Number(lockoutMinutes),
@@ -323,7 +331,8 @@ export const AdminSettingsTab: React.FC = () => {
 
   const categories = [
     { id: 'all', label: 'Všetky nastavenia' },
-    { id: 'stripe', label: 'Platby Stripe' },
+    ...(canManageStripe ? [{ id: 'accounts', label: 'Účty' }] : []),
+    ...(canManageStripe ? [{ id: 'stripe', label: 'Platby Stripe' }] : []),
     { id: 'salon', label: 'Salón & Kontakt' },
     { id: 'banner', label: 'Oznam na webe' },
     { id: 'bookings', label: 'Rezervácie & Kapacita' },
@@ -334,14 +343,19 @@ export const AdminSettingsTab: React.FC = () => {
   ];
 
   return (
-    <div className="space-y-6 animate-fadeIn pb-12">
+    <div className="admin-settings space-y-6 animate-fadeIn pb-12">
+      {saveError && (
+        <p role="alert" className="sticky top-16 z-20 rounded-xl bg-red-950 p-3 text-sm text-red-100">
+          {saveError}
+        </p>
+      )}
       {/* Header */}
       <div className="pb-1">
         <h1 className="text-2xl font-semibold text-white tracking-tight">
           Systémové nastavenia & Správa salónu
         </h1>
         <p className="text-xs text-zinc-400 mt-1">
-          Komplexná konfigurácia prevádzky salónu Riccardo, platieb Stripe, oznámení, notifikácií, fakturácie a bezpečnosti.
+          Komplexná konfigurácia prevádzky salónu Riccardo, oznámení, notifikácií, fakturácie a bezpečnosti.
         </p>
       </div>
 
@@ -364,7 +378,24 @@ export const AdminSettingsTab: React.FC = () => {
       </div>
 
       {/* 1. Stripe Payment Gateway Section */}
-      {(activeCategory === 'all' || activeCategory === 'stripe') && (
+      {canManageStripe && (activeCategory === 'all' || activeCategory === 'accounts') && (
+        <section className="rounded-3xl bg-zinc-950 p-6" aria-labelledby="admin-accounts-title">
+          <h2 id="admin-accounts-title" className="text-base font-semibold text-white">Účty administrácie</h2>
+          <ul className="mt-4 divide-y divide-zinc-800">
+            {AUTHORIZED_ADMIN_ACCOUNTS.map(({ email, name, roleTitle }) => (
+              <li key={email} className="flex flex-wrap items-center justify-between gap-2 py-3 text-sm">
+                <div className="min-w-0">
+                  <p className="font-medium text-white">{name}</p>
+                  <p className="break-all text-zinc-400">{email}</p>
+                </div>
+                <span className="text-xs text-zinc-400">{roleTitle}</span>
+              </li>
+            ))}
+          </ul>
+        </section>
+      )}
+
+      {canManageStripe && (activeCategory === 'all' || activeCategory === 'stripe') && (
         <div className="p-6 rounded-3xl bg-zinc-900/40 space-y-4">
           <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2">
             <div className="flex items-center gap-2.5">
@@ -378,7 +409,7 @@ export const AdminSettingsTab: React.FC = () => {
                 </p>
               </div>
             </div>
-            <span className="text-[10px] font-mono uppercase px-3 py-1 rounded-full bg-emerald-500/10 text-emerald-300 ring-1 ring-emerald-500/20">
+            <span className="text-[10px] uppercase px-3 py-1 rounded-full bg-emerald-500/10 text-emerald-300 ring-1 ring-emerald-500/20">
               Trvalý živý režim (Live Production)
             </span>
           </div>
@@ -398,7 +429,7 @@ export const AdminSettingsTab: React.FC = () => {
             <div className="space-y-1">
               <div className="font-semibold text-white flex items-center gap-2">
                 <span>Výhradne živá produkčná prevádzka (Live Mode)</span>
-                <span className="text-[10px] font-mono px-1.5 py-0.5 rounded bg-emerald-500/20 text-emerald-300 uppercase tracking-wider">Aktívne</span>
+                <span className="text-[10px] px-1.5 py-0.5 rounded bg-emerald-500/20 text-emerald-300 uppercase tracking-wider">Aktívne</span>
               </div>
               <p className="text-[11px] text-zinc-400 leading-relaxed">
                 Testovací režim bol trvalo vyradený. Všetky transakcie z Apple Pay, Google Pay a platobných kariet prebiehajú v reálnom čase a platby sú pripisované priamo na bankový účet spoločnosti ZETEREM s.r.o.
@@ -406,7 +437,7 @@ export const AdminSettingsTab: React.FC = () => {
             </div>
           </div>
 
-          <form onSubmit={handleSaveStripeGateway} className="space-y-4 text-xs pt-1">
+          <form onSubmit={submitSettings(handleSaveStripeGateway)} className="space-y-4 text-xs pt-1">
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
               <div className="space-y-1">
                 <label className="text-zinc-300 font-medium block">
@@ -417,7 +448,7 @@ export const AdminSettingsTab: React.FC = () => {
                   value={stripePk}
                   onChange={(e) => setStripePk(e.target.value)}
                   placeholder="pk_live_51..."
-                  className="w-full bg-zinc-950/80 text-white p-3 rounded-xl border-0 focus:ring-1 focus:ring-white/20 font-mono text-xs outline-none"
+                  className="w-full bg-zinc-950/80 text-white p-3 rounded-xl border-0 focus:ring-1 focus:ring-white/20 text-xs outline-none"
                 />
                 <span className="text-[10px] text-zinc-500 block">
                   Verejný kľúč použitý na webe pre inicializáciu Stripe.js, Apple Pay a Google Pay.
@@ -440,7 +471,7 @@ export const AdminSettingsTab: React.FC = () => {
                   value={stripeSk}
                   onChange={(e) => setStripeSk(e.target.value)}
                   placeholder="sk_live_51..."
-                  className="w-full bg-zinc-950/80 text-white p-3 rounded-xl border-0 focus:ring-1 focus:ring-white/20 font-mono text-xs outline-none"
+                  className="w-full bg-zinc-950/80 text-white p-3 rounded-xl border-0 focus:ring-1 focus:ring-white/20 text-xs outline-none"
                 />
                 <span className="text-[10px] text-zinc-500 block">
                   Tajný kľúč servera pre autorizáciu platby a stiahnutie peňazí.
@@ -485,7 +516,7 @@ export const AdminSettingsTab: React.FC = () => {
             </div>
           )}
 
-          <form onSubmit={handleSaveSalonInfo} className="space-y-4 text-xs pt-1">
+          <form onSubmit={submitSettings(handleSaveSalonInfo)} className="space-y-4 text-xs pt-1">
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
               <div className="space-y-1">
                 <label className="text-zinc-300 font-medium block">Hlavný telefón na salón</label>
@@ -612,7 +643,7 @@ export const AdminSettingsTab: React.FC = () => {
 
           {/* Live Preview */}
           <div className="p-3.5 rounded-2xl bg-zinc-950/70 border border-zinc-850 space-y-2">
-            <span className="text-[10px] font-mono text-zinc-500 uppercase tracking-wider block">
+            <span className="text-[10px] text-zinc-500 uppercase tracking-wider block">
               Živý náhľad bannera:
             </span>
             <div
@@ -634,7 +665,7 @@ export const AdminSettingsTab: React.FC = () => {
             </div>
           </div>
 
-          <form onSubmit={handleSaveBanner} className="space-y-4 text-xs pt-1">
+          <form onSubmit={submitSettings(handleSaveBanner)} className="space-y-4 text-xs pt-1">
             <div className="space-y-1">
               <label className="text-zinc-300 font-medium block">Text oznámenia</label>
               <input
@@ -665,7 +696,7 @@ export const AdminSettingsTab: React.FC = () => {
                   value={bannerButtonLink}
                   onChange={(e) => setBannerButtonLink(e.target.value)}
                   placeholder="/seminare"
-                  className="w-full bg-zinc-950/80 text-white p-3 rounded-xl border-0 focus:ring-1 focus:ring-white/20 text-xs outline-none font-mono"
+                  className="w-full bg-zinc-950/80 text-white p-3 rounded-xl border-0 focus:ring-1 focus:ring-white/20 text-xs outline-none"
                 />
               </div>
 
@@ -717,7 +748,7 @@ export const AdminSettingsTab: React.FC = () => {
             </div>
           )}
 
-          <form onSubmit={handleSaveBookings} className="space-y-4 text-xs pt-1">
+          <form onSubmit={submitSettings(handleSaveBookings)} className="space-y-4 text-xs pt-1">
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
               {/* Toggle 1: Show seats */}
               <div className="p-4 rounded-2xl bg-zinc-950/60 flex items-center justify-between gap-3">
@@ -852,7 +883,7 @@ export const AdminSettingsTab: React.FC = () => {
             </div>
           )}
 
-          <form onSubmit={handleSaveNotifications} className="space-y-4 text-xs pt-1">
+          <form onSubmit={submitSettings(handleSaveNotifications)} className="space-y-4 text-xs pt-1">
             <div className="space-y-1">
               <label className="text-zinc-300 font-medium block">
                 Notifikačný email administrátora
@@ -957,7 +988,7 @@ export const AdminSettingsTab: React.FC = () => {
             </div>
           )}
 
-          <form onSubmit={handleSaveBilling} className="space-y-4 text-xs pt-1">
+          <form onSubmit={submitSettings(handleSaveBilling)} className="space-y-4 text-xs pt-1">
             <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
               <div className="space-y-1">
                 <label className="text-zinc-300 font-medium block">Predčíslie faktúr & dokladov</label>
@@ -966,12 +997,10 @@ export const AdminSettingsTab: React.FC = () => {
                   value={invoicePrefix}
                   onChange={(e) => setInvoicePrefix(e.target.value)}
                   onBlur={() => {
-                    const current = store.getSettings();
-                    if (invoicePrefix.trim() && current.invoicePrefix !== invoicePrefix.trim()) {
+                                    if (invoicePrefix.trim() && current.invoicePrefix !== invoicePrefix.trim()) {
                       store.saveSettings(
                         {
-                          ...current,
-                          invoicePrefix: invoicePrefix.trim()
+                                            invoicePrefix: invoicePrefix.trim()
                         },
                         'Automatické uloženie predčíslia',
                         `Nové predčíslie: ${invoicePrefix.trim()}`
@@ -981,9 +1010,9 @@ export const AdminSettingsTab: React.FC = () => {
                     }
                   }}
                   placeholder="RIC-2026-"
-                  className="w-full bg-zinc-950/80 text-white p-3 rounded-xl border border-zinc-800 focus:border-zinc-500 text-xs outline-none font-mono transition-colors"
+                  className="w-full bg-zinc-950/80 text-white p-3 rounded-xl border border-zinc-800 focus:border-zinc-500 text-xs outline-none transition-colors"
                 />
-                <div className="flex items-center gap-1.5 text-[11px] font-mono mt-1">
+                <div className="flex items-center gap-1.5 text-[11px] mt-1">
                   <span className="text-zinc-500">Náhľad kódu dokladu:</span>
                   <span className="font-semibold bg-emerald-950/60 text-emerald-300 px-2 py-0.5 rounded border border-emerald-500/30">
                     {invoicePrefix.trim() ? (invoicePrefix.trim().endsWith('-') ? `${invoicePrefix.trim()}LUC-4821` : `${invoicePrefix.trim()}-LUC-4821`) : 'RIC-2026-LUC-4821'}
@@ -997,7 +1026,7 @@ export const AdminSettingsTab: React.FC = () => {
                   type="text"
                   value={currency}
                   disabled
-                  className="w-full bg-zinc-950/40 text-zinc-400 p-3 rounded-xl border-0 text-xs outline-none font-mono cursor-not-allowed"
+                  className="w-full bg-zinc-950/40 text-zinc-400 p-3 rounded-xl border-0 text-xs outline-none cursor-not-allowed"
                 />
                 <span className="text-[10px] text-zinc-500 block">Štandardná mena Slovenskej republiky (EUR).</span>
               </div>
@@ -1041,15 +1070,15 @@ export const AdminSettingsTab: React.FC = () => {
               </div>
               <div className="p-3 rounded-2xl bg-zinc-950/60">
                 <span className="text-[10px] text-zinc-500 uppercase block">IČO:</span>
-                <span className="text-white font-mono block mt-0.5">{COMPANY_DETAILS.ico}</span>
+                <span className="text-white block mt-0.5">{COMPANY_DETAILS.ico}</span>
               </div>
               <div className="p-3 rounded-2xl bg-zinc-950/60">
                 <span className="text-[10px] text-zinc-500 uppercase block">DIČ:</span>
-                <span className="text-white font-mono block mt-0.5">{COMPANY_DETAILS.dic}</span>
+                <span className="text-white block mt-0.5">{COMPANY_DETAILS.dic}</span>
               </div>
               <div className="p-3 rounded-2xl bg-zinc-950/60">
                 <span className="text-[10px] text-zinc-500 uppercase block">IBAN:</span>
-                <span className="text-emerald-400 font-mono text-[11px] block mt-0.5 truncate">{COMPANY_DETAILS.bankAccount.iban}</span>
+                <span className="text-emerald-400 text-[11px] block mt-0.5 truncate">{COMPANY_DETAILS.bankAccount.iban}</span>
               </div>
             </div>
 
@@ -1092,7 +1121,7 @@ export const AdminSettingsTab: React.FC = () => {
               </div>
             )}
 
-            <form onSubmit={handlePasswordChange} className="space-y-3 text-xs">
+            <form onSubmit={submitSettings(handlePasswordChange)} className="space-y-3 text-xs">
               <div className="space-y-1">
                 <label className="text-zinc-300 font-medium block">Pôvodné heslo</label>
                 <div className="relative">
@@ -1172,7 +1201,7 @@ export const AdminSettingsTab: React.FC = () => {
               </div>
             )}
 
-            <form onSubmit={handleSaveSecuritySettings} className="space-y-3.5 text-xs">
+            <form onSubmit={submitSettings(handleSaveSecuritySettings)} className="space-y-3.5 text-xs">
               <div className="space-y-1">
                 <label className="text-zinc-300 font-medium block">Časový limit relácie (nečinnosť)</label>
                 <select
@@ -1238,7 +1267,7 @@ export const AdminSettingsTab: React.FC = () => {
                 <Download className="w-4 h-4 text-white" />
                 <h2 className="text-sm font-semibold text-white">Zálohovanie dát & Obnova zo zálohy</h2>
               </div>
-              <span className="text-[10px] font-mono text-zinc-500">JSON formát</span>
+              <span className="text-[10px] text-zinc-500">JSON formát</span>
             </div>
 
             {restoreMessage && (
@@ -1332,13 +1361,13 @@ export const AdminSettingsTab: React.FC = () => {
                   placeholder="Filtrovať záznamy..."
                   value={logSearch}
                   onChange={(e) => setLogSearch(e.target.value)}
-                  className="w-full bg-zinc-950/80 text-white pl-8 pr-3 py-2 rounded-xl text-xs focus:ring-1 focus:ring-white/20 outline-none font-mono"
+                  className="w-full bg-zinc-950/80 text-white pl-8 pr-3 py-2 rounded-xl text-xs focus:ring-1 focus:ring-white/20 outline-none"
                 />
               </div>
             </div>
 
             <div className="rounded-2xl bg-zinc-950/60 overflow-hidden max-h-80 overflow-y-auto">
-              <table className="w-full text-left text-xs font-mono">
+              <table className="w-full text-left text-xs">
                 <thead className="bg-zinc-900/90 text-zinc-400 text-[10px] uppercase tracking-wider sticky top-0">
                   <tr>
                     <th className="py-2.5 px-3">Časová pečiatka</th>

@@ -39,7 +39,7 @@ export const TermsPage: React.FC = () => {
             <Building2 className="w-4 h-4 text-amber-400" />
             <span>Identifikačné údaje prevádzkovateľa a predávajúceho:</span>
           </div>
-          <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 pt-2 border-t border-zinc-850 font-mono text-[11px]">
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 pt-2 border-t border-zinc-850 text-[11px]">
             <div><strong>Obchodné meno:</strong> {COMPANY_DETAILS.legalName}</div>
             <div><strong>IČO:</strong> {COMPANY_DETAILS.ico}</div>
             <div><strong>Sídlo:</strong> {COMPANY_DETAILS.registeredOffice}</div>
@@ -206,7 +206,7 @@ export const TermsPage: React.FC = () => {
           >
             Späť na úvod
           </Link>
-          <span className="text-xs text-zinc-500 font-mono">
+          <span className="text-xs text-zinc-500">
             ZETEREM s.r.o. • IČO: 47 520 817
           </span>
         </div>

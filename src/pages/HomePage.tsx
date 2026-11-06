@@ -2,22 +2,26 @@ import { GlassHeadlineLine } from '../components/GlassHeadlineLine';
 import React, { useRef, useState, useEffect } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { Hero } from '../components/Hero';
-import { SEMINARS_DATA, PORTFOLIO_DATA, STYLIST_PROFILE, TESTIMONIALS_DATA, TESTIMONIALS_STATS, PortfolioItem } from '../data/content';
-import { formatPrice } from '../utils/currency';
-import { ArrowUpRight, Check, Trophy, MoveHorizontal, Star, CheckCircle2, ChevronLeft, ChevronRight, Bell, MapPin, Building2 } from 'lucide-react';
+import { SEMINARS_DATA, PORTFOLIO_DATA, STYLIST_PROFILE, TESTIMONIALS_DATA, TESTIMONIALS_STATS, PortfolioItem, Seminar } from '../data/content';
+import { adminStore } from '../services/adminStore';
+import { SeminarSpotlightCard } from '../components/SeminarSpotlightCard';
+import { ArrowUpRight, Check, Star, ChevronLeft, ChevronRight, MapPin } from 'lucide-react';
 import { GoogleIcon, FacebookIcon } from '../components/SocialIcons';
 import { WaitlistModal } from '../components/WaitlistModal';
-import { SeminarSpotlightPhoto } from '../components/SeminarSpotlightPhoto';
+import { hasSpotlightCutout } from '../components/SeminarSpotlightPhoto';
 
 interface HomePageProps {
+  onOpenDetail: (seminar: Seminar) => void;
   onOpenBooking: (seminar?: Seminar) => void;
   onSelectPortfolioItem: (item: PortfolioItem) => void;
 }
 
-export const HomePage: React.FC<HomePageProps> = ({ onOpenBooking, onSelectPortfolioItem }) => {
+export const HomePage: React.FC<HomePageProps> = ({ onOpenDetail, onOpenBooking, onSelectPortfolioItem, Seminar }) => {
   const navigate = useNavigate();
   const [activeTurnusIndex, setActiveTurnusIndex] = useState(0);
-  const featuredSeminar = SEMINARS_DATA[activeTurnusIndex] || SEMINARS_DATA[0];
+  const seminars = adminStore.getSeminars();
+  const featuredSeminars = SEMINARS_DATA.slice(0, 2).flatMap(({ id }) => seminars.filter((seminar) => seminar.id === id));
+  const featuredSeminar = featuredSeminars[activeTurnusIndex] ?? featuredSeminars[0];
   const tickerPortfolio = PORTFOLIO_DATA.slice(0, 10);
   const marqueePortfolio = [...tickerPortfolio, ...tickerPortfolio];
 
@@ -111,119 +115,25 @@ export const HomePage: React.FC<HomePageProps> = ({ onOpenBooking, onSelectPortf
 
           {/* Turnus Switcher Tabs */}
           <div className="flex flex-wrap items-center gap-2 mb-6">
-            <button
-              onClick={() => setActiveTurnusIndex(0)}
-              className={`px-4 py-2 rounded-full text-xs font-semibold transition-all cursor-pointer ${
-                activeTurnusIndex === 0
-                  ? 'bg-white text-black shadow-lg shadow-white/10'
-                  : 'bg-zinc-900/90 text-zinc-400 hover:text-white border border-zinc-800'
-              }`}
-            >
-              Turnus I: Umenie fúkanej (16. – 17. Nov 2026)
-            </button>
-            <button
-              onClick={() => setActiveTurnusIndex(1)}
-              className={`px-4 py-2 rounded-full text-xs font-semibold transition-all cursor-pointer ${
-                activeTurnusIndex === 1
-                  ? 'bg-white text-black shadow-lg shadow-white/10'
-                  : 'bg-zinc-900/90 text-zinc-400 hover:text-white border border-zinc-800'
-              }`}
-            >
-              Turnus II: Biker Glamour & Kučery (17. – 18. Máj 2027)
-            </button>
+            {featuredSeminars.map((seminar, index) => (
+              <button
+                key={seminar.id}
+                onClick={() => setActiveTurnusIndex(index)}
+                className={`px-4 py-2 rounded-full text-xs font-semibold transition-all cursor-pointer ${
+                  seminar.id === featuredSeminar?.id
+                    ? 'bg-white text-black shadow-lg shadow-white/10'
+                    : 'bg-zinc-900/90 text-zinc-400 hover:text-white border border-zinc-800'
+                }`}
+              >
+                {seminar.title.split(":")[0]} ({seminar.dates})
+              </button>
+            ))}
           </div>
 
           {/* Spotlight Card */}
           {featuredSeminar && (
-            <div className="rounded-3xl bg-zinc-950 border border-zinc-800/80 overflow-hidden shadow-2xl">
-              <div className="grid grid-cols-1 lg:grid-cols-12">
-                <div className="lg:col-span-5 relative">
-                  <SeminarSpotlightPhoto
-                    primaryImage={featuredSeminar.image}
-                    secondaryImage={featuredSeminar.secondaryImage}
-                    title={featuredSeminar.title}
-                    availableSeats={featuredSeminar.availableSeats}
-                    totalSeats={featuredSeminar.totalSeats}
-                  />
-                </div>
-
-                <div className="lg:col-span-7 p-8 sm:p-12 flex flex-col justify-between space-y-6">
-                  <div>
-                    <div className="flex items-center gap-2 text-xs text-zinc-500 font-medium mb-2">
-                      <span className="text-zinc-300">{featuredSeminar.dates}</span>
-                      <span>•</span>
-                      <span>{featuredSeminar.city} (Atelier)</span>
-                    </div>
-
-                    <h3 className="text-2xl sm:text-3xl font-semibold text-white tracking-tight leading-snug mb-3">
-                      <GlassHeadlineLine>{featuredSeminar.title}</GlassHeadlineLine>
-                    </h3>
-
-                    <p className="text-sm text-zinc-400 leading-relaxed font-normal mb-6">
-                      {featuredSeminar.description}
-                    </p>
-
-                    <div className="space-y-2 py-4 text-xs sm:text-sm text-zinc-300">
-                      <div className="flex items-center gap-2">
-                        <span className="w-1.5 h-1.5 rounded-full bg-white flex-shrink-0" />
-                        <span>Prísna kapacita 6 kaderníkov pre garanciu osobnej spätnej väzby</span>
-                      </div>
-                      <div className="flex items-center gap-2">
-                        <span className="w-1.5 h-1.5 rounded-full bg-white flex-shrink-0" />
-                        <span>Hands-on prax na reálnych modelkách a cvičných hlavách</span>
-                      </div>
-                      <div className="flex items-center gap-2">
-                        <span className="w-1.5 h-1.5 rounded-full bg-white flex-shrink-0" />
-                        <span>Termokefa Riccardo, pracovné skriptá a certifikát v cene</span>
-                      </div>
-                      <div className="flex items-center gap-2">
-                        <span className="w-1.5 h-1.5 rounded-full bg-white flex-shrink-0" />
-                        <span><strong>Fakturácia:</strong> Možnosť vystavenia daňového dokladu na salón (IČO / DIČ)</span>
-                      </div>
-                    </div>
-                  </div>
-
-                  <div className="pt-4 border-t border-zinc-850/60 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
-                    <div>
-                      <span className="text-[11px] uppercase tracking-wider text-zinc-500 block font-medium">
-                        Cena kurzu
-                      </span>
-                      <div className="flex items-baseline gap-2 mt-0.5">
-                        <span className="text-2xl sm:text-3xl font-semibold text-white tracking-tight whitespace-nowrap">
-                          {formatPrice(featuredSeminar.tiers[0]?.priceEUR || 380)}
-                        </span>
-                      </div>
-                    </div>
-
-                    <div className="flex items-center gap-3 w-full sm:w-auto justify-end">
-                      <Link
-                        to="/seminare"
-                        className="glass-action px-4 py-2.5 rounded-full text-xs font-medium text-zinc-400 hover:text-white transition-colors cursor-pointer whitespace-nowrap"
-                      >
-                        Viac informácií
-                      </Link>
-
-                      {featuredSeminar.availableSeats > 0 ? (
-                        <button
-                          onClick={() => onOpenBooking(featuredSeminar)}
-                          className="inline-flex items-center justify-center gap-1.5 px-6 py-2.5 rounded-full text-xs sm:text-sm font-semibold bg-white text-black hover:bg-zinc-200 transition-all active:scale-95 shadow-lg shadow-white/10 cursor-pointer whitespace-nowrap"
-                        >
-                          <span>Rezervovať miesto</span>
-                          <ArrowUpRight className="w-4 h-4" />
-                        </button>
-                      ) : (
-                        <button
-                          onClick={() => setIsWaitlistOpen(true)}
-                          className="inline-flex items-center justify-center gap-1.5 px-6 py-2.5 rounded-full text-xs sm:text-sm font-semibold bg-zinc-800 hover:bg-zinc-700 text-white transition-all cursor-pointer whitespace-nowrap"
-                        >
-                          <Bell className="w-4 h-4 text-amber-400" />
-                          <span>Zapísať sa na Waitlist</span>
-                        </button>
-                      )}
-                    </div>
-                  </div>
-                </div>
-              </div>
+            <div className={hasSpotlightCutout(featuredSeminar.image) ? "lg:mt-[calc(7rem+20px)]" : undefined}>
+              <SeminarSpotlightCard seminar={featuredSeminar} onOpenDetail={onOpenDetail} onBook={onOpenBooking} onWaitlist={() => setIsWaitlistOpen(true)} />
             </div>
           )}
         </div>
@@ -300,11 +210,7 @@ export const HomePage: React.FC<HomePageProps> = ({ onOpenBooking, onSelectPortf
         </div>
 
         <div className="max-w-6xl mx-auto px-4 sm:px-6">
-          <div className="mt-8 flex flex-col sm:flex-row sm:items-center justify-between gap-3 text-xs text-zinc-500 border-t border-zinc-900 pt-4">
-            <span className="flex items-center gap-2">
-              <span className="w-2 h-2 rounded-full bg-amber-400 animate-pulse" />
-              <span>Prejdite myšou pre pozastavenie pohybu a kliknite na detail účesu</span>
-            </span>
+          <div className="mt-8 flex justify-end text-xs border-t border-zinc-900 pt-4">
             <Link
               to="/tvorba"
               className="inline-flex items-center gap-1 text-zinc-400 hover:text-white transition-colors"
@@ -341,24 +247,22 @@ export const HomePage: React.FC<HomePageProps> = ({ onOpenBooking, onSelectPortf
                   </Link>
                 </div>
 
-                <div className="flex-shrink-0 text-left lg:text-right">
-                  <span className="text-5xl sm:text-7xl font-bold tracking-tight text-white block">
-                    2023
-                  </span>
-                  <span className="text-xs text-zinc-500 uppercase tracking-wider block mt-1">
-                    Forum Karlín, Praha
-                  </span>
-                </div>
+                <figure className="relative w-full overflow-hidden rounded-2xl border border-white/10 lg:w-[42%] lg:shrink-0">
+                  <img
+                    src="/images/riccardo/hda_winners_group_hires.jpg"
+                    alt="Víťazi Czech & Slovak Hairdressing Awards 2023 s trofejami na pódiu"
+                    className="aspect-[3/2] w-full object-cover"
+                    loading="lazy"
+                  />
+                  <figcaption className="absolute inset-x-0 bottom-0 bg-gradient-to-t from-black/90 to-transparent px-5 pb-4 pt-10 text-xs font-medium text-white">
+                    Odovzdávanie cien · Forum Karlín, Praha · 2023
+                  </figcaption>
+                </figure>
               </div>
 
               {/* Gala Ceremony Photo Gallery (Distinct from portfolio above) */}
-              <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 pt-4">
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 pt-4">
                 {[
-                  {
-                    img: '/images/riccardo/hda_winners_group_hires.jpg',
-                    title: 'Pódium víťazov CSHA',
-                    subtitle: 'Richard Čonka s víťaznou soškou kaderníckych Oskarov'
-                  },
                   {
                     img: '/images/riccardo/gallery/riccardo_art_12.jpg',
                     title: 'Červený koberec & Galavečer',
@@ -398,24 +302,35 @@ export const HomePage: React.FC<HomePageProps> = ({ onOpenBooking, onSelectPortf
         <div className="max-w-6xl mx-auto px-4 sm:px-6">
           <div className="flex flex-col md:flex-row md:items-end justify-between gap-6 mb-10">
             <div>
-              <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-zinc-900/80 text-[11px] font-medium text-zinc-300 mb-3">
-                <CheckCircle2 className="w-3.5 h-3.5 text-emerald-400" />
-                <span>Overené hodnotenia Google Maps & Facebook (Hodnotenie 5.0)</span>
-              </div>
-              <h2 className="text-3xl sm:text-5xl font-semibold tracking-[-0.03em] leading-tight">
-                Dôvera klientov v číslach.
+              <h2 className="text-3xl sm:text-5xl font-semibold tracking-tight leading-tight">
+                Čo hovoria naši klienti
               </h2>
+              <Link to="/referencie" className="mt-3 inline-flex text-sm text-zinc-400 transition-colors hover:text-white">
+                Všetkých {TESTIMONIALS_STATS.totalReviews} hodnotení z Googlu a Facebooku
+              </Link>
             </div>
             
             <div className="flex items-center gap-3">
-              <Link
-                to="/referencie"
-                className="hidden sm:inline-flex items-center gap-1.5 text-xs sm:text-sm text-zinc-400 hover:text-white font-medium transition-colors mr-2"
+              <a
+                href={STYLIST_PROFILE.googleMapsUrl}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="glass-action inline-flex items-center gap-3 rounded-2xl border border-white/10 bg-zinc-900/80 px-4 py-3 text-white"
               >
-                <span>Všetkých {TESTIMONIALS_STATS.totalReviews} recenzií</span>
-                <ArrowUpRight className="w-4 h-4" />
-              </Link>
-              
+                <span className="grid h-9 w-9 shrink-0 place-items-center rounded-full bg-white text-zinc-950">
+                  <GoogleIcon className="h-4 w-4" />
+                </span>
+                <span className="space-y-1">
+                  <span className="block text-sm font-semibold">Recenzie na Googli</span>
+                  <span className="flex gap-0.5 text-amber-400" aria-hidden="true">
+                    {Array.from({ length: 5 }, (_, index) => (
+                      <Star key={index} className="h-3 w-3 fill-current" />
+                    ))}
+                  </span>
+                </span>
+                <ArrowUpRight className="h-4 w-4 shrink-0 text-zinc-400" />
+              </a>
+
               {/* Slider Arrows */}
               <div className="flex items-center gap-1.5">
                 <button
@@ -509,7 +424,7 @@ export const HomePage: React.FC<HomePageProps> = ({ onOpenBooking, onSelectPortf
                       {rev.city || 'Lučenec'} • Overený klient
                     </span>
                   </div>
-                  <span className="text-[10px] text-zinc-600 font-mono">
+                  <span className="text-[10px] text-zinc-600">
                     {rev.relativeTime}
                   </span>
                 </div>
@@ -530,109 +445,35 @@ export const HomePage: React.FC<HomePageProps> = ({ onOpenBooking, onSelectPortf
         </div>
       </section>
 
-      {/* SECTION: Atelier Lučenec Callout with House Photo & Google Maps */}
       <section className="py-20 sm:py-28 text-white">
-        <div className="max-w-6xl mx-auto px-4 sm:px-6 space-y-8">
-          {/* Header Row */}
-          <div className="flex flex-col md:flex-row items-start md:items-end justify-between gap-6">
-            <div className="max-w-2xl">
-              <span className="text-xs uppercase tracking-[0.2em] text-zinc-500 font-medium block mb-2">
-                Atelier & Salón Lučenec
-              </span>
-              <h3 className="text-2xl sm:text-4xl font-semibold text-white tracking-tight mb-2">
-                J. Kármána 1727/30, 984 01 Lučenec
-              </h3>
-              <p className="text-sm text-zinc-400 leading-relaxed">
-                Príjemné, komorné prostredie pre klientov i účastníkov vzdelávacích kurzov. Bezplatné a pohodlné parkovanie priamo pred salónom.
+        <div className="max-w-6xl mx-auto px-4 sm:px-6">
+          <div className="grid overflow-hidden rounded-3xl border border-white/10 bg-zinc-950 shadow-2xl md:grid-cols-2">
+            <div className="self-center p-6 sm:p-10">
+              <p className="mb-2 text-xs font-medium uppercase tracking-[0.2em] text-zinc-300">Ateliér a akadémia · Lučenec</p>
+              <h2 className="text-3xl font-semibold tracking-tight sm:text-4xl">Hair Salon Riccardo</h2>
+              <p className="mt-3 text-sm leading-relaxed text-zinc-300">
+                V našom ateliéri v Lučenci sa venujeme strihu, farbeniu a stylingu. Stretávame sa tu aj s kaderníkmi na praktických seminároch.
               </p>
-            </div>
-
-            <div className="flex flex-wrap items-center gap-3 shrink-0">
-              <a
-                href={STYLIST_PROFILE.googleMapsUrl}
-                target="_blank"
-                rel="noopener noreferrer"
-                className="glass-action inline-flex items-center gap-2 px-5 py-3 rounded-full text-xs sm:text-sm font-semibold bg-white hover:bg-zinc-200 text-black transition-all active:scale-95 shadow-lg whitespace-nowrap cursor-pointer"
-              >
-                <MapPin className="w-4 h-4" />
-                <span>Navigovať cez Google Maps</span>
-                <ArrowUpRight className="w-3.5 h-3.5" />
-              </a>
-
-              <Link
-                to="/salon"
-                className="glass-action inline-flex items-center gap-2 px-5 py-3 rounded-full text-xs sm:text-sm font-medium bg-zinc-900 hover:bg-zinc-800 text-zinc-200 hover:text-white transition-all whitespace-nowrap"
-              >
-                <span>Viac o salóne</span>
-                <ArrowUpRight className="w-3.5 h-3.5 text-zinc-400" />
-              </Link>
-            </div>
-          </div>
-
-          {/* 2-Card Visual Showcase: House Photo + Google Maps */}
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-6 pt-2">
-            {/* 1. House Photo Card */}
-            <div className="relative rounded-3xl overflow-hidden bg-zinc-950 min-h-[300px] sm:min-h-[360px] group shadow-2xl flex flex-col justify-between">
-              <img
-                src="/images/riccardo/salon_house.jpg"
-                alt="Hair Salon Riccardo - Ateliér a dom na J. Kármána 30 v Lučenci"
-                onError={(e) => {
-                  (e.target as HTMLImageElement).src = '/images/riccardo/official_logo_square.png';
-                }}
-                className="absolute inset-0 w-full h-full object-cover transition-transform duration-700 group-hover:scale-105"
-              />
-              <div className="absolute inset-0 bg-gradient-to-t from-black/90 via-black/30 to-black/30 pointer-events-none" />
-
-              {/* Top Badges */}
-              <div className="relative z-10 p-5 flex items-center justify-between">
-                <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-black/60 backdrop-blur-md text-[11px] font-mono text-zinc-300">
-                  <Building2 className="w-3.5 h-3.5 text-white" />
-                  <span>Sídlo salónu & Akadémie</span>
-                </span>
-                <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-emerald-500/20 backdrop-blur-md text-[11px] font-mono text-emerald-300">
-                  <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse" />
-                  <span>Parkovanie pred domom</span>
-                </span>
-              </div>
-
-              {/* Bottom Info */}
-              <div className="relative z-10 p-6 space-y-1">
-                <div className="text-white font-semibold text-lg tracking-tight">
-                  Hair Salon Riccardo Atelier
-                </div>
-                <p className="text-xs text-zinc-300">
-                  Rodinný dom pod nadjazdom • J. Kármána 1727/30, Lučenec
-                </p>
-              </div>
-            </div>
-
-            {/* 2. Interactive Google Maps Card */}
-            <div className="relative rounded-3xl overflow-hidden bg-zinc-950 min-h-[300px] sm:min-h-[360px] shadow-2xl flex flex-col">
-              <iframe
-                title="Hair Salon Riccardo Lučenec - Google Maps"
-                src="https://maps.google.com/maps?q=Hair+Salon+Riccardo,+J.+K%C3%A1rm%C3%A1na+1727%2F30,+Lu%C4%8Denec&t=&z=16&ie=UTF8&iwloc=&output=embed"
-                className="w-full h-full min-h-[300px] sm:min-h-[360px] border-0 filter invert-[92%] hue-rotate-180 contrast-[105%]"
-                loading="lazy"
-                allowFullScreen
-              />
-
-              {/* Map Floating Glassmorphism Controls Overlay */}
-              <div className="absolute bottom-4 left-4 right-4 p-3 rounded-2xl bg-black/85 backdrop-blur-md flex items-center justify-between gap-3 text-xs">
-                <div className="flex items-center gap-2 text-zinc-200 min-w-0">
-                  <MapPin className="w-4 h-4 text-emerald-400 shrink-0" />
-                  <span className="font-medium truncate text-xs">J. Kármána 1727/30, 984 01 Lučenec</span>
-                </div>
-                <a
-                  href={STYLIST_PROFILE.googleMapsUrl}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="glass-action px-3.5 py-1.5 rounded-xl bg-white hover:bg-zinc-200 text-black font-semibold text-[11px] transition-colors shrink-0 flex items-center gap-1 cursor-pointer"
-                >
-                  <span>Trasa</span>
-                  <ArrowUpRight className="w-3 h-3" />
+              <p className="mt-5 flex items-start gap-2 text-sm text-zinc-200">
+                <MapPin className="h-4 w-4 shrink-0 text-amber-300" />
+                <span>J. Kármána 1727/30, 984 01 Lučenec<span className="mt-1 block text-xs text-zinc-400">Bezplatné parkovanie pred salónom</span></span>
+              </p>
+              <div className="mt-6 flex flex-wrap gap-3">
+                <Link to="/salon" className="glass-action inline-flex items-center gap-2 rounded-full bg-white px-5 py-3 text-xs font-semibold text-black">
+                  Viac o salóne <ArrowUpRight className="h-4 w-4" />
+                </Link>
+                <a href={STYLIST_PROFILE.googleMapsUrl} target="_blank" rel="noopener noreferrer" className="glass-action inline-flex items-center gap-2 rounded-full bg-zinc-900/80 px-5 py-3 text-xs font-medium text-white">
+                  Trasa v Google Maps <ArrowUpRight className="h-4 w-4" />
                 </a>
               </div>
             </div>
+            <iframe
+              title="Hair Salon Riccardo – poloha na Google Maps"
+              src="https://maps.google.com/maps?q=Hair+Salon+Riccardo,+J.+K%C3%A1rm%C3%A1na+1727%2F30,+Lu%C4%8Denec&t=&z=16&ie=UTF8&iwloc=&output=embed"
+              className="block h-full min-h-[18rem] w-full border-0 md:min-h-[24rem]"
+              loading="lazy"
+              referrerPolicy="strict-origin-when-cross-origin"
+            />
           </div>
         </div>
       </section>

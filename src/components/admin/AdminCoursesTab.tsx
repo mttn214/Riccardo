@@ -119,12 +119,12 @@ export const AdminCoursesTab: React.FC<AdminCoursesTabProps> = ({
 
                 {/* Top Badges */}
                 <div className="absolute top-3 left-3 right-3 flex items-center justify-between">
-                  <span className="text-[10px] font-mono uppercase px-2.5 py-1 rounded-full bg-zinc-900/90 text-zinc-200 backdrop-blur-md">
+                  <span className="text-[10px] uppercase px-2.5 py-1 rounded-full bg-zinc-900/90 text-zinc-200 backdrop-blur-md">
                     {seminar.category}
                   </span>
 
                   <span
-                    className={`text-[10px] font-mono uppercase px-2.5 py-1 rounded-full backdrop-blur-md ${
+                    className={`text-[10px] uppercase px-2.5 py-1 rounded-full backdrop-blur-md ${
                       isSoldOut
                         ? 'bg-red-500/20 text-red-300'
                         : seminar.availableSeats <= 2
@@ -142,7 +142,7 @@ export const AdminCoursesTab: React.FC<AdminCoursesTabProps> = ({
                     <MapPin className="w-3.5 h-3.5 text-zinc-400" />
                     <span>{seminar.city}</span>
                   </div>
-                  <div className="flex items-center gap-1 text-[11px] font-mono text-zinc-400">
+                  <div className="flex items-center gap-1 text-[11px] text-zinc-400">
                     <Calendar className="w-3.5 h-3.5" />
                     <span>{seminar.dates}</span>
                   </div>
@@ -162,7 +162,7 @@ export const AdminCoursesTab: React.FC<AdminCoursesTabProps> = ({
 
                 {/* Seats and Occupancy Gauge */}
                 <div className="p-3.5 rounded-2xl bg-zinc-950/60 space-y-2 text-xs">
-                  <div className="flex justify-between items-center text-zinc-400 font-mono text-[11px]">
+                  <div className="flex justify-between items-center text-zinc-400 text-[11px]">
                     <span className="flex items-center gap-1.5">
                       <Users className="w-3.5 h-3.5 text-zinc-500" />
                       <span>Obsadenosť:</span>
@@ -192,11 +192,11 @@ export const AdminCoursesTab: React.FC<AdminCoursesTabProps> = ({
                         onClick={() => handleSeatAdjust(seminar.id, -1)}
                         disabled={seminar.availableSeats <= 0}
                         title="Znížiť voľné miesta"
-                        className="w-6 h-6 rounded bg-zinc-800 hover:bg-zinc-700 text-zinc-300 disabled:opacity-40 flex items-center justify-center font-mono font-bold cursor-pointer"
+                        className="w-6 h-6 rounded bg-zinc-800 hover:bg-zinc-700 text-zinc-300 disabled:opacity-40 flex items-center justify-center font-bold cursor-pointer"
                       >
                         -
                       </button>
-                      <span className="w-6 text-center font-mono text-white font-bold">
+                      <span className="w-6 text-center text-white font-bold">
                         {seminar.availableSeats}
                       </span>
                       <button
@@ -204,7 +204,7 @@ export const AdminCoursesTab: React.FC<AdminCoursesTabProps> = ({
                         onClick={() => handleSeatAdjust(seminar.id, 1)}
                         disabled={seminar.availableSeats >= seminar.totalSeats}
                         title="Zvýšiť voľné miesta"
-                        className="w-6 h-6 rounded bg-zinc-800 hover:bg-zinc-700 text-zinc-300 disabled:opacity-40 flex items-center justify-center font-mono font-bold cursor-pointer"
+                        className="w-6 h-6 rounded bg-zinc-800 hover:bg-zinc-700 text-zinc-300 disabled:opacity-40 flex items-center justify-center font-bold cursor-pointer"
                       >
                         +
                       </button>
@@ -215,9 +215,9 @@ export const AdminCoursesTab: React.FC<AdminCoursesTabProps> = ({
                 {/* Price and Tiers */}
                 <div className="flex items-center justify-between text-xs pt-1">
                   <div className="text-zinc-400">
-                    Cena od: <strong className="text-white font-mono text-sm">{minPrice} €</strong>
+                    Cena od: <strong className="text-white text-sm">{minPrice} €</strong>
                   </div>
-                  <span className="text-[11px] font-mono text-zinc-500">
+                  <span className="text-[11px] text-zinc-500">
                     {seminar.tiers.length} {seminar.tiers.length === 1 ? 'balíček' : 'balíčky'}
                   </span>
                 </div>
@@ -278,14 +278,14 @@ export const AdminCoursesTab: React.FC<AdminCoursesTabProps> = ({
                 onClick={() => setDeleteConfirmId(null)}
                 className="flex-1 py-2.5 rounded-xl bg-zinc-900 hover:bg-zinc-800 text-zinc-300 text-xs font-medium transition-colors cursor-pointer"
               >
-                Zrušiť
+                Ponechať seminár
               </button>
               <button
                 type="button"
                 onClick={() => handleDelete(deleteConfirmId)}
                 className="flex-1 py-2.5 rounded-xl bg-red-600 hover:bg-red-500 text-white text-xs font-semibold transition-colors cursor-pointer"
               >
-                Potvrdiť vymazanie
+                Odstrániť seminár
               </button>
             </div>
           </div>

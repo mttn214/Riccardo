@@ -86,7 +86,7 @@ export const AdminLogin: React.FC<AdminLoginProps> = ({ onLoginSuccess }) => {
             />
           </div>
 
-          <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-zinc-900 text-[11px] font-mono tracking-wider uppercase text-zinc-400 mb-2">
+          <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-zinc-900 text-[11px] tracking-wider uppercase text-zinc-400 mb-2">
             <ShieldCheck className="w-3.5 h-3.5 text-emerald-400" />
             <span>Zabezpečený prístup</span>
           </div>
@@ -94,7 +94,7 @@ export const AdminLogin: React.FC<AdminLoginProps> = ({ onLoginSuccess }) => {
           <h1 className="text-2xl sm:text-3xl font-light tracking-tight text-white uppercase">
             HAIR SALON <span className="font-bold">RICCARDO</span>
           </h1>
-          <p className="text-xs text-zinc-400 font-mono tracking-wider uppercase">
+          <p className="text-xs text-zinc-400 tracking-wider uppercase">
             Administratívny portál & Správa kurzov
           </p>
         </div>
@@ -180,7 +180,7 @@ export const AdminLogin: React.FC<AdminLoginProps> = ({ onLoginSuccess }) => {
                     if (error) setError('');
                   }}
                   placeholder="••••••••••••"
-                  className="w-full bg-zinc-900 focus:bg-zinc-850 text-white pl-10 pr-11 py-3.5 rounded-xl text-sm focus:outline-none focus:ring-1 focus:ring-white/20 transition-all disabled:opacity-50 font-mono"
+                  className="w-full bg-zinc-900 focus:bg-zinc-850 text-white pl-10 pr-11 py-3.5 rounded-xl text-sm focus:outline-none focus:ring-1 focus:ring-white/20 transition-all disabled:opacity-50"
                 />
                 <button
                   type="button"

@@ -39,7 +39,7 @@ export const AcademyGallerySection: React.FC = () => {
               <div className="absolute inset-0 bg-gradient-to-t from-black/90 via-black/20 to-transparent pointer-events-none" />
 
               <div className="relative z-10 space-y-1">
-                <span className="inline-block px-2 py-0.5 rounded text-[9px] uppercase tracking-wider bg-black/60 backdrop-blur-md border border-white/10 text-zinc-300 font-medium font-mono">
+                <span className="inline-block px-2 py-0.5 rounded text-[9px] uppercase tracking-wider bg-black/60 backdrop-blur-md border border-white/10 text-zinc-300 font-medium">
                   {item.subcategory}
                 </span>
                 <h3 className="text-sm font-semibold text-white tracking-tight line-clamp-1">

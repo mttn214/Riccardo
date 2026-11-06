@@ -139,7 +139,7 @@ export const TestimonialsSection: React.FC = () => {
             <div className="lg:col-span-4 space-y-1.5 py-4 lg:py-0 border-y lg:border-y-0 lg:border-x border-zinc-850 lg:px-8">
               {TESTIMONIALS_STATS.distribution.map((d) => (
                 <div key={d.stars} className="flex items-center gap-3 text-xs">
-                  <span className="w-6 text-right font-mono text-zinc-400 flex items-center justify-end gap-0.5">
+                  <span className="w-6 text-right text-zinc-400 flex items-center justify-end gap-0.5">
                     {d.stars}
                     <Star className="w-2.5 h-2.5 fill-amber-400 text-amber-400" />
                   </span>
@@ -149,7 +149,7 @@ export const TestimonialsSection: React.FC = () => {
                       style={{ width: `${d.percentage}%` }}
                     />
                   </div>
-                  <span className="w-8 text-right font-mono text-zinc-500 text-[11px]">
+                  <span className="w-8 text-right text-zinc-500 text-[11px]">
                     {d.count}
                   </span>
                 </div>
@@ -335,7 +335,7 @@ export const TestimonialsSection: React.FC = () => {
                         </span>
                       </div>
 
-                      <span className="text-[10px] text-zinc-500 font-mono">
+                      <span className="text-[10px] text-zinc-500">
                         {rev.relativeTime}
                       </span>
                     </div>
@@ -414,7 +414,7 @@ export const TestimonialsSection: React.FC = () => {
                       </span>
                     </div>
 
-                    <span className="text-[10px] text-zinc-500 font-mono">
+                    <span className="text-[10px] text-zinc-500">
                       {rev.relativeTime}
                     </span>
                   </div>

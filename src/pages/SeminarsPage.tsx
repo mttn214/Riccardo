@@ -18,7 +18,7 @@ export const SeminarsPage: React.FC<SeminarsPageProps> = ({ onOpenDetail, onBook
     <div className="pt-20">
       {/* 1. Main Upcoming Seminars Section */}
       <SeminarsSection
-        currency="EUR"
+        onOpenWaitlist={() => setIsWaitlistOpen(true)}
         onOpenDetail={onOpenDetail}
         onBookSeminar={onBookSeminar}
       />

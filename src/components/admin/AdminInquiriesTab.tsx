@@ -70,7 +70,7 @@ export const AdminInquiriesTab: React.FC = () => {
         </div>
 
         <div className="flex items-center gap-2">
-          <span className="text-xs font-mono text-zinc-500">
+          <span className="text-xs text-zinc-500">
             Spolu: <strong className="text-white">{inquiries.length}</strong> správ
           </span>
         </div>
@@ -79,7 +79,7 @@ export const AdminInquiriesTab: React.FC = () => {
       {/* Filter and Search Bar - Borderless */}
       <div className="grid grid-cols-1 sm:grid-cols-12 gap-3 bg-zinc-900/40 p-4 rounded-3xl">
         <div className="sm:col-span-4">
-          <label className="text-[10px] font-mono uppercase text-zinc-500 block mb-1">Typ správy</label>
+          <label className="text-[10px] uppercase text-zinc-500 block mb-1">Typ správy</label>
           <select
             value={filterType}
             onChange={(e) => setFilterType(e.target.value)}
@@ -92,7 +92,7 @@ export const AdminInquiriesTab: React.FC = () => {
         </div>
 
         <div className="sm:col-span-4">
-          <label className="text-[10px] font-mono uppercase text-zinc-500 block mb-1">Stav vybavenia</label>
+          <label className="text-[10px] uppercase text-zinc-500 block mb-1">Stav vybavenia</label>
           <select
             value={filterStatus}
             onChange={(e) => setFilterStatus(e.target.value)}
@@ -106,7 +106,7 @@ export const AdminInquiriesTab: React.FC = () => {
         </div>
 
         <div className="sm:col-span-4">
-          <label className="text-[10px] font-mono uppercase text-zinc-500 block mb-1">Hľadať</label>
+          <label className="text-[10px] uppercase text-zinc-500 block mb-1">Hľadať</label>
           <div className="relative">
             <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none text-zinc-500">
               <Search className="w-3.5 h-3.5" />
@@ -125,7 +125,7 @@ export const AdminInquiriesTab: React.FC = () => {
       {/* Inquiries List - Borderless Cards */}
       <div className="grid grid-cols-1 gap-3">
         {filteredInquiries.length === 0 ? (
-          <div className="p-12 text-center text-xs text-zinc-500 font-mono bg-zinc-900/40 rounded-3xl">
+          <div className="p-12 text-center text-xs text-zinc-500 bg-zinc-900/40 rounded-3xl">
             Žiadne správy nevyhovujú zvoleným kritériám.
           </div>
         ) : (
@@ -147,7 +147,7 @@ export const AdminInquiriesTab: React.FC = () => {
               <div className="space-y-1.5 min-w-0 flex-1">
                 <div className="flex items-center gap-2.5 flex-wrap">
                   <span
-                    className={`text-[10px] font-mono uppercase px-2.5 py-0.5 rounded-full ${
+                    className={`text-[10px] uppercase px-2.5 py-0.5 rounded-full ${
                       inq.type === 'waitlist'
                         ? 'bg-purple-500/20 text-purple-300'
                         : 'bg-blue-500/20 text-blue-300'
@@ -157,10 +157,10 @@ export const AdminInquiriesTab: React.FC = () => {
                   </span>
 
                   <span className="text-xs font-bold text-white">{inq.name}</span>
-                  <span className="text-[11px] text-zinc-400 font-mono">{inq.submittedAt}</span>
+                  <span className="text-[11px] text-zinc-400">{inq.submittedAt}</span>
 
                   <span
-                    className={`text-[9px] font-mono uppercase px-2 py-0.5 rounded-full ml-auto sm:ml-0 ${
+                    className={`text-[9px] uppercase px-2 py-0.5 rounded-full ml-auto sm:ml-0 ${
                       inq.status === 'unread'
                         ? 'bg-amber-500/20 text-amber-300'
                         : inq.status === 'resolved'
@@ -180,7 +180,7 @@ export const AdminInquiriesTab: React.FC = () => {
                   {inq.message || 'Záujem o zaradenie do poradovníka.'}
                 </p>
 
-                <div className="flex items-center gap-4 text-[11px] text-zinc-500 font-mono pt-1">
+                <div className="flex items-center gap-4 text-[11px] text-zinc-500 pt-1">
                   <span>{inq.email}</span>
                   {inq.phone && <span>• {inq.phone}</span>}
                 </div>
@@ -229,11 +229,11 @@ export const AdminInquiriesTab: React.FC = () => {
           <div className="w-full max-w-lg rounded-3xl bg-zinc-950 p-6 space-y-5 shadow-2xl">
             <div className="flex items-start justify-between">
               <div>
-                <span className="text-[10px] font-mono uppercase px-2 py-0.5 rounded-md bg-zinc-900 text-zinc-400">
+                <span className="text-[10px] uppercase px-2 py-0.5 rounded-md bg-zinc-900 text-zinc-400">
                   {selectedInquiry.type === 'waitlist' ? 'VIP Waitlist dopyt' : 'Kontaktná správa'}
                 </span>
                 <h3 className="text-lg font-bold text-white mt-1">{selectedInquiry.name}</h3>
-                <p className="text-xs text-zinc-500 font-mono">{selectedInquiry.submittedAt}</p>
+                <p className="text-xs text-zinc-500">{selectedInquiry.submittedAt}</p>
               </div>
 
               <button
@@ -246,7 +246,7 @@ export const AdminInquiriesTab: React.FC = () => {
             </div>
 
             <div className="space-y-3 text-xs">
-              <div className="p-4 rounded-2xl bg-zinc-900/60 space-y-1.5 font-mono">
+              <div className="p-4 rounded-2xl bg-zinc-900/60 space-y-1.5">
                 <div className="flex justify-between">
                   <span className="text-zinc-500">Email:</span>
                   <a href={`mailto:${selectedInquiry.email}`} className="text-white hover:underline">

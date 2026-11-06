@@ -74,31 +74,31 @@ export const AdminLayout: React.FC = () => {
     },
     {
       id: 'courses' as AdminTab,
-      label: 'Kurzy & Semináre',
+      label: 'Semináre',
       icon: GraduationCap,
       count: seminars.length,
     },
     {
       id: 'participants' as AdminTab,
-      label: 'Zoznam účastníkov',
+      label: 'Účastníci',
       icon: Users,
       count: participants.length,
     },
     {
       id: 'portfolio' as AdminTab,
-      label: 'Galéria & Fotky',
+      label: 'Galéria',
       icon: Image,
       count: portfolio.length,
     },
     {
       id: 'inquiries' as AdminTab,
-      label: 'Dopyty & Správy',
+      label: 'Správy',
       icon: MessageSquare,
       badge: unreadInquiries > 0 ? unreadInquiries : undefined,
     },
     {
       id: 'settings' as AdminTab,
-      label: 'Bezpečnosť & Nastavenia',
+      label: 'Nastavenia',
       icon: Settings,
     },
   ];
@@ -110,7 +110,7 @@ export const AdminLayout: React.FC = () => {
         <div className="space-y-6">
           {/* Logo & Brand */}
           <div className="space-y-3">
-            <div className="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full bg-white/[0.06] text-[10px] font-mono uppercase text-emerald-400">
+            <div className="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full bg-white/[0.06] text-[10px] uppercase text-emerald-400">
               <ShieldCheck className="w-3 h-3" />
               <span>Admin Portál</span>
             </div>
@@ -127,7 +127,7 @@ export const AdminLayout: React.FC = () => {
                 <p className="text-[10px] text-zinc-400 truncate">
                   Hair Salon & Academy
                 </p>
-                <p className="text-[9px] text-zinc-500 font-mono truncate">
+                <p className="text-[9px] text-zinc-500 truncate">
                   {COMPANY_DETAILS.legalName}
                 </p>
               </div>
@@ -144,6 +144,7 @@ export const AdminLayout: React.FC = () => {
                 <button
                   key={item.id}
                   type="button"
+                  aria-current={isActive ? "page" : undefined}
                   onClick={() => {
                     setActiveTab(item.id);
                     if (item.id === 'participants') {
@@ -162,13 +163,13 @@ export const AdminLayout: React.FC = () => {
                   </div>
 
                   {item.badge !== undefined && (
-                    <span className="text-[10px] font-mono px-2 py-0.5 rounded-full bg-purple-900/60 text-purple-300">
+                    <span className="text-[10px] px-2 py-0.5 rounded-full bg-purple-900/60 text-purple-300">
                       {item.badge}
                     </span>
                   )}
 
                   {item.count !== undefined && !item.badge && (
-                    <span className="text-[10px] font-mono text-zinc-500">
+                    <span className="text-[10px] text-zinc-500">
                       {item.count}
                     </span>
                   )}
@@ -186,7 +187,7 @@ export const AdminLayout: React.FC = () => {
             </div>
             <div className="min-w-0 flex-1">
               <p className="text-xs font-semibold text-white truncate">{activeUser.name}</p>
-              <p className="text-[10px] text-zinc-400 font-mono truncate">{activeUser.email}</p>
+              <p className="text-[10px] text-zinc-400 truncate">{activeUser.email}</p>
             </div>
           </div>
           <div className="mt-2 pt-2 border-t border-zinc-800/60 flex items-center justify-between text-[10px] text-zinc-400">
@@ -200,7 +201,7 @@ export const AdminLayout: React.FC = () => {
           <Link
             to="/"
             target="_blank"
-            className="w-full py-2.5 px-3 rounded-xl bg-zinc-900/60 hover:bg-zinc-800 text-zinc-300 hover:text-white text-xs font-medium flex items-center justify-between transition-colors"
+            className="glass-action w-full py-2.5 px-3 rounded-xl bg-zinc-900/60 hover:bg-zinc-800 text-zinc-300 hover:text-white text-xs font-medium flex items-center justify-between transition-colors"
           >
             <span className="flex items-center gap-2">
               <ExternalLink className="w-3.5 h-3.5 text-zinc-400" />
@@ -228,14 +229,16 @@ export const AdminLayout: React.FC = () => {
             {/* Mobile menu trigger */}
             <button
               type="button"
+              aria-label="Menu administrácie"
+              aria-expanded={isMobileMenuOpen}
               onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
               className="lg:hidden p-2 rounded-xl bg-zinc-900 text-zinc-300 hover:text-white"
             >
               {isMobileMenuOpen ? <X className="w-4 h-4" /> : <Menu className="w-4 h-4" />}
             </button>
 
-            <span className="text-xs font-mono uppercase tracking-wider text-zinc-400 hidden sm:inline">
-              Administrácia • {COMPANY_DETAILS.legalName}
+            <span className="text-sm font-semibold truncate">
+              {navItems.find((item) => item.id === activeTab)?.label}
             </span>
           </div>
 
@@ -251,7 +254,7 @@ export const AdminLayout: React.FC = () => {
               <span className="hidden sm:inline">QR Check-in</span>
             </button>
 
-            <span className="text-[11px] font-mono text-emerald-400 bg-emerald-950/50 px-2.5 py-1 rounded-full flex items-center gap-1.5">
+            <span className="text-[11px] text-emerald-400 bg-emerald-950/50 px-2.5 py-1 rounded-full flex items-center gap-1.5">
               <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse" />
               <span>Relácia aktívna</span>
             </span>
@@ -282,7 +285,7 @@ export const AdminLayout: React.FC = () => {
 
             <Link
               to="/"
-              className="hidden sm:inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-zinc-900 hover:bg-zinc-800 text-zinc-300 hover:text-white text-xs font-medium transition-colors"
+              className="glass-action hidden sm:inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-zinc-900 hover:bg-zinc-800 text-zinc-300 hover:text-white text-xs font-medium transition-colors"
             >
               <ExternalLink className="w-3.5 h-3.5" />
               <span>Verejný web</span>
@@ -310,6 +313,7 @@ export const AdminLayout: React.FC = () => {
                 <button
                   key={item.id}
                   type="button"
+                  aria-current={isActive ? "page" : undefined}
                   onClick={() => {
                     setActiveTab(item.id);
                     setIsMobileMenuOpen(false);
@@ -326,7 +330,7 @@ export const AdminLayout: React.FC = () => {
                     <span>{item.label}</span>
                   </div>
                   {item.badge && (
-                    <span className="text-[10px] font-mono px-2 py-0.5 rounded-full bg-purple-900 text-purple-300">
+                    <span className="text-[10px] px-2 py-0.5 rounded-full bg-purple-900 text-purple-300">
                       {item.badge}
                     </span>
                   )}

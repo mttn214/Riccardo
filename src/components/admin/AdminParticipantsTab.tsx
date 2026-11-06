@@ -280,7 +280,7 @@ export const AdminParticipantsTab: React.FC<AdminParticipantsTabProps> = ({
       <div className="grid grid-cols-1 sm:grid-cols-12 gap-3 bg-zinc-900/40 p-4 rounded-3xl">
         {/* Seminar Select */}
         <div className="sm:col-span-5 relative">
-          <label className="text-[10px] font-mono uppercase text-zinc-500 block mb-1">
+          <label className="text-[10px] uppercase text-zinc-500 block mb-1">
             Výber seminára
           </label>
           <div className="relative">
@@ -305,7 +305,7 @@ export const AdminParticipantsTab: React.FC<AdminParticipantsTabProps> = ({
 
         {/* Status Filter */}
         <div className="sm:col-span-3">
-          <label className="text-[10px] font-mono uppercase text-zinc-500 block mb-1">
+          <label className="text-[10px] uppercase text-zinc-500 block mb-1">
             Stav úhrady / Účasť
           </label>
           <select
@@ -324,7 +324,7 @@ export const AdminParticipantsTab: React.FC<AdminParticipantsTabProps> = ({
 
         {/* Search Input */}
         <div className="sm:col-span-4">
-          <label className="text-[10px] font-mono uppercase text-zinc-500 block mb-1">
+          <label className="text-[10px] uppercase text-zinc-500 block mb-1">
             Vyhľadávanie účastníka
           </label>
           <div className="relative">
@@ -352,7 +352,7 @@ export const AdminParticipantsTab: React.FC<AdminParticipantsTabProps> = ({
       </div>
 
       {/* Summary Metrics Bar for Selected Seminar / Filter */}
-      <div className="p-4 rounded-3xl bg-zinc-900/40 flex flex-wrap items-center justify-between gap-4 text-xs font-mono">
+      <div className="p-4 rounded-3xl bg-zinc-900/40 flex flex-wrap items-center justify-between gap-4 text-xs">
         <div className="flex items-center gap-6 flex-wrap">
           <div>
             <span className="text-zinc-500 block text-[10px]">Vybraných:</span>
@@ -385,7 +385,7 @@ export const AdminParticipantsTab: React.FC<AdminParticipantsTabProps> = ({
       <div className="rounded-3xl bg-zinc-900/40 overflow-hidden shadow-2xl">
         <div className="overflow-x-auto">
           <table className="w-full text-left text-xs">
-            <thead className="bg-zinc-950/70 text-zinc-400 font-mono uppercase text-[10px] tracking-wider">
+            <thead className="bg-zinc-950/70 text-zinc-400 uppercase text-[10px] tracking-wider">
               <tr>
                 <th className="py-3.5 px-4">Účasť</th>
                 <th className="py-3.5 px-4">Kód / Dátum</th>
@@ -401,7 +401,7 @@ export const AdminParticipantsTab: React.FC<AdminParticipantsTabProps> = ({
             <tbody className="divide-y divide-white/[0.03]">
               {filteredParticipants.length === 0 ? (
                 <tr>
-                  <td colSpan={8} className="py-12 text-center text-zinc-500 font-mono">
+                  <td colSpan={8} className="py-12 text-center text-zinc-500">
                     Žiadni účastníci nevyhovujú zadaným filtrom.
                   </td>
                 </tr>
@@ -434,8 +434,8 @@ export const AdminParticipantsTab: React.FC<AdminParticipantsTabProps> = ({
 
                     {/* Ticket Code & Reg Date */}
                     <td className="py-3 px-4">
-                      <div className="font-mono text-white font-semibold">{part.ticketCode}</div>
-                      <div className="text-[10px] text-zinc-500 font-mono">{part.registeredAt.slice(0, 10)}</div>
+                      <div className="text-white font-semibold">{part.ticketCode}</div>
+                      <div className="text-[10px] text-zinc-500">{part.registeredAt.slice(0, 10)}</div>
                     </td>
 
                     {/* Name & Contact */}
@@ -444,13 +444,13 @@ export const AdminParticipantsTab: React.FC<AdminParticipantsTabProps> = ({
                       <div className="text-[11px] text-zinc-400">
                         {part.salonName ? `${part.salonName} • ${part.city || ''}` : part.email}
                       </div>
-                      <div className="text-[10px] text-zinc-500 font-mono mt-0.5">{part.phone}</div>
+                      <div className="text-[10px] text-zinc-500 mt-0.5">{part.phone}</div>
                     </td>
 
                     {/* Course */}
                     <td className="py-3 px-4">
                       <div className="text-zinc-200 font-medium line-clamp-1">{part.seminarTitle}</div>
-                      <div className="text-[10px] text-zinc-500 font-mono">{part.seminarCity} • {part.seminarDates}</div>
+                      <div className="text-[10px] text-zinc-500">{part.seminarCity} • {part.seminarDates}</div>
                     </td>
 
                     {/* Tier */}
@@ -461,7 +461,7 @@ export const AdminParticipantsTab: React.FC<AdminParticipantsTabProps> = ({
                     {/* Status */}
                     <td className="py-3 px-4">
                       <span
-                        className={`text-[10px] font-mono uppercase px-2 py-0.5 rounded-full inline-block ${
+                        className={`text-[10px] uppercase px-2 py-0.5 rounded-full inline-block ${
                           part.paymentStatus.includes('Plná suma')
                             ? 'bg-emerald-500/10 text-emerald-400 border border-emerald-500/20'
                             : part.paymentStatus.includes('záloha')
@@ -475,16 +475,16 @@ export const AdminParticipantsTab: React.FC<AdminParticipantsTabProps> = ({
                           ? 'Záloha 100€'
                           : 'Prevod / Účet'}
                       </span>
-                      <div className="text-[10px] text-zinc-500 font-mono mt-0.5 truncate max-w-[130px]">
+                      <div className="text-[10px] text-zinc-500 mt-0.5 truncate max-w-[130px]">
                         {part.paymentMethod}
                       </div>
                     </td>
 
                     {/* Amount */}
                     <td className="py-3 px-4 text-right">
-                      <div className="font-mono text-white font-bold">{part.amountPaidEUR} €</div>
+                      <div className="text-white font-bold">{part.amountPaidEUR} €</div>
                       {part.amountRemainingEUR > 0 && (
-                        <div className="text-[10px] text-amber-400/90 font-mono">
+                        <div className="text-[10px] text-amber-400/90">
                           +{part.amountRemainingEUR} € doplatok
                         </div>
                       )}
@@ -535,11 +535,11 @@ export const AdminParticipantsTab: React.FC<AdminParticipantsTabProps> = ({
             <div className="flex items-start justify-between border-b border-zinc-850 pb-4">
               <div>
                 <div className="flex items-center gap-2">
-                  <span className="text-[11px] font-mono uppercase px-2 py-0.5 rounded-md bg-zinc-900 border border-zinc-800 text-zinc-300">
+                  <span className="text-[11px] uppercase px-2 py-0.5 rounded-md bg-zinc-900 border border-zinc-800 text-zinc-300">
                     {selectedParticipant.ticketCode}
                   </span>
                   <span
-                    className={`text-[10px] font-mono uppercase px-2 py-0.5 rounded-full ${
+                    className={`text-[10px] uppercase px-2 py-0.5 rounded-full ${
                       selectedParticipant.checkedIn
                         ? 'bg-blue-500/20 text-blue-300 border border-blue-500/30'
                         : 'bg-zinc-850 text-zinc-400'
@@ -565,7 +565,7 @@ export const AdminParticipantsTab: React.FC<AdminParticipantsTabProps> = ({
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 text-xs">
               {/* Contact Information */}
               <div className="p-4 rounded-2xl bg-zinc-900/60 space-y-2.5">
-                <span className="text-[10px] font-mono uppercase text-zinc-500 block font-semibold">
+                <span className="text-[10px] uppercase text-zinc-500 block font-semibold">
                   Kontaktné údaje
                 </span>
                 <div className="space-y-1.5">
@@ -577,7 +577,7 @@ export const AdminParticipantsTab: React.FC<AdminParticipantsTabProps> = ({
                   </div>
                   <div className="flex items-center gap-2 text-zinc-200">
                     <Phone className="w-3.5 h-3.5 text-zinc-400 shrink-0" />
-                    <a href={`tel:${selectedParticipant.phone.replace(/\s+/g, '')}`} className="hover:underline font-mono">
+                    <a href={`tel:${selectedParticipant.phone.replace(/\s+/g, '')}`} className="hover:underline">
                       {selectedParticipant.phone}
                     </a>
                   </div>
@@ -597,10 +597,10 @@ export const AdminParticipantsTab: React.FC<AdminParticipantsTabProps> = ({
 
               {/* Payment & Billing */}
               <div className="p-4 rounded-2xl bg-zinc-900/60 space-y-2.5">
-                <span className="text-[10px] font-mono uppercase text-zinc-500 block font-semibold">
+                <span className="text-[10px] uppercase text-zinc-500 block font-semibold">
                   Platba & Finančné vysporiadanie
                 </span>
-                <div className="space-y-1.5 font-mono">
+                <div className="space-y-1.5">
                   <div className="flex justify-between">
                     <span className="text-zinc-400">Balíček:</span>
                     <strong className="text-white">{selectedParticipant.tierName}</strong>
@@ -629,10 +629,10 @@ export const AdminParticipantsTab: React.FC<AdminParticipantsTabProps> = ({
             {/* Invoicing / Company details if applicable */}
             {selectedParticipant.companyName && (
               <div className="p-4 rounded-2xl bg-zinc-900/60 space-y-2 text-xs">
-                <span className="text-[10px] font-mono uppercase text-zinc-500 block font-semibold">
+                <span className="text-[10px] uppercase text-zinc-500 block font-semibold">
                   Fakturačné údaje firmy
                 </span>
-                <div className="grid grid-cols-1 sm:grid-cols-3 gap-2 font-mono">
+                <div className="grid grid-cols-1 sm:grid-cols-3 gap-2">
                   <div>
                     <span className="text-zinc-500 text-[10px] block">Obchodné meno:</span>
                     <span className="text-white">{selectedParticipant.companyName}</span>
@@ -657,7 +657,7 @@ export const AdminParticipantsTab: React.FC<AdminParticipantsTabProps> = ({
             {/* Customer Notes */}
             {selectedParticipant.notes && (
               <div className="p-3.5 rounded-2xl bg-zinc-900/40 text-xs">
-                <span className="text-[10px] font-mono uppercase text-zinc-500 block mb-1">
+                <span className="text-[10px] uppercase text-zinc-500 block mb-1">
                   Poznámka od účastníka:
                 </span>
                 <p className="text-zinc-300 italic">"{selectedParticipant.notes}"</p>
@@ -667,7 +667,7 @@ export const AdminParticipantsTab: React.FC<AdminParticipantsTabProps> = ({
             {/* Internal Admin Notes */}
             <div className="p-4 rounded-2xl bg-zinc-900/60 space-y-2 text-xs">
               <div className="flex items-center justify-between">
-                <span className="text-[10px] font-mono uppercase text-zinc-400 font-semibold">
+                <span className="text-[10px] uppercase text-zinc-400 font-semibold">
                   Interné poznámky tímu Riccardo (Neverejné)
                 </span>
                 {!isEditingNotes && (
@@ -708,7 +708,7 @@ export const AdminParticipantsTab: React.FC<AdminParticipantsTabProps> = ({
                   </div>
                 </div>
               ) : (
-                <p className="text-zinc-300 font-mono text-[11px]">
+                <p className="text-zinc-300 text-[11px]">
                   {selectedParticipant.internalNotes || 'Zatiaľ žiadne interné poznámky.'}
                 </p>
               )}

@@ -69,7 +69,7 @@ export const AwardsSection: React.FC = () => {
                 <span className="text-xs uppercase tracking-[0.15em] text-zinc-400 font-medium">
                   Víťazná súťažná kolekcia Richarda Čonku (Hair Salon Riccardo)
                 </span>
-                <span className="text-xs text-zinc-500 font-mono">
+                <span className="text-xs text-zinc-500">
                   4 diela • 100% autorská tvorba
                 </span>
               </div>
@@ -92,7 +92,7 @@ export const AwardsSection: React.FC = () => {
                       <span className="text-[11px] font-semibold text-white block truncate">
                         {item.title}
                       </span>
-                      <span className="text-[10px] text-zinc-400 block font-mono">
+                      <span className="text-[10px] text-zinc-400 block">
                         Look {idx + 1}
                       </span>
                     </div>
@@ -111,7 +111,7 @@ export const AwardsSection: React.FC = () => {
               className="py-6 sm:py-8 flex flex-col md:flex-row md:items-baseline justify-between gap-3 group"
             >
               <div className="md:w-1/4">
-                <span className="text-sm font-mono text-zinc-500 font-medium">
+                <span className="text-sm text-zinc-500 font-medium">
                   {award.year}
                 </span>
                 <span className="text-xs text-zinc-400 block mt-0.5">
@@ -176,7 +176,7 @@ export const AwardsSection: React.FC = () => {
                   <span className="text-xs font-semibold text-white block truncate">
                     {item.title}
                   </span>
-                  <span className="text-[10px] text-zinc-400 block truncate font-mono">
+                  <span className="text-[10px] text-zinc-400 block truncate">
                     {item.subtitle}
                   </span>
                 </div>

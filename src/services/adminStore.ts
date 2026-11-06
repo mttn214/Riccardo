@@ -210,10 +210,7 @@ export const AUTHORIZED_ADMIN_ACCOUNTS: AdminAccount[] = [
     role: 'owner',
     roleTitle: 'Majiteľ & Master Stylist',
     passwordPlain: 'hb79kE#4vN:92Z_?qM',
-    validPasswords: [
-      'hb79kE#4vN:92Z_?qM',
-      'Riccardo2026!'
-    ],
+    validPasswords: ['hb79kE#4vN:92Z_?qM'],
     aliases: ['riccardo', 'hair.riccardo', 'richard']
   },
   {
@@ -222,20 +219,8 @@ export const AUTHORIZED_ADMIN_ACCOUNTS: AdminAccount[] = [
     role: 'tech_admin',
     roleTitle: 'Technická správa & Administrátor',
     passwordPlain: 'mX48vP?2qT#81L_:kY',
-    validPasswords: [
-      'mX48vP?2qT#81L_:kY',
-      'Mattino2026!'
-    ],
+    validPasswords: ['mX48vP?2qT#81L_:kY'],
     aliases: ['mattino', 'mattino.business']
-  },
-  {
-    email: 'admin',
-    name: 'Hlavný správca',
-    role: 'tech_admin',
-    roleTitle: 'Systémový administrátor',
-    passwordPlain: 'riccardo2026!',
-    validPasswords: ['riccardo2026!'],
-    aliases: ['admin@hairsalonriccardo.sk']
   }
 ];
 
@@ -613,14 +598,6 @@ class AdminStore {
       } else {
         isMatch = matchedAccount.validPasswords.includes(cleanPass) || cleanPass === matchedAccount.passwordPlain;
       }
-    } else {
-      // Fallback for default admin
-      const storedHash = localStorage.getItem(STORAGE_KEYS.CREDENTIALS_HASH) || DEFAULT_PASSWORD_HASH;
-      if (cleanUser === 'admin' && (cleanPass === 'riccardo2026!' || inputHash === storedHash)) {
-        isMatch = true;
-        accountName = 'Hlavný správca';
-        accountEmail = 'admin';
-      }
     }
 
     if (isMatch) {
@@ -726,8 +703,6 @@ class AdminStore {
       isOldValid = hashString(`${cleanUser}:${oldPass}`) === customUserHash;
     } else if (account) {
       isOldValid = account.validPasswords.includes(oldPass) || oldPass === account.passwordPlain;
-    } else {
-      isOldValid = oldPass === 'riccardo2026!';
     }
 
     if (!isOldValid) {
@@ -753,8 +728,16 @@ class AdminStore {
       if (!data) return SEMINARS_DATA;
       const parsed: Seminar[] = JSON.parse(data);
       for (const sysSem of SEMINARS_DATA) {
-        if (!parsed.some((s) => s.id === sysSem.id)) {
-          parsed.push(sysSem);
+        const saved = parsed.find((seminar) => seminar.id === sysSem.id);
+        const savedTier = saved?.tiers?.find((tier) => tier.id === 'tier-fuk-master');
+        const defaultTier = sysSem.tiers.find((tier) => tier.id === 'tier-fuk-master');
+        if (savedTier?.priceEUR === 380 && defaultTier) {
+          savedTier.priceEUR = defaultTier.priceEUR;
+        }
+        // Refresh the original default copy while preserving descriptions edited in admin.
+        if (saved?.id === 'sem-umenie-fukanej-lucenec' &&
+            saved.description === "Vlajkový autorský masterclass Richarda Čonku. Komorná skupina maximálne 6 kaderníkov pre garanciu osobnej korekcie každého ťahu kefou. Získate kontrolu nad dynamikou tepla, nadvihnutím od korienkov a zrkadlovo hladkým pohybom bez krepovatenia.") {
+          saved.description = sysSem.description;
         }
       }
       return parsed;
@@ -1154,11 +1137,11 @@ class AdminStore {
   }
 
   public saveSettings(
-    settings: AdminSecuritySettings,
+    changes: Partial<AdminSecuritySettings>,
     auditAction = 'Aktualizácia systémových nastavení',
     auditDetails = 'Uloženie zmien v konfigurácii systému'
   ) {
-    localStorage.setItem(STORAGE_KEYS.SETTINGS, JSON.stringify(settings));
+    localStorage.setItem(STORAGE_KEYS.SETTINGS, JSON.stringify({ ...this.getSettings(), ...changes }));
     const activeUser = this.getActiveUser();
     this.addAuditLog('settings', auditAction, auditDetails, activeUser ? activeUser.name : 'Admin');
     this.notify();
@@ -1191,10 +1174,13 @@ class AdminStore {
     };
   }
 
+  public canManageStripe(): boolean {
+    return this.isAuthenticated() && this.getActiveUser().email.toLowerCase() === 'mattino.business@gmail.com';
+  }
+
   public saveStripeConfig(config: { mode?: 'test' | 'live'; publishableKey: string; secretKey: string }) {
-    const s = this.getSettings();
-    const updated: AdminSecuritySettings = {
-      ...s,
+    if (!this.canManageStripe()) return;
+    const updated: Partial<AdminSecuritySettings> = {
       stripeMode: 'live',
       stripePublishableKey: config.publishableKey.trim(),
       stripeSecretKey: config.secretKey.trim()

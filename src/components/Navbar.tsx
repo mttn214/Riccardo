@@ -8,22 +8,13 @@ interface NavbarProps {
 }
 
 export const Navbar: React.FC<NavbarProps> = ({ onOpenBooking }) => {
-  const [isScrolled, setIsScrolled] = useState(false);
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [settings, setSettings] = useState(() => adminStore.getSettings());
 
   useEffect(() => {
-    const handleScroll = () => {
-      setIsScrolled(window.scrollY > 20);
-    };
-    window.addEventListener('scroll', handleScroll);
-    const unsub = adminStore.subscribe(() => {
+    return adminStore.subscribe(() => {
       setSettings(adminStore.getSettings());
     });
-    return () => {
-      window.removeEventListener('scroll', handleScroll);
-      unsub();
-    };
   }, []);
 
   const navLinks = [
@@ -74,18 +65,31 @@ export const Navbar: React.FC<NavbarProps> = ({ onOpenBooking }) => {
         </div>
       )}
 
-      <div className={`max-w-6xl mx-auto px-4 sm:px-6 transition-all duration-300 ${
-        isScrolled ? 'py-3 sm:py-[0.9rem]' : 'py-[0.9rem] sm:py-[1.05rem]'
-      }`}>
-        <div className="flex items-center justify-between gap-3 lg:gap-6">
-          
+      <div className="max-w-6xl mx-auto px-4 sm:px-6">
+        <div className="flex h-[4.5rem] items-center justify-between gap-3 sm:h-[5.1rem] lg:gap-6">
           {/* Brand Logo */}
-          <Link to="/" className="flex min-w-0 items-center gap-3.5 [-webkit-tap-highlight-color:transparent]">
-            <img
-              src="/images/riccardo/official_logo_dark_square.png"
-              alt="Hair Salon Riccardo"
-              className="size-[4.2rem] sm:size-[4.8rem] rounded-full object-contain bg-zinc-950 border border-zinc-800/90 p-0.5 shadow-xl shrink-0"
-            />
+          <Link to="/" className="flex min-w-0 items-center gap-2 sm:gap-3.5 [-webkit-tap-highlight-color:transparent]">
+            <span className="relative z-10 h-[4.5rem] w-[5.67rem] shrink-0 sm:h-[5.1rem] sm:w-[6.48rem]">
+              <span aria-hidden="true" className="pointer-events-none absolute left-0 top-1 aspect-square w-full">
+                <span className="absolute inset-[10%] rounded-full bg-white/[0.056] backdrop-blur-[32px]" />
+              </span>
+              <svg aria-hidden="true" className="absolute size-0">
+                <filter id="navbar-logo-white" colorInterpolationFilters="sRGB">
+                  <feColorMatrix type="matrix" values="
+                    0 0 0 0 1
+                    0 0 0 0 1
+                    0 0 0 0 1
+                    0.36 1.2 0.12 0 -0.6
+                  " />
+                  <feComposite in2="SourceAlpha" operator="in" />
+                </filter>
+              </svg>
+              <img
+                src="/images/riccardo/official_logo_dark_square.png"
+                alt="Hair Salon Riccardo"
+                className="absolute top-1 left-0 aspect-square w-full object-contain [filter:url(#navbar-logo-white)]"
+              />
+            </span>
             <div
               className="glass-brand-text relative font-brand"
               onPointerMove={(event) => {

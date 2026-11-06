@@ -60,7 +60,7 @@ export const PastSeminarsSection: React.FC<PastSeminarsSectionProps> = ({ onOpen
                   </div>
 
                   <div className="absolute bottom-3 left-4 right-4 flex items-center justify-between text-xs text-zinc-300">
-                    <span className="font-mono text-zinc-400">{seminar.date}</span>
+                    <span className="text-zinc-400">{seminar.date}</span>
                     <span className="px-2 py-0.5 rounded bg-black/70 backdrop-blur-sm border border-zinc-800 text-[11px] text-emerald-400 font-medium">
                       Obsadené 6 / 6
                     </span>
@@ -98,7 +98,7 @@ export const PastSeminarsSection: React.FC<PastSeminarsSectionProps> = ({ onOpen
                   <CheckCircle className="w-3.5 h-3.5" />
                   <span>100% spokojnosť</span>
                 </span>
-                <span className="font-mono text-zinc-400">{seminar.rating}</span>
+                <span className="text-zinc-400">{seminar.rating}</span>
               </div>
             </div>
           ))}

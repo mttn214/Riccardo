@@ -189,7 +189,7 @@ export const AdminAddParticipantModal: React.FC<AdminAddParticipantModalProps> =
                 value={phone}
                 onChange={(e) => setPhone(e.target.value)}
                 placeholder="+421 9xx xxx xxx"
-                className="w-full bg-zinc-900 border border-zinc-800 text-white p-2.5 rounded-xl focus:outline-none font-mono"
+                className="w-full bg-zinc-900 border border-zinc-800 text-white p-2.5 rounded-xl focus:outline-none"
               />
             </div>
 
@@ -228,7 +228,7 @@ export const AdminAddParticipantModal: React.FC<AdminAddParticipantModalProps> =
                   type="number"
                   value={amountPaidEUR}
                   onChange={(e) => setAmountPaidEUR(Number(e.target.value))}
-                  className="w-full bg-zinc-950 border border-zinc-800 text-white p-2 rounded-xl focus:outline-none font-mono font-bold"
+                  className="w-full bg-zinc-950 border border-zinc-800 text-white p-2 rounded-xl focus:outline-none font-bold"
                 />
               </div>
 

@@ -279,7 +279,7 @@ export const AdminSeminarModal: React.FC<AdminSeminarModalProps> = ({
                 max={50}
                 value={totalSeats}
                 onChange={(e) => setTotalSeats(Number(e.target.value))}
-                className="w-full bg-zinc-950 border border-zinc-800 text-white p-2 rounded-xl focus:outline-none font-mono"
+                className="w-full bg-zinc-950 border border-zinc-800 text-white p-2 rounded-xl focus:outline-none"
               />
             </div>
 
@@ -291,7 +291,7 @@ export const AdminSeminarModal: React.FC<AdminSeminarModalProps> = ({
                 max={totalSeats}
                 value={availableSeats}
                 onChange={(e) => setAvailableSeats(Number(e.target.value))}
-                className="w-full bg-zinc-950 border border-zinc-800 text-white p-2 rounded-xl focus:outline-none font-mono"
+                className="w-full bg-zinc-950 border border-zinc-800 text-white p-2 rounded-xl focus:outline-none"
               />
             </div>
           </div>
@@ -304,7 +304,7 @@ export const AdminSeminarModal: React.FC<AdminSeminarModalProps> = ({
               value={image}
               onChange={(e) => setImage(e.target.value)}
               placeholder="/images/riccardo/richard_conka_hda_1.jpg"
-              className="w-full bg-zinc-900 border border-zinc-800 text-white p-2.5 rounded-xl focus:outline-none font-mono text-xs"
+              className="w-full bg-zinc-900 border border-zinc-800 text-white p-2.5 rounded-xl focus:outline-none text-xs"
             />
           </div>
 
@@ -359,7 +359,7 @@ export const AdminSeminarModal: React.FC<AdminSeminarModalProps> = ({
                     type="number"
                     value={t.priceEUR}
                     onChange={(e) => handleTierChange(idx, 'priceEUR', Number(e.target.value))}
-                    className="w-full bg-zinc-900 border border-zinc-800 text-white p-2 pr-6 rounded-lg text-xs font-mono font-bold text-right"
+                    className="w-full bg-zinc-900 border border-zinc-800 text-white p-2 pr-6 rounded-lg text-xs font-bold text-right"
                   />
                   <span className="absolute right-2.5 top-1/2 -translate-y-1/2 text-zinc-400 pointer-events-none">€</span>
                 </div>

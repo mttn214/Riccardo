@@ -167,7 +167,9 @@ export function App() {
   }, []);
 
   const handleOpenBooking = (seminar?: Seminar, tierId?: string) => {
-    setBookingSeminar(seminar || SEMINARS_DATA[0]);
+    const selectedSeminar = seminar ?? adminStore.getSeminars()[0];
+    if (!selectedSeminar) return;
+    setBookingSeminar(selectedSeminar);
     setBookingTierId(tierId);
     setInitialBookingStep(1);
     setInitialConfirmationCode('');
@@ -204,6 +206,7 @@ export function App() {
             path="/"
             element={
               <HomePage
+                onOpenDetail={setDetailSeminar}
                 onOpenBooking={(sem) => handleOpenBooking(sem)}
                 onSelectPortfolioItem={(item) => setPortfolioItem(item)}
               />

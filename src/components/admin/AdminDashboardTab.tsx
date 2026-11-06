@@ -92,12 +92,12 @@ export const AdminDashboardTab: React.FC<AdminDashboardTabProps> = ({
             </span>
           </div>
           <div>
-            <div className="text-2xl sm:text-3xl font-bold text-white font-mono tracking-tight">
+            <div className="text-2xl sm:text-3xl font-bold text-white tracking-tight">
               {formatPrice(totalRevenue, 'EUR')}
             </div>
             <div className="text-[11px] text-zinc-500 mt-1 flex items-center justify-between">
               <span>Zostáva doplatiť na mieste:</span>
-              <strong className="text-zinc-300 font-mono">{formatPrice(totalOutstanding, 'EUR')}</strong>
+              <strong className="text-zinc-300">{formatPrice(totalOutstanding, 'EUR')}</strong>
             </div>
           </div>
           <div className="w-full bg-zinc-950 h-1.5 rounded-full overflow-hidden">
@@ -119,12 +119,12 @@ export const AdminDashboardTab: React.FC<AdminDashboardTabProps> = ({
             </span>
           </div>
           <div>
-            <div className="text-2xl sm:text-3xl font-bold text-white font-mono tracking-tight">
+            <div className="text-2xl sm:text-3xl font-bold text-white tracking-tight">
               {participants.length} <span className="text-sm font-normal text-zinc-500">kaderníkov</span>
             </div>
             <div className="text-[11px] text-zinc-500 mt-1 flex items-center justify-between">
               <span>Skontrolovaná prezenčka:</span>
-              <strong className="text-blue-400 font-mono">{checkedInCount} prítomných</strong>
+              <strong className="text-blue-400">{checkedInCount} prítomných</strong>
             </div>
           </div>
           <div className="w-full bg-zinc-950 h-1.5 rounded-full overflow-hidden">
@@ -144,12 +144,12 @@ export const AdminDashboardTab: React.FC<AdminDashboardTabProps> = ({
             </span>
           </div>
           <div>
-            <div className="text-2xl sm:text-3xl font-bold text-white font-mono tracking-tight">
+            <div className="text-2xl sm:text-3xl font-bold text-white tracking-tight">
               {occupancyRate}%
             </div>
             <div className="text-[11px] text-zinc-500 mt-1 flex items-center justify-between">
               <span>Voľné miesta spolu:</span>
-              <strong className="text-amber-400 font-mono">{availableSeats} z {totalSeats}</strong>
+              <strong className="text-amber-400">{availableSeats} z {totalSeats}</strong>
             </div>
           </div>
           <div className="w-full bg-zinc-950 h-1.5 rounded-full overflow-hidden">
@@ -172,17 +172,17 @@ export const AdminDashboardTab: React.FC<AdminDashboardTabProps> = ({
             </span>
           </div>
           <div>
-            <div className="text-2xl sm:text-3xl font-bold text-white font-mono tracking-tight flex items-center gap-2">
+            <div className="text-2xl sm:text-3xl font-bold text-white tracking-tight flex items-center gap-2">
               <span>{inquiries.length}</span>
               {unreadInquiries > 0 && (
-                <span className="text-xs px-2 py-0.5 rounded-full bg-purple-900/60 text-purple-300 font-mono font-medium">
+                <span className="text-xs px-2 py-0.5 rounded-full bg-purple-900/60 text-purple-300 font-medium">
                   {unreadInquiries} nové
                 </span>
               )}
             </div>
             <div className="text-[11px] text-zinc-500 mt-1 flex items-center justify-between">
               <span>Fotografie v galérii:</span>
-              <strong className="text-zinc-300 font-mono">{portfolio.length} diel</strong>
+              <strong className="text-zinc-300">{portfolio.length} diel</strong>
             </div>
           </div>
           <div className="text-[11px] text-purple-400 font-medium flex items-center gap-1">
@@ -227,7 +227,7 @@ export const AdminDashboardTab: React.FC<AdminDashboardTabProps> = ({
                       <h4 className="text-xs font-semibold text-white leading-tight">
                         {seminar.title}
                       </h4>
-                      <div className="flex items-center gap-2 text-[11px] text-zinc-400 mt-1 font-mono">
+                      <div className="flex items-center gap-2 text-[11px] text-zinc-400 mt-1">
                         <span className="text-zinc-300">{seminar.city}</span>
                         <span>•</span>
                         <span>{seminar.dates}</span>
@@ -235,7 +235,7 @@ export const AdminDashboardTab: React.FC<AdminDashboardTabProps> = ({
                     </div>
 
                     <span
-                      className={`text-[10px] font-mono uppercase px-2 py-0.5 rounded-full shrink-0 ${
+                      className={`text-[10px] uppercase px-2 py-0.5 rounded-full shrink-0 ${
                         isSoldOut
                           ? 'bg-red-500/10 text-red-400'
                           : seminar.availableSeats <= 2
@@ -249,7 +249,7 @@ export const AdminDashboardTab: React.FC<AdminDashboardTabProps> = ({
 
                   {/* Seat Progress */}
                   <div className="space-y-1">
-                    <div className="flex justify-between text-[11px] text-zinc-500 font-mono">
+                    <div className="flex justify-between text-[11px] text-zinc-500">
                       <span>Obsadené {semOccupied} z {seminar.totalSeats} miest</span>
                       <span>{semRate}%</span>
                     </div>
@@ -287,7 +287,7 @@ export const AdminDashboardTab: React.FC<AdminDashboardTabProps> = ({
 
           <div className="space-y-3 pt-1">
             {recentParticipants.length === 0 ? (
-              <div className="p-8 text-center text-xs text-zinc-500 font-mono">
+              <div className="p-8 text-center text-xs text-zinc-500">
                 Zatiaľ žiadne záznamy účastníkov.
               </div>
             ) : (
@@ -301,7 +301,7 @@ export const AdminDashboardTab: React.FC<AdminDashboardTabProps> = ({
                       <span className="text-xs font-semibold text-white truncate">
                         {part.fullName}
                       </span>
-                      <span className="text-[10px] font-mono text-zinc-400 bg-zinc-900 px-1.5 py-0.5 rounded">
+                      <span className="text-[10px] text-zinc-400 bg-zinc-900 px-1.5 py-0.5 rounded">
                         {part.ticketCode}
                       </span>
                     </div>
@@ -310,17 +310,17 @@ export const AdminDashboardTab: React.FC<AdminDashboardTabProps> = ({
                       {part.salonName ? `${part.salonName} (${part.city})` : part.email}
                     </div>
 
-                    <div className="text-[10px] text-zinc-500 mt-1 font-mono truncate">
+                    <div className="text-[10px] text-zinc-500 mt-1 truncate">
                       {part.seminarTitle.slice(0, 36)}...
                     </div>
                   </div>
 
                   <div className="text-right shrink-0">
-                    <div className="text-xs font-bold font-mono text-white">
+                    <div className="text-xs font-bold text-white">
                       {part.amountPaidEUR} €
                     </div>
                     <span
-                      className={`text-[9px] font-mono uppercase px-1.5 py-0.5 rounded-full inline-block mt-1 ${
+                      className={`text-[9px] uppercase px-1.5 py-0.5 rounded-full inline-block mt-1 ${
                         part.paymentStatus.includes('Plná suma')
                           ? 'bg-emerald-500/10 text-emerald-400'
                           : part.paymentStatus.includes('záloha')
@@ -350,7 +350,7 @@ export const AdminDashboardTab: React.FC<AdminDashboardTabProps> = ({
             Prevádzkovateľ systému: <strong>ZETEREM s.r.o.</strong> • IČO: 47 520 817 • DIČ: 2023950863
           </span>
         </div>
-        <span className="text-[11px] font-mono text-zinc-500">
+        <span className="text-[11px] text-zinc-500">
           Oficiálny systém certifikácie Hairstylist Riccardo
         </span>
       </div>

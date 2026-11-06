@@ -20,11 +20,11 @@ const AdminContent: React.FC = () => {
     };
   }, [theme]);
 
-  if (!isAuthenticated) {
-    return <AdminLogin onLoginSuccess={() => {}} />;
-  }
-
-  return <AdminLayout />;
+  return (
+    <div className="admin-portal">
+      {isAuthenticated ? <AdminLayout /> : <AdminLogin onLoginSuccess={() => {}} />}
+    </div>
+  );
 };
 
 export const AdminPage: React.FC = () => {

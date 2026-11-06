@@ -103,7 +103,7 @@ export const WaitlistModal: React.FC<WaitlistModalProps> = ({
               </div>
               <div className="flex items-center justify-between">
                 <span className="text-zinc-500">Kapacita termínu:</span>
-                <span className="text-emerald-400 font-mono font-medium">Striktne max 6 miest</span>
+                <span className="text-emerald-400 font-medium">Striktne max 6 miest</span>
               </div>
             </div>
 

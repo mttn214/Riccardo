@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { Link } from 'react-router-dom';
-import { STYLIST_PROFILE, COMPANY_DETAILS } from '../data/content';
+import { STYLIST_PROFILE } from '../data/content';
 import { ChevronDown, ArrowUpRight, Check, Building2, FileText, MapPin } from 'lucide-react';
 import { InstagramIcon, FacebookIcon } from './SocialIcons';
 import { sendFormNotification } from '../services/formService';
@@ -171,23 +171,6 @@ export const ContactSection: React.FC = () => {
 
               {/* Official Corporate & Billing Information */}
               <div className="pt-6 border-t border-zinc-850 space-y-3">
-                <div className="flex items-center gap-2 text-white font-medium text-xs">
-                  <Building2 className="w-4 h-4 text-zinc-400" />
-                  <span>Fakturačné údaje prevádzkovateľa:</span>
-                </div>
-                <div className="p-4 rounded-2xl bg-zinc-950 border border-zinc-850 space-y-2 text-xs font-mono text-zinc-400">
-                  <div className="text-white font-semibold font-sans">{COMPANY_DETAILS.legalName}</div>
-                  <div>Sídlo: {COMPANY_DETAILS.registeredOffice}</div>
-                  <div className="flex flex-wrap gap-x-4 gap-y-1">
-                    <span>IČO: <strong className="text-zinc-200">{COMPANY_DETAILS.ico}</strong></span>
-                    <span>DIČ: <strong className="text-zinc-200">{COMPANY_DETAILS.dic}</strong></span>
-                  </div>
-                  <div className="text-[11px] text-zinc-500 font-sans">{COMPANY_DETAILS.vatStatus}</div>
-                  <div className="text-[10px] text-zinc-500 font-sans leading-normal pt-1 border-t border-zinc-900">
-                    {COMPANY_DETAILS.courtRegistration}
-                  </div>
-                </div>
-
                 <div className="flex flex-wrap items-center gap-x-4 gap-y-1 text-[11px] text-zinc-500 pt-1">
                   <Link to="/obchodne-podmienky" className="hover:text-white transition-colors underline">
                     Obchodné podmienky (VOP)
@@ -333,11 +316,11 @@ export const ContactSection: React.FC = () => {
 
               {/* Top Badges */}
               <div className="relative z-10 p-5 flex items-center justify-between">
-                <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-black/60 backdrop-blur-md text-[11px] font-mono text-zinc-300">
+                <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-black/60 backdrop-blur-md text-[11px] text-zinc-300">
                   <Building2 className="w-3.5 h-3.5 text-white" />
                   <span>Sídlo salónu & Akadémie</span>
                 </span>
-                <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-emerald-500/20 backdrop-blur-md text-[11px] font-mono text-emerald-300">
+                <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-emerald-500/20 backdrop-blur-md text-[11px] text-emerald-300">
                   <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse" />
                   <span>Parkovanie pred domom</span>
                 </span>

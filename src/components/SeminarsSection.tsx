@@ -1,18 +1,19 @@
 import React, { useState } from 'react';
 import { SEMINARS_DATA, Seminar } from '../data/content';
-import { Currency, formatPrice } from '../utils/currency';
+import { adminStore } from '../services/adminStore';
 import { ArrowUpRight, Check, Users, Clock, MapPin, Sparkles } from 'lucide-react';
 import { sendFormNotification } from '../services/formService';
-import { SeminarSpotlightPhoto } from './SeminarSpotlightPhoto';
+import { SeminarSpotlightCard } from './SeminarSpotlightCard';
+import { SeatsBadge } from './SeatsBadge';
 
 interface SeminarsSectionProps {
-  currency: Currency;
+  onOpenWaitlist: () => void;
   onOpenDetail: (seminar: Seminar) => void;
   onBookSeminar: (seminar: Seminar) => void;
 }
 
 export const SeminarsSection: React.FC<SeminarsSectionProps> = ({
-  currency,
+  onOpenWaitlist,
   onOpenDetail,
   onBookSeminar,
 }) => {
@@ -20,9 +21,11 @@ export const SeminarsSection: React.FC<SeminarsSectionProps> = ({
   const [prioritySubscribed, setPrioritySubscribed] = useState(false);
 
   // The primary imminent masterclasses with spotlight interactive photos
-  const featuredSeminars = [SEMINARS_DATA[0], SEMINARS_DATA[1]];
+  const seminars = adminStore.getSeminars();
+  const featuredIds = SEMINARS_DATA.slice(0, 2).map(({ id }) => id);
+  const featuredSeminars = seminars.filter(({ id }) => featuredIds.includes(id));
   // Next exclusive dates in 2027
-  const upcomingSeminars = SEMINARS_DATA.slice(2);
+  const upcomingSeminars = seminars.filter(({ id }) => !featuredIds.includes(id));
 
   const handlePrioritySubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -43,7 +46,7 @@ export const SeminarsSection: React.FC<SeminarsSectionProps> = ({
 
   return (
     <section id="seminare" className="py-24 sm:py-36 bg-black border-t border-zinc-900 text-white">
-      <div className="max-w-5xl mx-auto px-4 sm:px-6">
+      <div className="max-w-6xl mx-auto px-4 sm:px-6">
         
         {/* Section Header: Rarity & Exclusivity */}
         <div className="max-w-2xl mb-16">
@@ -62,98 +65,7 @@ export const SeminarsSection: React.FC<SeminarsSectionProps> = ({
         {/* FEATURED IMMINENT MASTERCLASSES (Editorial Spotlight Cards) */}
         <div className="space-y-12 mb-16">
           {featuredSeminars.map((seminar) => (
-            <div
-              key={seminar.id}
-              className="rounded-3xl bg-zinc-950 border border-zinc-800/80 overflow-hidden shadow-2xl relative"
-            >
-              <div className="grid grid-cols-1 lg:grid-cols-12">
-                
-                {/* Photo Side (5 cols) */}
-                <div className="lg:col-span-5 relative">
-                  <SeminarSpotlightPhoto
-                    primaryImage={seminar.image}
-                    secondaryImage={seminar.secondaryImage}
-                    title={seminar.title}
-                    availableSeats={seminar.availableSeats}
-                    totalSeats={seminar.totalSeats}
-                  />
-                </div>
-
-                {/* Details Side (7 cols) */}
-                <div className="lg:col-span-7 p-7 sm:p-10 flex flex-col justify-between space-y-6">
-                  <div>
-                    <div className="flex flex-wrap items-center gap-2 text-xs text-zinc-500 font-medium mb-2">
-                      <span className="text-zinc-300 font-semibold">{seminar.dates}</span>
-                      <span>•</span>
-                      <span>{seminar.city} (Atelier)</span>
-                      <span>•</span>
-                      <span>{seminar.duration}</span>
-                    </div>
-
-                    <h3 className="text-2xl sm:text-3xl font-semibold text-white tracking-tight leading-snug mb-3">
-                      {seminar.title}
-                    </h3>
-
-                    <p className="text-xs sm:text-sm text-zinc-400 leading-relaxed font-normal mb-6">
-                      {seminar.description}
-                    </p>
-
-                    {/* Highlights list */}
-                    <div className="space-y-2 py-4 text-xs sm:text-sm text-zinc-300">
-                      <div className="flex items-center gap-2">
-                        <span className="w-1.5 h-1.5 rounded-full bg-white flex-shrink-0" />
-                        <span><strong>Prísna kapacita:</strong> Iba 6 kaderníkov pre 100% individuálny prístup</span>
-                      </div>
-                      <div className="flex items-center gap-2">
-                        <span className="w-1.5 h-1.5 rounded-full bg-white flex-shrink-0" />
-                        <span><strong>Prax na modelkách:</strong> Osobné nastavenie biomechaniky rúk a techniky od Richarda</span>
-                      </div>
-                      <div className="flex items-center gap-2">
-                        <span className="w-1.5 h-1.5 rounded-full bg-white flex-shrink-0" />
-                        <span><strong>V cene:</strong> {seminar.includedItems?.[0] || 'Pracovné skriptá'}, certifikát a gurmánsky obed</span>
-                      </div>
-                      <div className="flex items-center gap-2">
-                        <span className="w-1.5 h-1.5 rounded-full bg-white flex-shrink-0" />
-                        <span><strong>Fakturácia:</strong> Možnosť vystavenia daňového dokladu na salón (IČO / DIČ)</span>
-                      </div>
-                    </div>
-                  </div>
-
-                  {/* Price & Action row */}
-                  <div className="pt-4 border-t border-zinc-850/60 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
-                    <div>
-                      <span className="text-[11px] uppercase tracking-wider text-zinc-500 block font-medium">
-                        Cena kurzu
-                      </span>
-                      <div className="flex items-baseline gap-2 mt-0.5">
-                        <span className="text-2xl sm:text-3xl font-semibold text-white tracking-tight whitespace-nowrap">
-                          {formatPrice(seminar.tiers[0]?.priceEUR || 380, currency)}
-                        </span>
-                      </div>
-                    </div>
-
-                    <div className="flex items-center gap-3 w-full sm:w-auto justify-end">
-                      <button
-                        onClick={() => onOpenDetail(seminar)}
-                        className="px-4 py-2.5 rounded-full text-xs font-medium text-zinc-400 hover:text-white transition-colors cursor-pointer whitespace-nowrap"
-                      >
-                        Harmonogram
-                      </button>
-
-                      <button
-                        onClick={() => onBookSeminar(seminar)}
-                        className="inline-flex items-center justify-center gap-1.5 px-6 py-2.5 rounded-full text-xs sm:text-sm font-semibold bg-white text-black hover:bg-zinc-200 transition-all active:scale-95 shadow-lg shadow-white/10 cursor-pointer whitespace-nowrap"
-                      >
-                        <span>Rezervovať miesto</span>
-                        <ArrowUpRight className="w-4 h-4" />
-                      </button>
-                    </div>
-                  </div>
-
-                </div>
-
-              </div>
-            </div>
+            <SeminarSpotlightCard key={seminar.id} seminar={seminar} onOpenDetail={onOpenDetail} onBook={onBookSeminar} onWaitlist={onOpenWaitlist} />
           ))}
         </div>
 
@@ -176,7 +88,7 @@ export const SeminarsSection: React.FC<SeminarsSectionProps> = ({
               >
                 {/* Date & Location */}
                 <div className="md:w-1/4">
-                  <span className="text-xs font-mono text-zinc-400 block mb-0.5">
+                  <span className="text-xs text-zinc-400 block mb-0.5">
                     {seminar.dates}
                   </span>
                   <span className="text-xs text-zinc-500 font-medium">
@@ -196,15 +108,13 @@ export const SeminarsSection: React.FC<SeminarsSectionProps> = ({
 
                 {/* Status & CTA */}
                 <div className="md:w-1/4 flex items-center justify-between md:justify-end gap-3">
-                  <span className="inline-block px-2.5 py-1 rounded-full text-[11px] font-medium bg-zinc-900/80 text-zinc-300">
-                    {seminar.availableSeats <= 1 ? 'Posledné 1 miesto' : `Zostávajú ${seminar.availableSeats} miesta`}
-                  </span>
+                  <SeatsBadge availableSeats={seminar.availableSeats} totalSeats={seminar.totalSeats} />
 
                   <button
                     onClick={() => onBookSeminar(seminar)}
                     className="inline-flex items-center gap-1 px-3.5 py-1.5 rounded-full text-xs font-semibold bg-zinc-800 hover:bg-white hover:text-black text-white transition-all active:scale-95 cursor-pointer"
                   >
-                    <span>Rezervovať</span>
+                    <span>Rezervovať (Záloha 100 €)</span>
                     <ArrowUpRight className="w-3.5 h-3.5" />
                   </button>
                 </div>

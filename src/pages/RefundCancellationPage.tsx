@@ -39,7 +39,7 @@ export const RefundCancellationPage: React.FC = () => {
             <Building2 className="w-4 h-4 text-amber-400" />
             <span>Prevádzkovateľ eshopu & akadémie:</span>
           </div>
-          <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 pt-2 border-t border-zinc-850 font-mono text-[11px]">
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 pt-2 border-t border-zinc-850 text-[11px]">
             <div><strong>Obchodné meno:</strong> {COMPANY_DETAILS.legalName}</div>
             <div><strong>IČO:</strong> {COMPANY_DETAILS.ico}</div>
             <div><strong>Sídlo:</strong> {COMPANY_DETAILS.registeredOffice}</div>
@@ -121,7 +121,7 @@ export const RefundCancellationPage: React.FC = () => {
             <p className="text-zinc-400">
               (Vyplňte a zašlite tento formulár iba v prípade, že si želáte odstúpiť od zmluvy v zákonnej lehote 14 dní od online nákupu)
             </p>
-            <div className="p-6 rounded-2xl bg-zinc-950 border border-zinc-850 font-mono text-xs text-zinc-300 space-y-2">
+            <div className="p-6 rounded-2xl bg-zinc-950 border border-zinc-850 text-xs text-zinc-300 space-y-2">
               <p><strong>Komu:</strong> ZETEREM s.r.o., Haličská cesta 942/3, 984 01 Lučenec, Email: {COMPANY_DETAILS.contactEmail}</p>
               <p>Týmto oznamujem/oznamujeme (*), že odstupujem/odstupujeme (*) od zmluvy na tento tovar / o poskytnutí tejto služby (*):</p>
               <p>— Názov seminára / služby: ................................................................</p>
@@ -164,7 +164,7 @@ export const RefundCancellationPage: React.FC = () => {
           >
             Späť na úvod
           </Link>
-          <span className="text-xs text-zinc-500 font-mono">
+          <span className="text-xs text-zinc-500">
             ZETEREM s.r.o. • IČO: 47 520 817
           </span>
         </div>

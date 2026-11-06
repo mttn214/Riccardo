@@ -191,12 +191,12 @@ export const AdminPortfolioTab: React.FC = () => {
 
               {/* Category pill */}
               <div className="absolute top-3 left-3 right-3 flex items-center justify-between">
-                <span className="text-[10px] font-mono uppercase px-2.5 py-0.5 rounded-full bg-zinc-900/90 text-zinc-200 backdrop-blur-md">
+                <span className="text-[10px] uppercase px-2.5 py-0.5 rounded-full bg-zinc-900/90 text-zinc-200 backdrop-blur-md">
                   {item.category}
                 </span>
 
                 {item.hasBeforeAfter && (
-                  <span className="text-[10px] font-mono uppercase px-2.5 py-0.5 rounded-full bg-emerald-500/20 text-emerald-300 backdrop-blur-md">
+                  <span className="text-[10px] uppercase px-2.5 py-0.5 rounded-full bg-emerald-500/20 text-emerald-300 backdrop-blur-md">
                     Pred / Po
                   </span>
                 )}
@@ -217,14 +217,14 @@ export const AdminPortfolioTab: React.FC = () => {
                 <h3 className="text-sm font-semibold text-white leading-snug group-hover:text-zinc-200">
                   {item.title}
                 </h3>
-                <p className="text-[11px] text-zinc-400 font-mono mt-0.5">{item.collection}</p>
+                <p className="text-[11px] text-zinc-400 mt-0.5">{item.collection}</p>
                 <p className="text-xs text-zinc-400 mt-2 line-clamp-2 leading-relaxed">
                   {item.description}
                 </p>
               </div>
 
               {item.formula && (
-                <div className="p-2.5 rounded-2xl bg-zinc-950/60 text-[10px] text-zinc-300 font-mono">
+                <div className="p-2.5 rounded-2xl bg-zinc-950/60 text-[10px] text-zinc-300">
                   <span className="text-zinc-500 block">Receptúra:</span>
                   <span className="truncate block">{item.formula}</span>
                 </div>
@@ -330,7 +330,7 @@ export const AdminPortfolioTab: React.FC = () => {
                     value={formYear}
                     onChange={(e) => setFormYear(e.target.value)}
                     placeholder="2026"
-                    className="w-full bg-zinc-900 border border-zinc-800 text-white p-2.5 rounded-xl focus:outline-none focus:border-zinc-500 font-mono"
+                    className="w-full bg-zinc-900 border border-zinc-800 text-white p-2.5 rounded-xl focus:outline-none focus:border-zinc-500"
                   />
                 </div>
 
@@ -356,7 +356,7 @@ export const AdminPortfolioTab: React.FC = () => {
                     value={formImage}
                     onChange={(e) => setFormImage(e.target.value)}
                     placeholder="/images/riccardo/... alebo https://..."
-                    className="flex-1 bg-zinc-950 border border-zinc-800 text-white p-2 rounded-xl focus:outline-none text-xs font-mono"
+                    className="flex-1 bg-zinc-950 border border-zinc-800 text-white p-2 rounded-xl focus:outline-none text-xs"
                   />
                   <label className="px-3 py-2 rounded-xl bg-zinc-800 hover:bg-zinc-700 text-zinc-300 text-xs font-medium cursor-pointer flex items-center gap-1 shrink-0">
                     <Upload className="w-3.5 h-3.5" />
@@ -386,7 +386,7 @@ export const AdminPortfolioTab: React.FC = () => {
                     value={formBeforeImage}
                     onChange={(e) => setFormBeforeImage(e.target.value)}
                     placeholder="URL fotografie pred premenou..."
-                    className="flex-1 bg-zinc-950 border border-zinc-800 text-white p-2 rounded-xl focus:outline-none text-xs font-mono"
+                    className="flex-1 bg-zinc-950 border border-zinc-800 text-white p-2 rounded-xl focus:outline-none text-xs"
                   />
                   <label className="px-3 py-2 rounded-xl bg-zinc-800 hover:bg-zinc-700 text-zinc-300 text-xs font-medium cursor-pointer flex items-center gap-1 shrink-0">
                     <Upload className="w-3.5 h-3.5" />
@@ -433,7 +433,7 @@ export const AdminPortfolioTab: React.FC = () => {
                     value={formFormula}
                     onChange={(e) => setFormFormula(e.target.value)}
                     placeholder="napr. 9.12 + 10.21 (1.9%)"
-                    className="w-full bg-zinc-900 border border-zinc-800 text-white p-2.5 rounded-xl focus:outline-none focus:border-zinc-500 font-mono"
+                    className="w-full bg-zinc-900 border border-zinc-800 text-white p-2.5 rounded-xl focus:outline-none focus:border-zinc-500"
                   />
                 </div>
               </div>
@@ -541,10 +541,10 @@ export const AdminPortfolioTab: React.FC = () => {
 
             <div>
               <div className="flex items-center gap-2">
-                <span className="text-[10px] font-mono uppercase px-2 py-0.5 rounded bg-zinc-900 text-zinc-400">
+                <span className="text-[10px] uppercase px-2 py-0.5 rounded bg-zinc-900 text-zinc-400">
                   {previewItem.category}
                 </span>
-                <span className="text-[10px] font-mono text-zinc-500">{previewItem.year}</span>
+                <span className="text-[10px] text-zinc-500">{previewItem.year}</span>
               </div>
               <h3 className="text-lg font-bold text-white mt-1">{previewItem.title}</h3>
               <p className="text-xs text-zinc-300 mt-1">{previewItem.description}</p>
